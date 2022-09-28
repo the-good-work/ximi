@@ -13,13 +13,13 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "eslint-config-custom": "workspace:*",
+    "eslint-config-custom": "*",
+    "eslint-config-react-app": "^7.0.1",
     "prettier": "latest",
     "turbo": "latest"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
-  "packageManager": "pnpm@7.12.2"
+  "packageManager": "npm@8.5.5"
 }

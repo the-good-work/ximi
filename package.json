@@ -23,6 +23,7 @@
   },
   "packageManager": "npm@8.5.5",
   "dependencies": {
-    "@stitches/react": "^1.2.8"
+    "@stitches/react": "^1.2.8",
+    "date-fns": "^2.29.3"
   }
 }

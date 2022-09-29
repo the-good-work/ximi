@@ -23,6 +23,12 @@ const StyledText = styled("span", {
   defaultVariants: {
     color: "default",
   },
+  "@base": {
+    fontSize: "$2xs",
+  },
+  "@md": {
+    fontSize: "$xs",
+  },
 });
 
 export default function Text({
@@ -32,25 +38,5 @@ export default function Text({
   children: any;
   color?: Color;
 }) {
-  return (
-    <StyledText
-      css={{
-        "@xs": {
-          fontSize: "$xs",
-          fontWeight: "extrabold",
-        },
-        "@sm": {
-          fontSize: "$sm",
-          fontWeight: "bold",
-        },
-        "@md": {
-          fontSize: "$sm",
-          fontWeight: "black",
-        },
-      }}
-      color={color}
-    >
-      {children}
-    </StyledText>
-  );
+  return <StyledText color={color}>{children}</StyledText>;
 }

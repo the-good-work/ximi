@@ -1,15 +1,10 @@
 import React from "react";
 import { styled } from "../theme/theme";
 
-type Mode = "gradient" | "white" | "accent";
+type Color = "gradient" | "white" | "accent";
+type Position = "none" | "center";
 
 const StyledImage = styled("div", {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "128px",
-  height: "46px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -21,7 +16,18 @@ const StyledImage = styled("div", {
     backgroundSize: "contain",
   },
   variants: {
-    mode: {
+    position: {
+      center: {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      },
+      none: {
+        position: "static",
+      },
+    },
+    color: {
       gradient: {
         ".image": {
           backgroundImage: "url('/images/logos/logo-gradient.png')",
@@ -39,11 +45,27 @@ const StyledImage = styled("div", {
       },
     },
   },
+  "@base": {
+    width: "64px",
+    height: "23px",
+  },
+  "@md": {
+    width: "96px",
+    height: "34px",
+  },
 });
 
-export default function Logo({ mode = "gradient" }: { mode?: Mode }) {
+export default function Logo({
+  color = "gradient",
+  position = "none",
+  css,
+}: {
+  color?: Color;
+  css?: any;
+  position?: Position;
+}) {
   return (
-    <StyledImage mode={mode}>
+    <StyledImage color={color} css={css} position={position}>
       <div className="image"></div>
     </StyledImage>
   );

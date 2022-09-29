@@ -17,7 +17,8 @@ export const { styled, css } = createStitches({
         "160.26deg, #5237F3 46.37%, #E8E8F4 84.22%, #5237F3 154.83%",
     },
     space: {
-      xs: "0.25rem", //4px
+      "2xs": "0.25rem", //4px
+      xs: "0.5rem", //8px
       sm: "1rem", //16px
       md: "1.25rem", //20px
       lg: "2rem", //32px
@@ -51,13 +52,6 @@ export const { styled, css } = createStitches({
       black: "900",
     },
 
-    media: {
-      xs: "(min-width: 375px)",
-      sm: "(min-width: 480px)",
-      md: "(min-width: 800px)",
-      lg: "(min-width: 1024px)",
-      xl: "(min-width: 1200px)",
-    },
     radii: {
       xs: "3px",
     },
@@ -69,5 +63,14 @@ export const { styled, css } = createStitches({
     shadows: {},
     zIndices: {},
     transitions: {},
+  },
+  media: {
+    base: "(min-width: 0px)",
+    xs: "(min-width: 375px)",
+    sm: "(min-width: 600px)",
+    md: "(min-width: 800px)",
+    lg: "(min-width: 1024px)",
+    xl: "(min-width: 1200px)",
+    mobile: "(min-width: 600px)",
   },
 });

@@ -16,7 +16,9 @@ export default function ListOfRooms({ rooms }: { rooms: any }) {
       {rooms.map((r: any) => {
         return (
           <li key={r.id}>
-            <ListButton>{r.name}</ListButton>
+            <ListButton noOfParticipants={r.noOfParticipants}>
+              {r.name}
+            </ListButton>
           </li>
         );
       })}

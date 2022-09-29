@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Text from "../Texts/Text";
 import { styled } from "../theme/theme";
 import Logo from "./Logo";
@@ -17,19 +17,36 @@ const StyledHeader = styled("div", {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "$md $2xl",
   boxSizing: "border-box",
 
   ".status-group": {
     display: "flex",
     alignItems: "center",
-    gap: "$lg",
   },
 
   ".status-box": {
     display: "flex",
     alignItems: "center",
-    gap: "$sm",
+  },
+
+  "@base": {
+    padding: "$xs $md",
+    ".status-box": {
+      gap: "$xs",
+    },
+    ".status-group": {
+      gap: "$xs",
+    },
+  },
+
+  "@md": {
+    padding: "$sm $md",
+    ".status-box": {
+      gap: "$xs",
+    },
+    ".status-group": {
+      gap: "$md",
+    },
   },
 });
 
@@ -42,14 +59,20 @@ export default function Header({
   room: string;
   version: string;
 }) {
+  let [currentDate, setCurrentDate] = useState(new Date());
+  useEffect(() => {
+    setTimeout(() => {
+      setCurrentDate(new Date());
+    }, 1000);
+  }, [currentDate]);
   return (
     <StyledHeader>
       <div className="status-box">
         <Text color="accent">Room</Text> <Text>{room}</Text>
       </div>
-      <div className="logo-box">
-        <Logo />
-      </div>
+
+      <Logo position="center" />
+
       <div className="status-group">
         <div className="status-box">
           <Text color="accent">V</Text> <Text>{version}</Text>

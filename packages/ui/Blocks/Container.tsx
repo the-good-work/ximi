@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Heading from "../Texts/Heading";
 import { styled } from "../theme/theme";
 import Header from "./Header";
@@ -76,6 +76,8 @@ const StyledContainer = styled("main", {
   },
   "@sm": {
     ".frame": { display: "flex" },
+  },
+  "@md": {
     ".content": { padding: "$3xl" },
   },
 });
@@ -83,19 +85,21 @@ const StyledContainer = styled("main", {
 export default function Container({
   children,
   isFullWidth = false,
+  room,
 }: {
-  children: any;
+  children: ReactNode;
   isFullWidth?: boolean;
+  room: string;
 }) {
   return (
     <>
       <StyledContainer isFullWidth={isFullWidth}>
         <div className="frame">
-          <Header room={"test"} version={"1.2.5"} />
+          <Header room={room} version={"1.2.5"} />
           <div className="content">{children}</div>
         </div>
         <RoadBlock>
-          <Logo css={{ position: "static" }} />
+          <Logo css={{ position: "static" }} size="sm" />
           <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
             You are currently viewing XIMI from an unsupported viewport. Change
             your device or increase your viewport width to 600px and above.

@@ -74,7 +74,7 @@ export default function Header({
         <Text>{room}</Text>
       </div>
 
-      <Logo position="center" />
+      <Logo position="center" size="xs" />
 
       <div className="status-group">
         <div className="status-box" aria-label="Version">

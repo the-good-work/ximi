@@ -1,5 +1,6 @@
 import * as React from "react";
 export * from "./Buttons/ListButton";
+export * from "./Buttons/IconButton";
 export * from "./Blocks/Container";
 export * from "./Blocks/ListOfRooms";
 export * from "./Blocks/Header";

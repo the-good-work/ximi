@@ -1,14 +1,22 @@
 import React from "react";
-import { styled } from "@stitches/react";
+import { styled } from "../theme/theme";
 import ListButton from "../Buttons/ListButton";
 
 const List = styled("ul", {
   display: "flex",
   flexDirection: "column",
   minWidth: "500px",
+  width: "100%",
+  maxWidth: "600px",
   paddingLeft: "0",
   listStyle: "none",
-  gap: "$xs",
+
+  "@base": {
+    gap: "$xs",
+  },
+  "@md": {
+    gap: "$sm",
+  },
 });
 
 export default function ListOfRooms({

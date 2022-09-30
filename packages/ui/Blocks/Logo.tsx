@@ -16,6 +16,14 @@ const StyledImage = styled("div", {
     backgroundSize: "contain",
   },
   variants: {
+    size: {
+      xs: {
+        width: "64px",
+        height: "23px",
+      },
+      sm: { width: "96px", height: "34px" },
+      md: { width: "128px", height: "46px" },
+    },
     position: {
       center: {
         position: "absolute",
@@ -45,27 +53,30 @@ const StyledImage = styled("div", {
       },
     },
   },
-  "@base": {
-    width: "64px",
-    height: "23px",
-  },
-  "@md": {
-    width: "96px",
-    height: "34px",
-  },
 });
 
 export default function Logo({
   color = "gradient",
   position = "none",
+  size = "sm",
   css,
 }: {
   color?: Color;
   css?: any;
   position?: Position;
+  size?: "sm" | "xs";
 }) {
   return (
-    <StyledImage color={color} css={css} position={position}>
+    <StyledImage
+      size={
+        size === "sm"
+          ? { "@base": "sm", "@md": "md" }
+          : { "@base": "xs", "@md": "sm" }
+      }
+      color={color}
+      css={css}
+      position={position}
+    >
       <div className="image"></div>
     </StyledImage>
   );

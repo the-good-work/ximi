@@ -7,3 +7,4 @@ export * from "./Blocks/Header";
 export * from "./Texts/Text";
 export * from "./Texts/Heading";
 export * from "./Blocks/Logo";
+export * from "./Screens/Home";

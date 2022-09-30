@@ -7,12 +7,28 @@ import ListOfRooms from "ui/Blocks/ListOfRooms";
 const rooms = [
   { name: "asdf", id: "1", noOfParticipants: 1 },
   { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+  { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
 ];
 
 function App() {
   return (
     <Container isFullWidth={false}>
-      <Heading color="gradient" css={{ textAlign: "center" }}>
+      <Heading
+        color="gradient"
+        css={{
+          textAlign: "center",
+          paddingBottom: { "@base": "$xl", "@md": "$3xl" },
+        }}
+      >
         ROOMS ONLINE
       </Heading>
       <ListOfRooms rooms={rooms} />

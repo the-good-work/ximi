@@ -44,9 +44,12 @@ const StyledContainer = styled("main", {
   },
 
   ".content": {
+    boxSizing: "border-box",
     flexDirection: "column",
     display: "flex",
+    width: "100%",
     alignItems: "center",
+    overflow: "scroll",
   },
 
   variants: {
@@ -69,9 +72,11 @@ const StyledContainer = styled("main", {
 
   "@base": {
     ".frame": { display: "none" },
+    ".content": { padding: "$md" },
   },
   "@sm": {
     ".frame": { display: "flex" },
+    ".content": { padding: "$3xl" },
   },
 });
 

@@ -5,21 +5,30 @@ import ListButton from "../Buttons/ListButton";
 const List = styled("ul", {
   display: "flex",
   flexDirection: "column",
-  gap: "$md",
   minWidth: "500px",
   paddingLeft: "0",
+  listStyle: "none",
+  gap: "$xs",
 });
 
-export default function ListOfRooms({ rooms }: { rooms: any }) {
+export default function ListOfRooms({
+  rooms,
+  ...props
+}: {
+  rooms: any;
+  props?: any;
+}) {
   return (
-    <List>
+    <List {...props}>
       {rooms.map((r: any) => {
         return (
-          <li key={r.id}>
-            <ListButton noOfParticipants={r.noOfParticipants}>
-              {r.name}
-            </ListButton>
-          </li>
+          <ListButton
+            as="button"
+            aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
+            noOfParticipants={r.noOfParticipants}
+          >
+            {r.name}
+          </ListButton>
         );
       })}
     </List>

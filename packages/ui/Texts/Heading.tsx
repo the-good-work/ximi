@@ -5,9 +5,21 @@ type Color = "white" | "accent" | "gradient";
 
 const StyledHeading = styled("span", {
   variants: {
-    level: {
-      1: {
+    size: {
+      lg: {
         fontSize: "$3xl",
+        fontWeight: "normal",
+      },
+      md: {
+        fontSize: "$2xl",
+        fontWeight: "normal",
+      },
+      sm: {
+        fontSize: "$xl",
+        fontWeight: "normal",
+      },
+      xs: {
+        fontSize: "$lg",
         fontWeight: "normal",
       },
     },
@@ -27,7 +39,7 @@ const StyledHeading = styled("span", {
 
   defaultVariants: {
     color: "default",
-    level: 1,
+    size: "lg",
   },
 });
 
@@ -43,7 +55,27 @@ export default function Heading({
   css?: any;
 }) {
   return (
-    <StyledHeading color={color} level={level} css={css}>
+    <StyledHeading
+      as={
+        level === 1
+          ? "h1"
+          : level === 2
+          ? "h2"
+          : level === 3
+          ? "h3"
+          : level === 4
+          ? "h4"
+          : level === 5
+          ? "h5"
+          : "h6"
+      }
+      color={color}
+      size={{
+        "@base": "md",
+        "@md": "lg",
+      }}
+      css={css}
+    >
       {children}
     </StyledHeading>
   );

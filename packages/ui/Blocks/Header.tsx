@@ -50,8 +50,6 @@ const StyledHeader = styled("div", {
   },
 });
 
-const currentDate = new Date();
-
 export default function Header({
   room,
   version,
@@ -66,23 +64,35 @@ export default function Header({
     }, 1000);
   }, [currentDate]);
   return (
-    <StyledHeader>
-      <div className="status-box">
-        <Text color="accent">Room</Text> <Text>{room}</Text>
+    <StyledHeader
+      css={{ "@base": { fontSize: "$2xs" }, "@md": { fontSize: "$xs" } }}
+    >
+      <div className="status-box" aria-label="Current room">
+        <Text color="accent" aria-hidden="true">
+          Room
+        </Text>
+        <Text>{room}</Text>
       </div>
 
       <Logo position="center" />
 
       <div className="status-group">
-        <div className="status-box">
-          <Text color="accent">V</Text> <Text>{version}</Text>
+        <div className="status-box" aria-label="Version">
+          <Text color="accent" aria-hidden="true">
+            V
+          </Text>
+          <Text>{version}</Text>
         </div>
-        <div className="status-box">
-          <Text color="accent">D</Text>{" "}
+        <div className="status-box" aria-label="Date">
+          <Text color="accent" aria-hidden="true">
+            D
+          </Text>
           <Text>{format(currentDate, "eee dd MMM")}</Text>
         </div>
-        <div className="status-box">
-          <Text color="accent">T</Text>{" "}
+        <div className="status-box" aria-label="Time">
+          <Text color="accent" aria-hidden="true">
+            T
+          </Text>
           <Text>{format(currentDate, "hh:mm:ssaaa")}</Text>
         </div>
       </div>

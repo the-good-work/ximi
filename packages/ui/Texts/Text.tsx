@@ -4,7 +4,6 @@ import { styled } from "../theme/theme";
 type Color = "white" | "accent" | "gradient";
 
 const StyledText = styled("span", {
-  fontSize: "$sm",
   fontWeight: "normal",
   variants: {
     color: {
@@ -23,20 +22,22 @@ const StyledText = styled("span", {
   defaultVariants: {
     color: "default",
   },
-  "@base": {
-    fontSize: "$2xs",
-  },
-  "@md": {
-    fontSize: "$xs",
-  },
 });
 
 export default function Text({
   children,
   color = "white",
+  css,
+  ...props
 }: {
   children: any;
   color?: Color;
+  props?: any;
+  css?: any;
 }) {
-  return <StyledText color={color}>{children}</StyledText>;
+  return (
+    <StyledText color={color} css={css} {...props}>
+      {children}
+    </StyledText>
+  );
 }

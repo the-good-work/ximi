@@ -4,7 +4,7 @@ import Home from "ui/Screens/Home";
 
 function App() {
   return (
-    <div>
+    <div id="App">
       <Home />
     </div>
   );

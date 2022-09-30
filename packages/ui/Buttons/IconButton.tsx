@@ -9,6 +9,10 @@ const StyledButton = styled("button", {
     justifyContent: "center",
     padding: "$2xs",
   },
+  "&:hover": {
+    cursor: "pointer",
+    backgroundColor: "$accent-translucent",
+  },
   variants: {
     iconSize: {
       sm: {
@@ -43,15 +47,17 @@ const StyledButton = styled("button", {
         backgroundColor: "$background",
         color: "$text",
       },
+      outline: {
+        borderRadius: "$xs",
+        border: "1px solid $brand",
+        backgroundColor: "transparent",
+        color: "$text",
+      },
       ghost: {
         borderRadius: "$xs",
         border: "none",
         backgroundColor: "transparent",
         color: "$text",
-        "&:hover": {
-          cursor: "pointer",
-          backgroundColor: "rgba(82, 55, 243, 0.5)",
-        },
       },
     },
   },
@@ -72,7 +78,7 @@ export default function IconButton({
   icon: ReactNode;
   iconSize: any;
   props?: any;
-  variant?: "solid" | "ghost";
+  variant?: "solid" | "ghost" | "outline";
   css?: any;
   onClick?: MouseEventHandler;
 }) {

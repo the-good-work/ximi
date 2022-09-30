@@ -1,8 +1,10 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
+import IconButton from "../Buttons/IconButton";
 import Heading from "../Texts/Heading";
 import { styled } from "../theme/theme";
 import Header from "./Header";
 import Logo from "./Logo";
+import { Contract, Expand } from "react-ionicons";
 
 const RoadBlock = styled("div", {
   width: "100%",
@@ -91,12 +93,32 @@ export default function Container({
   isFullWidth?: boolean;
   room: string;
 }) {
+  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+
   return (
     <>
       <StyledContainer isFullWidth={isFullWidth}>
         <div className="frame">
           <Header room={room} version={"1.2.5"} />
           <div className="content">{children}</div>
+          <IconButton
+            onClick={() => {
+              setIsFullScreen(!isFullScreen);
+            }}
+            css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+            iconSize="md"
+            variant="outline"
+            aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
+              isFullScreen ? "active" : "inactive"
+            }`}
+            icon={
+              isFullScreen ? (
+                <Contract color="inherit" />
+              ) : (
+                <Expand color="inherit" />
+              )
+            }
+          />
         </div>
         <RoadBlock>
           <Logo css={{ position: "static" }} size="sm" />

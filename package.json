@@ -21,5 +21,9 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "packageManager": "npm@8.5.5"
+  "packageManager": "npm@8.5.5",
+  "dependencies": {
+    "@stitches/react": "^1.2.8",
+    "date-fns": "^2.29.3"
+  }
 }

@@ -10,20 +10,20 @@ export default function Home() {
   const rooms = [
     { name: "asdf", id: "1", noOfParticipants: 1 },
     { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "3", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "4", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "5", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "6", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "7", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "8", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "9", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "10", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "11", noOfParticipants: 10 },
+    { name: "asdfasdsadf", id: "12", noOfParticipants: 10 },
   ];
 
   function onRefresh() {
-    console.log("test");
+    console.log("refresh");
   }
 
   const HeadingBox = styled("div", {

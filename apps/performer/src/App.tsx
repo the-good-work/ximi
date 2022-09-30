@@ -4,9 +4,9 @@ import Home from "ui/Screens/Home";
 
 function App() {
   return (
-    <>
+    <div>
       <Home />
-    </>
+    </div>
   );
 }
 

@@ -31,6 +31,7 @@ export default function ListOfRooms({
       {rooms.map((r: any) => {
         return (
           <ListButton
+            key={r.id}
             as="button"
             aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
             noOfParticipants={r.noOfParticipants}

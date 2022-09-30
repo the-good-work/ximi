@@ -94,6 +94,7 @@ export default function Container({
   room: string;
 }) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+  // const fullscreenRef = useRef();
 
   return (
     <>
@@ -104,6 +105,17 @@ export default function Container({
           <IconButton
             onClick={() => {
               setIsFullScreen(!isFullScreen);
+              let elem = document.getElementById("App");
+
+              if (!document.fullscreenElement) {
+                elem?.requestFullscreen().catch((err) => {
+                  alert(
+                    `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+                  );
+                });
+              } else {
+                document.exitFullscreen();
+              }
             }}
             css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
             iconSize="md"

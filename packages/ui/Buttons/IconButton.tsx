@@ -90,7 +90,7 @@ export default function IconButton({
       css={css}
       {...props}
     >
-      {icon}
+      <div aria-hidden="true">{icon}</div>
     </StyledButton>
   );
 }

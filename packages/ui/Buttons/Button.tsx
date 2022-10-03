@@ -74,9 +74,7 @@ export default function Button({
           {icon}
         </div>
       )}
-      <Text size="md" aria-hidden="true">
-        {children}
-      </Text>
+      <Text size="md">{children}</Text>
     </StyledButton>
   );
 }

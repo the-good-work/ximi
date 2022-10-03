@@ -46,10 +46,9 @@ export default function SelectInput({
       </Heading>
       <Text
         color="white"
+        size="sm"
         css={{
           marginBottom: "$3xl",
-          "@base": { fontSize: "$xs" },
-          "@md": { fontSize: "$sm" },
         }}
       >
         Choose your mode of audio connection to the room

@@ -88,11 +88,10 @@ export default function ListButton({
           <People color="inherit" />
         </div>
         <Text
+          size="sm"
           aria-label={`Number of participants currently in room`}
           css={{
             fontWeight: "$medium",
-            "@base": { fontSize: "$xs" },
-            "@md": { fontSize: "$sm" },
           }}
         >
           {noOfParticipants}

@@ -2,11 +2,12 @@ import React from "react";
 import { styled } from "../theme/theme";
 
 type Color = "white" | "accent" | "gradient";
-type Size = "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg";
 
 const StyledText = styled("span", {
   variants: {
     size: {
+      xs: { "@base": { fontSize: "$2xs" }, "@md": { fontSize: "$xs" } },
       sm: { "@base": { fontSize: "$xs" }, "@md": { fontSize: "$sm" } },
       md: { "@base": { fontSize: "$sm" }, "@md": { fontSize: "$md" } },
       lg: { "@base": { fontSize: "$md" }, "@md": { fontSize: "$lg" } },

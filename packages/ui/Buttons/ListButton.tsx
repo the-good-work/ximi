@@ -35,7 +35,7 @@ const StyledButton = styled("li", {
   },
   ".participants": {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     gap: "$sm",
   },
@@ -44,10 +44,16 @@ const StyledButton = styled("li", {
     ".icon": {
       width: "$sm",
     },
+    ".participants": {
+      minWidth: "54px",
+    },
   },
   "@md": {
     ".icon": {
       width: "$md",
+    },
+    ".participants": {
+      minWidth: "58px",
     },
   },
 });
@@ -77,7 +83,11 @@ export default function ListButton({
         </div>
         <Text
           aria-label={`Number of participants currently in room`}
-          css={{ "@base": { fontSize: "$xs" }, "@md": { fontSize: "$sm" } }}
+          css={{
+            fontWeight: "$medium",
+            "@base": { fontSize: "$xs" },
+            "@md": { fontSize: "$sm" },
+          }}
         >
           {noOfParticipants}
         </Text>

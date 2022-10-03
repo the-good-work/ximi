@@ -9,20 +9,17 @@ export type Pages = "home" | "select-input" | "enter-password";
 export type UpdateStateActions =
   | {
       type: "enter-room";
-      properties: { room: Room; isFullscreen: boolean };
+      properties: { room: Room };
     }
   | {
       type: "select-connection-mode";
       properties: {
         inputType: "voice" | "line";
-        isFullScreen: boolean;
       };
     }
   | {
       type: "go-home";
-      properties: {
-        isFullScreen: boolean;
-      };
+      properties: {};
     };
 
 export type RoomStateInit = {

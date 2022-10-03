@@ -51,7 +51,7 @@ export default function Home({
               onClick={() => {
                 updateState({
                   type: "enter-room",
-                  properties: { room: r, isFullscreen: false },
+                  properties: { room: r },
                 });
               }}
               key={r.id}

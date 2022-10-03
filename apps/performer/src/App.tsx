@@ -57,7 +57,7 @@ function App() {
       const __state: RoomStateEnterPassword = {
         page: "enter-password",
         properties: {
-          room: { name: "test", id: "asdf", noOfParticipants: 0 },
+          room: _state.properties.room,
           inputType: action.properties.inputType,
         },
       };

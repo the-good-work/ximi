@@ -60,7 +60,7 @@ export default function SelectInput({
             onClick={() => {
               updateState({
                 type: "select-connection-mode",
-                properties: { inputType: "voice", isFullScreen: false },
+                properties: { inputType: "voice" },
               });
             }}
             css={{
@@ -87,7 +87,7 @@ export default function SelectInput({
             onClick={() => {
               updateState({
                 type: "select-connection-mode",
-                properties: { inputType: "line", isFullScreen: false },
+                properties: { inputType: "line" },
               });
             }}
           >

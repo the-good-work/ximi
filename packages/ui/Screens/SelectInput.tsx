@@ -59,7 +59,7 @@ export default function SelectInput({
           <Button
             onClick={() => {
               updateState({
-                type: "select-connection-mode",
+                type: "connection-mode-selected",
                 properties: { inputType: "voice" },
               });
             }}
@@ -86,7 +86,7 @@ export default function SelectInput({
             icon={<PulseOutline color="inherit" />}
             onClick={() => {
               updateState({
-                type: "select-connection-mode",
+                type: "connection-mode-selected",
                 properties: { inputType: "line" },
               });
             }}

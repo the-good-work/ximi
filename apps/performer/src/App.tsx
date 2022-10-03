@@ -45,7 +45,7 @@ function App() {
         },
       };
       return __state;
-    } else if (action.type === "enter-room") {
+    } else if (action.type === "room-selected") {
       const __state: RoomStateSelectInput = {
         page: "select-input",
         properties: {
@@ -53,7 +53,7 @@ function App() {
         },
       };
       return __state;
-    } else if (action.type === "select-connection-mode") {
+    } else if (action.type === "connection-mode-selected") {
       const __state: RoomStateEnterPassword = {
         page: "enter-password",
         properties: {

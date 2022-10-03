@@ -50,7 +50,7 @@ export default function Home({
             <ListButton
               onClick={() => {
                 updateState({
-                  type: "enter-room",
+                  type: "room-selected",
                   properties: { room: r },
                 });
               }}

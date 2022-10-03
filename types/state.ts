@@ -8,17 +8,21 @@ export type Pages = "home" | "select-input" | "enter-password";
 
 export type UpdateStateActions =
   | {
-      type: "enter-room";
+      type: "go-home";
+      properties: {};
+    }
+  | {
+      type: "room-selected";
       properties: { room: Room };
     }
   | {
-      type: "select-connection-mode";
+      type: "connection-mode-selected";
       properties: {
         inputType: "voice" | "line";
       };
     }
   | {
-      type: "go-home";
+      type: "entered-password";
       properties: {};
     };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { styled } from "../theme/theme";
 import { People } from "react-ionicons";
 import Text from "../Texts/Text";
@@ -12,7 +12,7 @@ const StyledButton = styled("li", {
   color: "$text",
   width: "100%",
   display: "flex",
-  padding: "$xs $sm",
+  padding: "$sm $md",
   justifyContent: "space-between",
   alignItems: "center",
   cursor: "pointer",
@@ -60,19 +60,25 @@ const StyledButton = styled("li", {
 
 export default function ListButton({
   children,
+  onClick,
   noOfParticipants,
   as,
   ...props
 }: {
   children: any;
+  onClick: MouseEventHandler;
   noOfParticipants: number;
   as?: any;
   props?: any;
 }) {
   return (
-    <StyledButton as={as} {...props}>
+    <StyledButton as={as} onClick={onClick} {...props}>
       <Text
-        css={{ "@base": { fontSize: "$md" }, "@md": { fontSize: "$xl" } }}
+        css={{
+          "@base": { fontSize: "$md" },
+          "@md": { fontSize: "$xl" },
+          textTransform: "uppercase",
+        }}
         aria-hidden="true"
       >
         {children}

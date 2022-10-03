@@ -1,27 +1,18 @@
-import React from "react";
-import Container from "ui/Blocks/Container";
+import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
-import ListOfRooms from "ui/Blocks/ListOfRooms";
 import IconButton from "ui/Buttons/IconButton";
 import { Refresh } from "react-ionicons";
 import { styled } from "ui/theme/theme";
+import ListButton from "../Buttons/ListButton";
+import { RoomStateInit, UpdateStateActions } from "../../../types/state";
 
-export default function Home() {
-  const rooms = [
-    { name: "asdf", id: "1", noOfParticipants: 1 },
-    { name: "asdfasdsadf", id: "2", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "3", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "4", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "5", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "6", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "7", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "8", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "9", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "10", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "11", noOfParticipants: 10 },
-    { name: "asdfasdsadf", id: "12", noOfParticipants: 10 },
-  ];
-
+export default function Home({
+  state,
+  updateState,
+}: {
+  state: RoomStateInit;
+  updateState: Dispatch<UpdateStateActions>;
+}) {
   function onRefresh() {
     console.log("refresh");
   }
@@ -34,17 +25,61 @@ export default function Home() {
     justifyContent: "space-between",
   });
 
+  const List = styled("ul", {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: "500px",
+    width: "100%",
+    maxWidth: "600px",
+    paddingLeft: "0",
+    listStyle: "none",
+
+    "@base": {
+      gap: "$xs",
+    },
+    "@md": {
+      gap: "$sm",
+    },
+  });
+
+  function ListOfRooms({ rooms, ...props }: { rooms: any; props?: any }) {
+    return (
+      <List {...props}>
+        {rooms.map((r: any) => {
+          return (
+            <ListButton
+              onClick={() => {
+                updateState({
+                  type: "enter-room",
+                  properties: { room: r, isFullscreen: false },
+                });
+              }}
+              key={r.id}
+              as="button"
+              aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
+              noOfParticipants={r.noOfParticipants}
+            >
+              {r.name}
+            </ListButton>
+          );
+        })}
+      </List>
+    );
+  }
+
   return (
-    <Container room={"-"} isFullWidth={false}>
+    <div className="content">
       <HeadingBox>
         <Heading
           color="gradient"
           css={{
+            marginTop: "$sm",
+            marginBottom: "$sm",
             textAlign: "center",
-            paddingBottom: { "@base": "$xl", "@md": "$3xl" },
+            textTransform: "uppercase",
           }}
         >
-          ROOMS ONLINE
+          Rooms Online
         </Heading>
         <IconButton
           iconSize={{ "@base": "md", "@md": "lg" }}
@@ -54,7 +89,7 @@ export default function Home() {
           onClick={onRefresh}
         />
       </HeadingBox>
-      <ListOfRooms rooms={rooms} />
-    </Container>
+      <ListOfRooms rooms={state.properties.rooms} />
+    </div>
   );
 }

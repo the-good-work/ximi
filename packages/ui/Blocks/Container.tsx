@@ -11,7 +11,7 @@ const RoadBlock = styled("div", {
   height: "100%",
   padding: "$lg",
   boxSizing: "border-box",
-  maxWidth: "600px",
+  maxWidth: "650px",
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "column",
@@ -94,14 +94,13 @@ export default function Container({
   room: string;
 }) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-  // const fullscreenRef = useRef();
 
   return (
     <>
       <StyledContainer isFullWidth={isFullWidth}>
         <div className="frame">
           <Header room={room} version={"1.2.5"} />
-          <div className="content">{children}</div>
+          {children}
           <IconButton
             onClick={() => {
               setIsFullScreen(!isFullScreen);

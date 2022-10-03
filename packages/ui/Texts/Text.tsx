@@ -4,7 +4,6 @@ import { styled } from "../theme/theme";
 type Color = "white" | "accent" | "gradient";
 
 const StyledText = styled("span", {
-  fontWeight: "normal",
   variants: {
     color: {
       white: { color: "$text" },

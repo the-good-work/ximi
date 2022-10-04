@@ -1,5 +1,11 @@
+import { keyframes } from "@stitches/react";
 import React, { MouseEventHandler, ReactNode } from "react";
 import { styled } from "../theme/theme";
+
+const spin = keyframes({
+  from: { transform: "rotate(0)" },
+  to: { transform: "rotate(360deg)" },
+});
 
 const StyledButton = styled("button", {
   aspectRatio: 1,
@@ -18,7 +24,7 @@ const StyledButton = styled("button", {
       sm: {
         span: {
           svg: {
-            width: "16px",
+            width: "$sm",
             height: "auto",
           },
         },
@@ -26,7 +32,7 @@ const StyledButton = styled("button", {
       md: {
         span: {
           svg: {
-            width: "20px",
+            width: "$md",
             height: "auto",
           },
         },
@@ -34,10 +40,24 @@ const StyledButton = styled("button", {
       lg: {
         span: {
           svg: {
-            width: "24px",
+            width: "$lg",
             height: "auto",
           },
         },
+      },
+      xl: {
+        span: {
+          svg: {
+            width: "$xl",
+            height: "auto",
+          },
+        },
+      },
+    },
+    state: {
+      default: {},
+      loading: {
+        animation: `${spin} linear 1000ms infinite`,
       },
     },
     variant: {
@@ -64,6 +84,7 @@ const StyledButton = styled("button", {
   defaultVariants: {
     variant: "solid",
     iconSize: "sm",
+    state: "default",
   },
 });
 
@@ -72,11 +93,13 @@ export default function IconButton({
   iconSize,
   css,
   onClick,
+  state = "default",
   variant = "solid",
   ...props
 }: {
   icon: ReactNode;
   iconSize: any;
+  state?: "default" | "loading";
   props?: any;
   variant?: "solid" | "ghost" | "outline";
   css?: any;
@@ -84,6 +107,7 @@ export default function IconButton({
 }) {
   return (
     <StyledButton
+      state={state}
       iconSize={iconSize}
       variant={variant}
       onClick={onClick}

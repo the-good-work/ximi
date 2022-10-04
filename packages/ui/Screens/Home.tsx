@@ -1,10 +1,12 @@
-import React, { Dispatch } from "react";
+import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
 import IconButton from "ui/Buttons/IconButton";
-import { Refresh } from "react-ionicons";
+import { Refresh, SadOutline } from "react-ionicons";
 import { styled } from "ui/theme/theme";
 import ListButton from "../Buttons/ListButton";
 import { RoomStateInit, UpdateStateActions } from "../../../types/state";
+import Text from "../Texts/Text";
+import Icon from "../Texts/Icon";
 
 export default function Home({
   state,
@@ -13,8 +15,15 @@ export default function Home({
   state: RoomStateInit;
   updateState: Dispatch<UpdateStateActions>;
 }) {
-  function onRefresh() {
-    console.log("refresh");
+  const [isRefreshing, setIsRefreshing] = useState<boolean | null>(false);
+
+  async function onRefresh() {
+    setIsRefreshing(true);
+    return await new Promise((resolve) => setTimeout(resolve, 1500)).then(
+      () => {
+        setIsRefreshing(false);
+      }
+    );
   }
 
   const HeadingBox = styled("div", {
@@ -22,7 +31,20 @@ export default function Home({
     maxWidth: "600px",
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: "$lg",
+  });
+
+  const EmptyState = styled("div", {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: "500px",
+    width: "100%",
+    maxWidth: "600px",
+    marginTop: "$lg",
+    gap: "$sm",
   });
 
   const List = styled("ul", {
@@ -43,28 +65,42 @@ export default function Home({
   });
 
   function ListOfRooms({ rooms, ...props }: { rooms: any; props?: any }) {
-    return (
-      <List {...props}>
-        {rooms.map((r: any) => {
-          return (
-            <ListButton
-              onClick={() => {
-                updateState({
-                  type: "room-selected",
-                  properties: { room: r },
-                });
-              }}
-              key={r.id}
-              as="button"
-              aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
-              noOfParticipants={r.noOfParticipants}
-            >
-              {r.name}
-            </ListButton>
-          );
-        })}
-      </List>
-    );
+    if (isRefreshing) {
+      return (
+        <EmptyState>
+          <Text size="md">Refreshing...</Text>
+        </EmptyState>
+      );
+    } else if (rooms.length <= 0) {
+      return (
+        <EmptyState>
+          <Icon size="lg" icon={<SadOutline color="white" />} />
+          <Text size="md">There are currently no available rooms</Text>
+        </EmptyState>
+      );
+    } else
+      return (
+        <List {...props}>
+          {rooms.map((r: any) => {
+            return (
+              <ListButton
+                onClick={() => {
+                  updateState({
+                    type: "room-selected",
+                    properties: { room: r },
+                  });
+                }}
+                key={r.id}
+                as="button"
+                aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
+                noOfParticipants={r.noOfParticipants}
+              >
+                {r.name}
+              </ListButton>
+            );
+          })}
+        </List>
+      );
   }
 
   return (
@@ -82,11 +118,13 @@ export default function Home({
           Rooms Online
         </Heading>
         <IconButton
-          iconSize={{ "@base": "md", "@md": "lg" }}
+          css={{ borderRadius: "100%" }}
+          iconSize={{ "@base": "lg", "@md": "xl" }}
           aria-label="Refresh"
           variant="ghost"
           icon={<Refresh color="inherit" />}
           onClick={onRefresh}
+          state={isRefreshing ? "loading" : "default"}
         />
       </HeadingBox>
       <ListOfRooms rooms={state.properties.rooms} />

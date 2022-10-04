@@ -1,8 +1,14 @@
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import Text from "../Texts/Text";
+import Icon from "../Texts/Icon";
 import { styled } from "../theme/theme";
 import Logo from "./Logo";
+import {
+  CalendarClearOutline,
+  TimeOutline,
+  LayersOutline,
+} from "react-ionicons";
 
 const StyledHeader = styled("div", {
   width: "100vw",
@@ -32,7 +38,7 @@ const StyledHeader = styled("div", {
   "@base": {
     padding: "$xs $md",
     ".status-box": {
-      gap: "$xs",
+      gap: "$2xs",
     },
     ".status-group": {
       gap: "$xs",
@@ -64,36 +70,45 @@ export default function Header({
     }, 1000);
   }, [currentDate]);
   return (
-    <StyledHeader
-      css={{ "@base": { fontSize: "$2xs" }, "@md": { fontSize: "$xs" } }}
-    >
+    <StyledHeader>
       <div className="status-box" aria-label="Current room">
-        <Text color="accent" aria-hidden="true">
+        <Text color="accent" aria-hidden="true" size="2xs">
           Room
         </Text>
-        <Text>{room}</Text>
+        <Text size="2xs">{room}</Text>
       </div>
 
       <Logo position="center" size="xs" />
 
       <div className="status-group">
         <div className="status-box" aria-label="Version">
-          <Text color="accent" aria-hidden="true">
-            V
-          </Text>
-          <Text>{version}</Text>
+          <Icon
+            css={{ marginBottom: "1px" }}
+            size="sm"
+            color="accent"
+            icon={<LayersOutline color="inherit" />}
+          />
+          <Text size="2xs">{version}</Text>
         </div>
         <div className="status-box" aria-label="Date">
-          <Text color="accent" aria-hidden="true">
-            D
+          <Text size="2xs" color="accent" aria-hidden="true">
+            <Icon
+              css={{ marginBottom: "1px" }}
+              size="sm"
+              color="accent"
+              icon={<CalendarClearOutline color="inherit" />}
+            />
           </Text>
-          <Text>{format(currentDate, "eee dd MMM")}</Text>
+          <Text size="2xs">{format(currentDate, "eee dd MMM")}</Text>
         </div>
         <div className="status-box" aria-label="Time">
-          <Text color="accent" aria-hidden="true">
-            T
-          </Text>
-          <Text>{format(currentDate, "hh:mm:ssaaa")}</Text>
+          <Icon
+            size="sm"
+            css={{ marginBottom: "1px" }}
+            color="accent"
+            icon={<TimeOutline color="inherit" />}
+          />
+          <Text size="2xs">{format(currentDate, "hh:mm:ssaaa")}</Text>
         </div>
       </div>
     </StyledHeader>

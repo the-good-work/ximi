@@ -27,6 +27,17 @@ export const { styled, css } = createStitches({
       "2xl": "2.5rem", //40px
       "3xl": "2.875rem", //46px
     },
+    sizes: {
+      "3xs": "0.25rem", //4px
+      "2xs": "0.375rem", //6px
+      xs: "0.5rem", //8px
+      sm: "1rem", //16px
+      md: "1.25rem", //20px
+      lg: "2rem", //32px
+      xl: "2.25rem", //36px
+      "2xl": "2.5rem", //40px
+      "3xl": "2.875rem", //46px
+    },
     fontSizes: {
       "3xs": "0.5rem", //8px
       "2xs": "0.8rem", //12px
@@ -58,7 +69,6 @@ export const { styled, css } = createStitches({
     },
     lineHeights: {},
     letterSpacings: {},
-    sizes: {},
     borderWidths: {},
     borderStyles: {},
     shadows: {},

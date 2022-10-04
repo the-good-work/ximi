@@ -70,7 +70,13 @@ export default function Icon({
   size?: Size;
 }) {
   return (
-    <StyledIcon size={size} color={color} css={css} {...props}>
+    <StyledIcon
+      size={size}
+      color={color}
+      css={css}
+      aria-hidden="true"
+      {...props}
+    >
       {icon}
     </StyledIcon>
   );

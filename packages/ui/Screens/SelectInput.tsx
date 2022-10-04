@@ -1,10 +1,11 @@
 import { styled } from "@stitches/react";
 import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
-import { MicOutline, PulseOutline } from "react-ionicons";
+import { MicOutline, PulseOutline, ReturnDownBack } from "react-ionicons";
 import Button from "../Buttons/Button";
 import { RoomStateSelectInput, UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
+import IconButton from "../Buttons/IconButton";
 
 export default function SelectInput({
   state,
@@ -99,6 +100,18 @@ export default function SelectInput({
           </Text>
         </div>
       </ButtonGroup>
+      <IconButton
+        onClick={() => {
+          updateState({
+            type: "go-home",
+          });
+        }}
+        css={{ position: "fixed", bottom: "$sm", left: "$sm" }}
+        iconSize="md"
+        variant="outline"
+        aria-label={`Back to home`}
+        icon={<ReturnDownBack color="inherit" />}
+      />
     </div>
   );
 }

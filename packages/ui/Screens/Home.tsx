@@ -73,8 +73,8 @@ export default function Home({
       );
     } else if (rooms.length <= 0) {
       return (
-        <EmptyState>
-          <Icon size="lg" icon={<SadOutline color="white" />} />
+        <EmptyState css={{ fill: "$text" }}>
+          <Icon size="lg" icon={<SadOutline color="inherit" />} />
           <Text size="md">There are currently no available rooms</Text>
         </EmptyState>
       );
@@ -120,7 +120,7 @@ export default function Home({
         <IconButton
           css={{ borderRadius: "100%" }}
           iconSize={{ "@base": "lg", "@md": "xl" }}
-          aria-label="Refresh"
+          aria-label="Refresh list of rooms"
           variant="ghost"
           icon={<Refresh color="inherit" />}
           onClick={onRefresh}

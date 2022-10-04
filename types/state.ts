@@ -9,7 +9,6 @@ export type Pages = "home" | "select-input" | "enter-password";
 export type UpdateStateActions =
   | {
       type: "go-home";
-      properties: {};
     }
   | {
       type: "room-selected";

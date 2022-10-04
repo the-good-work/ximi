@@ -5,6 +5,7 @@ export * from "./Buttons/IconButton";
 export * from "./Blocks/Container";
 export * from "./Blocks/Header";
 export * from "./Texts/Text";
+export * from "./Texts/Icon";
 export * from "./Texts/Heading";
 export * from "./Blocks/Logo";
 export * from "./Screens/Home";

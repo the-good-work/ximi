@@ -57,7 +57,7 @@ const StyledButton = styled("button", {
     state: {
       default: {},
       loading: {
-        animation: `${spin} linear 1000ms infinite`,
+        animation: `${spin} ease-in-out 1000ms infinite`,
       },
     },
     variant: {

@@ -2,10 +2,11 @@ import React, { useReducer } from "react";
 import "./App.css";
 import Home from "ui/Screens/Home";
 import SelectInput from "ui/Screens/SelectInput";
+import EnterPasscode from "ui/Screens/EnterPasscode";
 import {
   ReducerStates,
   Room,
-  RoomStateEnterPassword,
+  RoomStateEnterPasscode,
   RoomStateInit,
   RoomStateSelectInput,
   UpdateStateActions,
@@ -55,8 +56,8 @@ function App() {
       };
       return __state;
     } else if (action.type === "connection-mode-selected") {
-      const __state: RoomStateEnterPassword = {
-        page: "enter-password",
+      const __state: RoomStateEnterPasscode = {
+        page: "enter-passcode",
         properties: {
           room: _state.properties.room,
           inputType: action.properties.inputType,
@@ -75,7 +76,9 @@ function App() {
     if (state.page === "home") {
       return <Home state={state} updateState={updateState} />;
     } else if (state.page === "select-input") {
-      return <SelectInput state={state} updateState={updateState} />;
+      return <SelectInput updateState={updateState} />;
+    } else if (state.page === "enter-passcode") {
+      return <EnterPasscode updateState={updateState} />;
     } else return <></>;
   }
   return (

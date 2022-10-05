@@ -3,15 +3,13 @@ import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
 import { MicOutline, PulseOutline, ReturnDownBack } from "react-ionicons";
 import Button from "../Buttons/Button";
-import { RoomStateSelectInput, UpdateStateActions } from "../../../types/state";
+import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import IconButton from "../Buttons/IconButton";
 
 export default function SelectInput({
-  state,
   updateState,
 }: {
-  state: RoomStateSelectInput;
   updateState: Dispatch<UpdateStateActions>;
 }) {
   const ButtonGroup = styled("div", {
@@ -50,6 +48,7 @@ export default function SelectInput({
         size="sm"
         css={{
           marginBottom: "$3xl",
+          maxWidth: "500px",
         }}
       >
         Choose your mode of audio connection to the room

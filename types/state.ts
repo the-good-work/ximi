@@ -4,7 +4,7 @@ export type Room = {
   noOfParticipants: number;
 } | null;
 
-export type Pages = "home" | "select-input" | "enter-password";
+export type Pages = "home" | "select-input" | "enter-passcode";
 
 export type UpdateStateActions =
   | {
@@ -21,7 +21,7 @@ export type UpdateStateActions =
       };
     }
   | {
-      type: "entered-password";
+      type: "entered-passcode";
       properties: {};
     };
 
@@ -40,8 +40,8 @@ export type RoomStateSelectInput = {
   };
 };
 
-export type RoomStateEnterPassword = {
-  page: "enter-password";
+export type RoomStateEnterPasscode = {
+  page: "enter-passcode";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -51,4 +51,4 @@ export type RoomStateEnterPassword = {
 export type ReducerStates =
   | RoomStateInit
   | RoomStateSelectInput
-  | RoomStateEnterPassword;
+  | RoomStateEnterPasscode;

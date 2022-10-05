@@ -1,14 +1,18 @@
 import React, { useReducer } from "react";
 import "./App.css";
 import Home from "ui/Screens/Home";
-import SelectInput from "ui/Screens/SelectInput";
+import SelectConnectionMode from "ui/Screens/SelectConnectionMode";
 import EnterPasscode from "ui/Screens/EnterPasscode";
+import EnterName from "ui/Screens/EnterName";
+import InSession from "ui/Screens/InSession";
 import {
   ReducerStates,
   Room,
+  RoomStateEnterName,
   RoomStateEnterPasscode,
   RoomStateInit,
-  RoomStateSelectInput,
+  RoomStateInSession,
+  RoomStateSelectConnectionInput,
   UpdateStateActions,
 } from "../../../types/state";
 import Container from "ui/Blocks/Container";
@@ -30,37 +34,76 @@ function App() {
   ];
 
   const initialState: RoomStateInit = {
-    page: "home",
-    properties: {
-      room: null,
-      rooms: rooms,
-    },
+    page: "list-room-page",
   };
 
   function reducer(_state: ReducerStates, action: UpdateStateActions) {
-    if (action.type === "go-home") {
+    if (
+      action.type === "back-to-list" &&
+      (_state.page === "in-session-page" ||
+        _state.page === "select-connection-input-page")
+    ) {
       const __state: RoomStateInit = {
-        page: "home",
+        page: "list-room-page",
+      };
+      return __state;
+    }
+    if (
+      action.type === "back-to-connection-input" &&
+      (_state.page === "enter-passcode-page" ||
+        _state.page === "enter-name-page")
+    ) {
+      const __state: RoomStateSelectConnectionInput = {
+        page: "select-connection-input-page",
         properties: {
-          room: null,
-          rooms: rooms,
+          room: _state.properties.room,
         },
       };
       return __state;
-    } else if (action.type === "room-selected") {
-      const __state: RoomStateSelectInput = {
-        page: "select-input",
+    } else if (
+      action.type === "select-room" &&
+      _state.page === "list-room-page"
+    ) {
+      const __state: RoomStateSelectConnectionInput = {
+        page: "select-connection-input-page",
         properties: {
           room: action.properties.room,
         },
       };
       return __state;
-    } else if (action.type === "connection-mode-selected") {
+    } else if (
+      action.type === "select-connection-mode" &&
+      _state.page === "select-connection-input-page"
+    ) {
       const __state: RoomStateEnterPasscode = {
-        page: "enter-passcode",
+        page: "enter-passcode-page",
         properties: {
           room: _state.properties.room,
           inputType: action.properties.inputType,
+        },
+      };
+      return __state;
+    } else if (
+      action.type === "submit-passcode" &&
+      _state.page === "enter-passcode-page"
+    ) {
+      const __state: RoomStateEnterName = {
+        page: "enter-name-page",
+        properties: {
+          room: _state.properties.room,
+          inputType: _state.properties.inputType,
+        },
+      };
+      return __state;
+    } else if (
+      action.type === "submit-name" &&
+      _state.page === "enter-name-page"
+    ) {
+      const __state: RoomStateInSession = {
+        page: "in-session-page",
+        properties: {
+          room: _state.properties.room,
+          inputType: _state.properties.inputType,
         },
       };
       return __state;
@@ -73,18 +116,28 @@ function App() {
   console.log(state);
 
   function PageRenderer({ state }: { state: ReducerStates }) {
-    if (state.page === "home") {
-      return <Home state={state} updateState={updateState} />;
-    } else if (state.page === "select-input") {
-      return <SelectInput updateState={updateState} />;
-    } else if (state.page === "enter-passcode") {
+    if (state.page === "list-room-page") {
+      return <Home rooms={rooms} updateState={updateState} />;
+    } else if (state.page === "select-connection-input-page") {
+      return <SelectConnectionMode updateState={updateState} />;
+    } else if (state.page === "enter-passcode-page") {
       return <EnterPasscode updateState={updateState} />;
+    } else if (state.page === "enter-name-page") {
+      return <EnterName updateState={updateState} />;
+    } else if (state.page === "in-session-page") {
+      return <InSession updateState={updateState} />;
     } else return <></>;
   }
   return (
     <div id="App">
       <Container
-        room={state.properties.room ? state.properties.room.name : "-"}
+        room={
+          state.page !== "list-room-page"
+            ? state.properties.room
+              ? state.properties.room.name
+              : "-"
+            : "-"
+        }
         isFullWidth={false}
       >
         <PageRenderer state={state} />

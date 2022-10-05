@@ -4,44 +4,69 @@ export type Room = {
   noOfParticipants: number;
 } | null;
 
-export type Pages = "home" | "select-input" | "enter-passcode";
+export type Pages =
+  | "list-room-page"
+  | "select-connection-input-page"
+  | "enter-passcode-page"
+  | "enter-name-page"
+  | "in-session-page";
 
 export type UpdateStateActions =
   | {
-      type: "go-home";
+      type: "back-to-list";
     }
   | {
-      type: "room-selected";
+      type: "back-to-connection-input";
+    }
+  | {
+      type: "select-room";
       properties: { room: Room };
     }
   | {
-      type: "connection-mode-selected";
+      type: "select-connection-mode";
       properties: {
         inputType: "voice" | "line";
       };
     }
   | {
-      type: "entered-passcode";
-      properties: {};
+      type: "submit-passcode";
+    }
+  | {
+      type: "submit-name";
+      properties: {
+        name: string;
+      };
     };
 
 export type RoomStateInit = {
-  page: "home";
-  properties: {
-    room: null;
-    rooms: Room[];
-  };
+  page: "list-room-page";
 };
 
-export type RoomStateSelectInput = {
-  page: "select-input";
+export type RoomStateSelectConnectionInput = {
+  page: "select-connection-input-page";
   properties: {
     room: Room;
   };
 };
 
 export type RoomStateEnterPasscode = {
-  page: "enter-passcode";
+  page: "enter-passcode-page";
+  properties: {
+    room: Room;
+    inputType: "voice" | "line";
+  };
+};
+
+export type RoomStateEnterName = {
+  page: "enter-name-page";
+  properties: {
+    room: Room;
+    inputType: "voice" | "line";
+  };
+};
+
+export type RoomStateInSession = {
+  page: "in-session-page";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -50,5 +75,7 @@ export type RoomStateEnterPasscode = {
 
 export type ReducerStates =
   | RoomStateInit
-  | RoomStateSelectInput
-  | RoomStateEnterPasscode;
+  | RoomStateSelectConnectionInput
+  | RoomStateEnterPasscode
+  | RoomStateEnterName
+  | RoomStateInSession;

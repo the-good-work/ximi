@@ -7,7 +7,7 @@ import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import IconButton from "../Buttons/IconButton";
 
-export default function SelectInput({
+export default function SelectConnectionMode({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
@@ -60,7 +60,7 @@ export default function SelectInput({
           <Button
             onClick={() => {
               updateState({
-                type: "connection-mode-selected",
+                type: "select-connection-mode",
                 properties: { inputType: "voice" },
               });
             }}
@@ -87,7 +87,7 @@ export default function SelectInput({
             icon={<PulseOutline color="inherit" />}
             onClick={() => {
               updateState({
-                type: "connection-mode-selected",
+                type: "select-connection-mode",
                 properties: { inputType: "line" },
               });
             }}
@@ -103,7 +103,7 @@ export default function SelectInput({
       <IconButton
         onClick={() => {
           updateState({
-            type: "go-home",
+            type: "back-to-list",
           });
         }}
         css={{ position: "fixed", bottom: "$sm", left: "$sm" }}

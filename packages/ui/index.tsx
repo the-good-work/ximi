@@ -10,5 +10,7 @@ export * from "./Texts/Icon";
 export * from "./Texts/Heading";
 export * from "./Form/Input";
 export * from "./Screens/Home";
-export * from "./Screens/SelectInput";
+export * from "./Screens/SelectConnectionMode";
 export * from "./Screens/EnterPasscode";
+export * from "./Screens/EnterName";
+export * from "./Screens/InSession";

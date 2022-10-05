@@ -4,15 +4,15 @@ import IconButton from "ui/Buttons/IconButton";
 import { Refresh, SadOutline } from "react-ionicons";
 import { styled } from "ui/theme/theme";
 import ListButton from "../Buttons/ListButton";
-import { RoomStateInit, UpdateStateActions } from "../../../types/state";
+import { Room, UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import Icon from "../Texts/Icon";
 
 export default function Home({
-  state,
+  rooms,
   updateState,
 }: {
-  state: RoomStateInit;
+  rooms: Room[];
   updateState: Dispatch<UpdateStateActions>;
 }) {
   const [isRefreshing, setIsRefreshing] = useState<boolean | null>(false);
@@ -86,7 +86,7 @@ export default function Home({
               <ListButton
                 onClick={() => {
                   updateState({
-                    type: "room-selected",
+                    type: "select-room",
                     properties: { room: r },
                   });
                 }}
@@ -127,7 +127,7 @@ export default function Home({
           state={isRefreshing ? "loading" : "default"}
         />
       </HeadingBox>
-      <ListOfRooms rooms={state.properties.rooms} />
+      <ListOfRooms rooms={rooms} />
     </div>
   );
 }

@@ -20,6 +20,7 @@ export default function SelectInput({
     gap: "$3xl",
     width: "100%",
     maxWidth: "650px",
+
     ".button-and-text": {
       display: "flex",
       justifyContent: "flex-start",
@@ -31,7 +32,7 @@ export default function SelectInput({
   });
 
   return (
-    <div className="content">
+    <div className="content noscroll">
       <Heading
         color="gradient"
         css={{

@@ -50,8 +50,17 @@ const StyledContainer = styled("main", {
     flexDirection: "column",
     display: "flex",
     width: "100%",
+    height: "100%",
     alignItems: "center",
+  },
+
+  ".scroll": {
+    justifyContent: "flex-start",
     overflow: "scroll",
+  },
+  ".noscroll": {
+    justifyContent: "center",
+    overflow: "hidden",
   },
 
   variants: {

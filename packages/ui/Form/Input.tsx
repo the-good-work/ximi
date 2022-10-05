@@ -61,6 +61,7 @@ export default function Input({
   css,
   as,
   name,
+  inputMode,
   type = "text",
   pattern,
   value,
@@ -74,6 +75,7 @@ export default function Input({
   pattern?: string;
   value?: string;
   type?: string;
+  inputMode?: string;
 }) {
   return (
     <StyledInput
@@ -84,6 +86,7 @@ export default function Input({
       name={name}
       {...props}
       value={value}
+      inputMode={inputMode}
     ></StyledInput>
   );
 }

@@ -8,29 +8,43 @@ import Input from "../Form/Input";
 import { styled } from "../theme/theme";
 import Button from "../Buttons/Button";
 
-export default function EnterPasscode({
+export default function EnterName({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
 }) {
-  const [passcode, setPasscode] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
   const keys = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    " ",
-    "0",
-    " ",
+    "q",
+    "w",
+    "e",
+    "r",
+    "t",
+    "y",
+    "u",
+    "i",
+    "o",
+    "p",
+    "a",
+    "s",
+    "d",
+    "f",
+    "g",
+    "h",
+    "j",
+    "k",
+    "l",
     "bsp",
+    "z",
+    "x",
+    "c",
+    "v",
+    "b",
+    "n",
+    "m",
     "clr",
-    "ent",
+    "confirm",
   ];
 
   const Keypad = styled("div", {
@@ -48,12 +62,12 @@ export default function EnterPasscode({
       gridRowStart: "4",
       gridRowEnd: "7",
     },
-    ".ent": {
+    ".confirm": {
       gridColumnStart: "4",
       gridRowStart: "7",
       gridRowEnd: "9",
     },
-    ".number": {
+    ".letter": {
       gridRow: "span 2",
     },
     "@base": {
@@ -75,7 +89,7 @@ export default function EnterPasscode({
           marginBottom: "$sm",
         }}
       >
-        Enter Passcode
+        Enter Nickname
       </Heading>
       <Text
         color="white"
@@ -85,25 +99,25 @@ export default function EnterPasscode({
           maxWidth: "500px",
         }}
       >
-        The room is protected by a passcode set by the creator of the room.
+        Choose a 5-letter nickname
       </Text>
       <form
         onSubmit={() => {
-          updateState({ type: "submit-passcode" });
+          updateState({ type: "submit-name", properties: { name: "test" } });
         }}
       >
-        <label htmlFor="password-input" style={{ display: "none" }}>
-          Enter Password
+        <label htmlFor="name-input" style={{ display: "none" }}>
+          Enter Name
         </label>
         <Input
-          name="password-input"
+          name="name-input"
           type="text"
           pattern="[0-9]*"
           inputMode="numeric"
-          value={passcode}
+          value={name}
           onChange={(e) => {
             const target = e.target as HTMLInputElement;
-            setPasscode(target.value.slice(0, 5));
+            setName(target.value.slice(0, 5));
           }}
         />
         <Keypad>
@@ -111,13 +125,13 @@ export default function EnterPasscode({
             let className;
             let type;
 
-            if (k != "ent" && k != "clr" && k != "bsp") {
-              className = "number";
+            if (k != "confirm" && k != "clr" && k != "bsp") {
+              className = "letter";
             } else {
               className = k;
             }
 
-            if (k === "ent") {
+            if (k === "confirm") {
               type = "submit";
             } else {
               type = "button";
@@ -131,13 +145,13 @@ export default function EnterPasscode({
                 type={type}
                 onClick={() => {
                   if (k === "clr") {
-                    setPasscode(passcode.slice(0, -5));
+                    setName(name.slice(0, -5));
                   } else if (k === "bsp") {
-                    setPasscode(passcode.slice(0, -1));
-                  } else if (passcode.length < 5) {
-                    setPasscode(`${passcode}${k}`);
-                  } else if (k === "ent") {
-                    return passcode;
+                    setName(name.slice(0, -1));
+                  } else if (name.length < 5) {
+                    setName(`${name}${k}`);
+                  } else if (k === "confirm") {
+                    return;
                   }
                 }}
               >

@@ -1,6 +1,5 @@
-import React, { ChangeEventHandler, MouseEventHandler, ReactNode } from "react";
+import React, { ChangeEventHandler, EventHandler, KeyboardEvent } from "react";
 import { styled } from "../theme/theme";
-import Text from "../Texts/Text";
 
 const StyledInput = styled("input", {
   borderRadius: "$xs",
@@ -11,7 +10,6 @@ const StyledInput = styled("input", {
   color: "$text",
   width: "100%",
   display: "flex",
-  padding: "$sm $md",
   justifyContent: "flex-start",
   gap: "$sm",
   alignItems: "center",
@@ -60,8 +58,10 @@ export default function Input({
   onChange,
   css,
   as,
-  name,
   inputMode,
+  onKeyDown,
+  autoFocus,
+  readOnly,
   type = "text",
   pattern,
   value,
@@ -71,19 +71,23 @@ export default function Input({
   onChange?: ChangeEventHandler;
   as?: any;
   props?: any;
-  name: string;
   pattern?: string;
   value?: string;
   type?: string;
+  autoFocus?: any;
+  readOnly?: any;
   inputMode?: string;
+  onKeyDown?: EventHandler<KeyboardEvent>;
 }) {
   return (
     <StyledInput
+      readOnly={readOnly}
+      autoFocus={autoFocus}
       css={css}
       type={type}
       as={as}
       onChange={onChange}
-      name={name}
+      onKeyDown={onKeyDown}
       {...props}
       value={value}
       inputMode={inputMode}

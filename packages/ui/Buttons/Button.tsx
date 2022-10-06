@@ -2,6 +2,8 @@ import React, { MouseEventHandler, ReactNode } from "react";
 import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
 
+type Variants = "solid" | "keypad";
+
 const StyledButton = styled("button", {
   borderRadius: "$xs",
   border: "2px solid $brand",
@@ -10,7 +12,7 @@ const StyledButton = styled("button", {
   width: "100%",
   display: "flex",
   padding: "$sm $md",
-  justifyContent: "flex-start",
+
   gap: "$sm",
   alignItems: "center",
   cursor: "pointer",
@@ -25,6 +27,17 @@ const StyledButton = styled("button", {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+    },
+  },
+
+  variants: {
+    variant: {
+      solid: {
+        justifyContent: "flex-start",
+      },
+      keypad: {
+        justifyContent: "center",
+      },
     },
   },
 
@@ -55,20 +68,33 @@ const StyledButton = styled("button", {
 export default function Button({
   children,
   icon,
+  variant = "solid",
   onClick,
   css,
   as,
+  type,
+  className,
   ...props
 }: {
   children: ReactNode;
-  icon: ReactNode;
+  icon?: ReactNode;
+  variant?: Variants;
   css?: any;
   onClick?: MouseEventHandler;
   as?: any;
+  type?: string;
   props?: any;
+  className?: string;
 }) {
   return (
-    <StyledButton css={css} as={as} onClick={onClick} {...props}>
+    <StyledButton
+      variant={variant}
+      css={css}
+      className={className}
+      as={as}
+      onClick={onClick}
+      {...props}
+    >
       {icon && (
         <div className="icon" aria-hidden="true">
           {icon}

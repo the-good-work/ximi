@@ -9,7 +9,7 @@ export * from "./Texts/Text";
 export * from "./Texts/Icon";
 export * from "./Texts/Heading";
 export * from "./Form/Input";
-export * from "./Screens/Home";
+export * from "./Screens/ListRooms";
 export * from "./Screens/SelectConnectionMode";
 export * from "./Screens/EnterPasscode";
 export * from "./Screens/EnterName";

@@ -1,14 +1,14 @@
 import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
 import IconButton from "ui/Buttons/IconButton";
-import { Refresh, SadOutline } from "react-ionicons";
+import { SyncOutline, SadOutline } from "react-ionicons";
 import { styled } from "ui/theme/theme";
 import ListButton from "../Buttons/ListButton";
 import { Room, UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import Icon from "../Texts/Icon";
 
-export default function Home({
+export default function ListRooms({
   rooms,
   updateState,
 }: {
@@ -122,7 +122,7 @@ export default function Home({
           iconSize={{ "@base": "lg", "@md": "xl" }}
           aria-label="Refresh list of rooms"
           variant="ghost"
-          icon={<Refresh color="inherit" />}
+          icon={<SyncOutline color="inherit" />}
           onClick={onRefresh}
           state={isRefreshing ? "loading" : "default"}
         />

@@ -1,6 +1,6 @@
 import React, { useReducer } from "react";
 import "./App.css";
-import Home from "ui/Screens/Home";
+import ListRooms from "ui/Screens/ListRooms";
 import SelectConnectionMode from "ui/Screens/SelectConnectionMode";
 import EnterPasscode from "ui/Screens/EnterPasscode";
 import EnterName from "ui/Screens/EnterName";
@@ -117,7 +117,7 @@ function App() {
 
   function PageRenderer({ state }: { state: ReducerStates }) {
     if (state.page === "list-room-page") {
-      return <Home rooms={rooms} updateState={updateState} />;
+      return <ListRooms rooms={rooms} updateState={updateState} />;
     } else if (state.page === "select-connection-input-page") {
       return <SelectConnectionMode updateState={updateState} />;
     } else if (state.page === "enter-passcode-page") {

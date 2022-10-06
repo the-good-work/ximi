@@ -4,12 +4,12 @@ export type Room = {
   noOfParticipants: number;
 } | null;
 
-export type Pages =
-  | "list-room-page"
-  | "select-connection-input-page"
-  | "enter-passcode-page"
-  | "enter-name-page"
-  | "in-session-page";
+export type Screens =
+  | "list-room-screen"
+  | "select-connection-input-screen"
+  | "enter-passcode-screen"
+  | "enter-name-screen"
+  | "in-session-screen";
 
 export type UpdateStateActions =
   | {
@@ -39,18 +39,18 @@ export type UpdateStateActions =
     };
 
 export type RoomStateInit = {
-  page: "list-room-page";
+  screen: "list-room-screen";
 };
 
 export type RoomStateSelectConnectionInput = {
-  page: "select-connection-input-page";
+  screen: "select-connection-input-screen";
   properties: {
     room: Room;
   };
 };
 
 export type RoomStateEnterPasscode = {
-  page: "enter-passcode-page";
+  screen: "enter-passcode-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -58,7 +58,7 @@ export type RoomStateEnterPasscode = {
 };
 
 export type RoomStateEnterName = {
-  page: "enter-name-page";
+  screen: "enter-name-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -66,7 +66,7 @@ export type RoomStateEnterName = {
 };
 
 export type RoomStateInSession = {
-  page: "in-session-page";
+  screen: "in-session-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";

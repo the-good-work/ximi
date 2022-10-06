@@ -38,8 +38,9 @@ export default function EnterPasscode({
   ];
 
   function comparePasscode(passcode: string) {
-    // updateState({ type: "submit-passcode" });
-    console.log(`compare password: ${parentPasscode} vs ${passcode}`);
+    if (passcode === parentPasscode) {
+      updateState({ type: "submit-passcode" });
+    }
   }
 
   const handlePasscode = (key: string, pass: string) => {

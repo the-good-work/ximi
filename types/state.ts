@@ -1,7 +1,6 @@
 export type Room = {
-  name: string;
-  id: string;
-  noOfParticipants: number;
+  room: string;
+  participants: number;
 } | null;
 
 export type Screens =

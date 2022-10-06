@@ -10,7 +10,11 @@ import Icon from "../Texts/Icon";
 import useSWR from "swr";
 
 const fetcher = (args: any) => fetch(args).then((res) => res.json());
-const options = { revalidateOnFocus: false };
+const options = {
+  revalidateOnFocus: false,
+  revalidateIfStale: false,
+  shouldRetryOnError: false,
+};
 const getListRooms = "https://server.ximi.network/rooms/list";
 const createNewRoom = "https://server.ximi.network/rooms/create";
 
@@ -48,7 +52,7 @@ export default function ListRooms({
     mutate();
   }
 
-  function ListOfRooms({ rooms, ...props }: { rooms: any; props?: any }) {
+  function ListOfRooms({ rooms, ...props }: { rooms: Room[]; props?: any }) {
     if (isRefreshing) {
       return (
         <EmptyState>
@@ -69,29 +73,32 @@ export default function ListRooms({
           <Text size="md">An error has occurred. Please try again later.</Text>
         </EmptyState>
       );
-    } else
+    } else {
       return (
         <List {...props}>
-          {rooms.map((r: any) => {
-            return (
-              <ListButton
-                onClick={() => {
-                  updateState({
-                    type: "select-room",
-                    properties: { room: r },
-                  });
-                }}
-                key={r.name}
-                as="button"
-                aria-label={`Room: ${r.name}, participants: ${r.participants}`}
-                noOfParticipants={r.participants}
-              >
-                {r.name}
-              </ListButton>
-            );
+          {rooms.map((r) => {
+            if (r) {
+              return (
+                <ListButton
+                  onClick={() => {
+                    updateState({
+                      type: "select-room",
+                      properties: { room: r },
+                    });
+                  }}
+                  key={r.room}
+                  as="button"
+                  aria-label={`Room: ${r.room}, participants: ${r.participants}`}
+                  noOfParticipants={r.participants}
+                >
+                  {r.room}
+                </ListButton>
+              );
+            }
           })}
         </List>
       );
+    }
   }
 
   const HeadingBox = styled("div", {
@@ -158,7 +165,13 @@ export default function ListRooms({
       </HeadingBox>
       <ListOfRooms rooms={rooms} />
       <IconButton
-        css={{ borderRadius: "100%", path: { fill: "$text" } }}
+        css={{
+          borderRadius: "100%",
+          path: { fill: "$text" },
+          position: "fixed",
+          bottom: "$sm",
+          left: "$sm",
+        }}
         iconSize={{ "@base": "lg", "@md": "xl" }}
         aria-label="Create room test"
         variant="ghost"

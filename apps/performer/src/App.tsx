@@ -117,7 +117,7 @@ function App() {
         room={
           state.screen !== "list-room-screen"
             ? state.properties.room
-              ? state.properties.room.name
+              ? state.properties.room.room
               : "-"
             : "-"
         }

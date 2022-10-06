@@ -1,5 +1,5 @@
 export type Room = {
-  name: string;
+  room: string;
   participants: number;
 } | null;
 

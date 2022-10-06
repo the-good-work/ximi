@@ -59,7 +59,7 @@ export default function ListRooms({
           <Text size="md">Refreshing...</Text>
         </EmptyState>
       );
-    } else if (!data) {
+    } else if (!data || data.length <= 0) {
       return (
         <EmptyState css={{ fill: "$text" }}>
           <Icon size="lg" icon={<SadOutline color="inherit" />} />

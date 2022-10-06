@@ -58,6 +58,7 @@ export default function EnterPasscode({
 
   const Keypad = styled("div", {
     display: "grid",
+    gap: "0",
     gridTemplateColumns: "repeat(4, 1fr)",
     gridTemplateRows: "repeat(4, 1fr)",
 
@@ -91,7 +92,11 @@ export default function EnterPasscode({
 
   const HeadingGroup = styled("div", {
     maxWidth: "600px",
-
+    marginBottom: "0",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     div: {
       width: "100%",
       display: passcode.length > 0 ? "none" : "flex",
@@ -101,141 +106,169 @@ export default function EnterPasscode({
     },
     input: {
       position: passcode.length > 0 ? "static" : "fixed",
-      top: passcode.length > 0 ? "0" : "-3000px",
+      top: passcode.length > 0 ? "unset" : "-3000px",
     },
 
     "@base": {
-      marginBottom: "$lg",
       span: {
         maxWidth: "400px",
       },
     },
     "@md": {
-      marginBottom: "$3xl",
       span: {
         maxWidth: "500px",
       },
     },
   });
 
+  const PageContainer = styled("div", {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
+    maxWidth: "600px",
+
+    "@base": {
+      gap: "$sm",
+      ".heading": {
+        minHeight: "120px",
+      },
+    },
+    "@md": {
+      gap: "$xl",
+      ".heading": {
+        minHeight: "140px",
+      },
+    },
+
+    ".flex-child": {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
+
   return (
     <div className="content noscroll">
-      <HeadingGroup>
-        <div>
-          <Heading
-            color="gradient"
+      <PageContainer>
+        <HeadingGroup className="flex-child heading">
+          <div>
+            <Heading
+              color="gradient"
+              css={{
+                textAlign: "center",
+                textTransform: "uppercase",
+                marginTop: "0",
+                marginBottom: "$sm",
+              }}
+            >
+              Enter Passcode
+            </Heading>
+            <Text color="white" size="sm">
+              The room is protected by a passcode set by the creator of the
+              room.
+            </Text>
+          </div>
+          <Input
+            autoFocus
+            readOnly
             css={{
-              textAlign: "center",
-              textTransform: "uppercase",
-              marginTop: "$sm",
-              marginBottom: "$sm",
+              letterSpacing: "1rem",
+              fontSize: "$2xl",
+              maxWidth: "450px",
             }}
-          >
-            Enter Passcode
-          </Heading>
-          <Text color="white" size="sm">
-            The room is protected by a passcode set by the creator of the room.
-          </Text>
+            type="password"
+            value={passcode}
+            onKeyDown={(e) => {
+              const target = e.code;
+              handlePasscode(target, passcode);
+            }}
+          />
+        </HeadingGroup>
+        <div className="flex-child keypad">
+          <Keypad>
+            {keys.map((k) => {
+              if (k === "ent") {
+                return (
+                  <Button
+                    variant="keypad"
+                    key={"ent"}
+                    className={"ent"}
+                    onClick={() => {
+                      handlePasscode("ent", passcode);
+                    }}
+                    css={{
+                      path: { stroke: "$text", fill: "transparent" },
+                    }}
+                    aria-label="Submit passcode"
+                  >
+                    <div aria-hidden="true">
+                      <ArrowForward color="inherit" />
+                    </div>
+                  </Button>
+                );
+              } else if (k === "clr") {
+                return (
+                  <Button
+                    variant="keypad"
+                    key={"clr"}
+                    className={"clr"}
+                    onClick={() => {
+                      handlePasscode("clr", passcode);
+                    }}
+                    aria-label="Clear passcode"
+                  >
+                    <div aria-hidden="true">
+                      <ArrowUndoOutline color="inherit" />
+                    </div>
+                  </Button>
+                );
+              } else if (k === "bsp") {
+                return (
+                  <Button
+                    variant="keypad"
+                    key={"bsp"}
+                    className={"bsp"}
+                    onClick={() => {
+                      handlePasscode("bsp", passcode);
+                    }}
+                    aria-label="Backspace"
+                  >
+                    <div aria-hidden="true">
+                      <Backspace color="inherit" />
+                    </div>
+                  </Button>
+                );
+              } else if (k === "0") {
+                return (
+                  <Button
+                    variant="keypad"
+                    key={k}
+                    className={"zero"}
+                    onClick={() => {
+                      handlePasscode(k, passcode);
+                    }}
+                  >
+                    {k}
+                  </Button>
+                );
+              } else
+                return (
+                  <Button
+                    variant="keypad"
+                    key={k}
+                    className={"number"}
+                    onClick={() => {
+                      handlePasscode(k, passcode);
+                    }}
+                  >
+                    {k}
+                  </Button>
+                );
+            })}
+          </Keypad>
         </div>
-        <Input
-          autoFocus
-          readOnly
-          css={{
-            letterSpacing: "1rem",
-            fontSize: "$2xl",
-            maxWidth: "450px",
-          }}
-          type="password"
-          value={passcode}
-          onKeyDown={(e) => {
-            const target = e.code;
-            handlePasscode(target, passcode);
-          }}
-        />
-      </HeadingGroup>
-
-      <Keypad>
-        {keys.map((k) => {
-          if (k === "ent") {
-            return (
-              <Button
-                variant="keypad"
-                key={"ent"}
-                className={"ent"}
-                onClick={() => {
-                  handlePasscode("ent", passcode);
-                }}
-                css={{
-                  path: { stroke: "$text", fill: "transparent" },
-                }}
-                aria-label="Submit passcode"
-              >
-                <div aria-hidden="true">
-                  <ArrowForward color="inherit" />
-                </div>
-              </Button>
-            );
-          } else if (k === "clr") {
-            return (
-              <Button
-                variant="keypad"
-                key={"clr"}
-                className={"clr"}
-                onClick={() => {
-                  handlePasscode("clr", passcode);
-                }}
-                aria-label="Clear passcode"
-              >
-                <div aria-hidden="true">
-                  <ArrowUndoOutline color="inherit" />
-                </div>
-              </Button>
-            );
-          } else if (k === "bsp") {
-            return (
-              <Button
-                variant="keypad"
-                key={"bsp"}
-                className={"bsp"}
-                onClick={() => {
-                  handlePasscode("bsp", passcode);
-                }}
-                aria-label="Backspace"
-              >
-                <div aria-hidden="true">
-                  <Backspace color="inherit" />
-                </div>
-              </Button>
-            );
-          } else if (k === "0") {
-            return (
-              <Button
-                variant="keypad"
-                key={k}
-                className={"zero"}
-                onClick={() => {
-                  handlePasscode(k, passcode);
-                }}
-              >
-                {k}
-              </Button>
-            );
-          } else
-            return (
-              <Button
-                variant="keypad"
-                key={k}
-                className={"number"}
-                onClick={() => {
-                  handlePasscode(k, passcode);
-                }}
-              >
-                {k}
-              </Button>
-            );
-        })}
-      </Keypad>
-
+      </PageContainer>
       <IconButton
         onClick={() => {
           updateState({

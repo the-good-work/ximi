@@ -1,29 +1,97 @@
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import Heading from "ui/Texts/Heading";
 import IconButton from "ui/Buttons/IconButton";
-import { SyncOutline, SadOutline } from "react-ionicons";
+import { SyncOutline, SadOutline, Create } from "react-ionicons";
 import { styled } from "ui/theme/theme";
 import ListButton from "../Buttons/ListButton";
 import { Room, UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import Icon from "../Texts/Icon";
+import useSWR from "swr";
+
+const fetcher = (args: any) => fetch(args).then((res) => res.json());
+const options = { revalidateOnFocus: false };
+const getListRooms = "https://server.ximi.network/rooms/list";
+const createNewRoom = "https://server.ximi.network/rooms/create";
+
+async function createRoomTest() {
+  const options = { method: "POST" };
+  const response = await fetch(createNewRoom, options);
+  return response;
+}
 
 export default function ListRooms({
-  rooms,
   updateState,
 }: {
-  rooms: Room[];
   updateState: Dispatch<UpdateStateActions>;
 }) {
-  const [isRefreshing, setIsRefreshing] = useState<boolean | null>(false);
+  const {
+    data,
+    mutate,
+    isValidating: isRefreshing,
+    error,
+  } = useSWR(getListRooms, fetcher, options);
+
+  const rooms: Room[] = data || [];
+
+  async function onCreate() {
+    createRoomTest()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   async function onRefresh() {
-    setIsRefreshing(true);
-    return await new Promise((resolve) => setTimeout(resolve, 1500)).then(
-      () => {
-        setIsRefreshing(false);
-      }
-    );
+    mutate();
+  }
+
+  function ListOfRooms({ rooms, ...props }: { rooms: any; props?: any }) {
+    if (isRefreshing) {
+      return (
+        <EmptyState>
+          <Text size="md">Refreshing...</Text>
+        </EmptyState>
+      );
+    } else if (!data) {
+      return (
+        <EmptyState css={{ fill: "$text" }}>
+          <Icon size="lg" icon={<SadOutline color="inherit" />} />
+          <Text size="md">There are currently no available rooms</Text>
+        </EmptyState>
+      );
+    } else if (error) {
+      return (
+        <EmptyState css={{ fill: "$text" }}>
+          <Icon size="lg" icon={<SadOutline color="inherit" />} />
+          <Text size="md">An error has occurred. Please try again later.</Text>
+        </EmptyState>
+      );
+    } else
+      return (
+        <List {...props}>
+          {rooms.map((r: any) => {
+            return (
+              <ListButton
+                onClick={() => {
+                  updateState({
+                    type: "select-room",
+                    properties: { room: r },
+                  });
+                }}
+                key={r.name}
+                as="button"
+                aria-label={`Room: ${r.name}, participants: ${r.participants}`}
+                noOfParticipants={r.participants}
+              >
+                {r.name}
+              </ListButton>
+            );
+          })}
+        </List>
+      );
   }
 
   const HeadingBox = styled("div", {
@@ -64,45 +132,6 @@ export default function ListRooms({
     },
   });
 
-  function ListOfRooms({ rooms, ...props }: { rooms: any; props?: any }) {
-    if (isRefreshing) {
-      return (
-        <EmptyState>
-          <Text size="md">Refreshing...</Text>
-        </EmptyState>
-      );
-    } else if (rooms.length <= 0) {
-      return (
-        <EmptyState css={{ fill: "$text" }}>
-          <Icon size="lg" icon={<SadOutline color="inherit" />} />
-          <Text size="md">There are currently no available rooms</Text>
-        </EmptyState>
-      );
-    } else
-      return (
-        <List {...props}>
-          {rooms.map((r: any) => {
-            return (
-              <ListButton
-                onClick={() => {
-                  updateState({
-                    type: "select-room",
-                    properties: { room: r },
-                  });
-                }}
-                key={r.id}
-                as="button"
-                aria-label={`Room: ${r.name}, participants: ${r.noOfParticipants}`}
-                noOfParticipants={r.noOfParticipants}
-              >
-                {r.name}
-              </ListButton>
-            );
-          })}
-        </List>
-      );
-  }
-
   return (
     <div className="content scroll">
       <HeadingBox>
@@ -128,6 +157,14 @@ export default function ListRooms({
         />
       </HeadingBox>
       <ListOfRooms rooms={rooms} />
+      <IconButton
+        css={{ borderRadius: "100%", path: { fill: "$text" } }}
+        iconSize={{ "@base": "lg", "@md": "xl" }}
+        aria-label="Create room test"
+        variant="ghost"
+        icon={<Create color="inherit" />}
+        onClick={onCreate}
+      />
     </div>
   );
 }

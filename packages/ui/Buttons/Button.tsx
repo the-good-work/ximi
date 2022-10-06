@@ -2,7 +2,7 @@ import React, { MouseEventHandler, ReactNode } from "react";
 import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
 
-type Variants = "solid" | "keypad";
+type Variants = "solid" | "keypad" | "keyboard";
 
 const StyledButton = styled("button", {
   borderRadius: "$xs",
@@ -11,7 +11,6 @@ const StyledButton = styled("button", {
   color: "$text",
   width: "100%",
   display: "flex",
-  padding: "$sm $md",
 
   gap: "$sm",
   alignItems: "center",
@@ -34,9 +33,15 @@ const StyledButton = styled("button", {
     variant: {
       solid: {
         justifyContent: "flex-start",
+        padding: "$sm $md",
       },
       keypad: {
         justifyContent: "center",
+        padding: "$sm $md",
+      },
+      keyboard: {
+        justifyContent: "center",
+        padding: "$xs $sm",
       },
     },
   },

@@ -4,7 +4,7 @@ import {
   ReturnDownBack,
   ArrowForward,
   Backspace,
-  ArrowUndoOutline,
+  CloseCircleOutline,
 } from "react-ionicons";
 import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
@@ -211,6 +211,9 @@ export default function EnterPasscode({
               } else if (k === "clr") {
                 return (
                   <Button
+                    css={{
+                      path: { stroke: "$text", fill: "transparent" },
+                    }}
                     variant="keypad"
                     key={"clr"}
                     className={"clr"}
@@ -220,7 +223,7 @@ export default function EnterPasscode({
                     aria-label="Clear passcode"
                   >
                     <div aria-hidden="true">
-                      <ArrowUndoOutline color="inherit" />
+                      <CloseCircleOutline color="inherit" />
                     </div>
                   </Button>
                 );

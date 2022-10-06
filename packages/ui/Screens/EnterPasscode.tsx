@@ -10,8 +10,9 @@ import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import IconButton from "../Buttons/IconButton";
 import Input from "../Form/Input";
-import { styled } from "../theme/theme";
+import { ScreenContainer } from "../Composites/ScreenContainer";
 import Button from "../Buttons/Button";
+import { styled } from "../theme/theme";
 
 export default function EnterPasscode({
   updateState,
@@ -92,74 +93,38 @@ export default function EnterPasscode({
   });
 
   const HeadingGroup = styled("div", {
-    maxWidth: "600px",
-    marginBottom: "0",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    div: {
-      width: "100%",
-      display: passcode.length > 0 ? "none" : "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    input: {
-      position: passcode.length > 0 ? "static" : "fixed",
-      top: passcode.length > 0 ? "unset" : "-3000px",
-    },
-
-    "@base": {
-      span: {
-        maxWidth: "400px",
-      },
-    },
-    "@md": {
-      span: {
-        maxWidth: "500px",
-      },
-    },
-  });
-
-  const PageContainer = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    maxWidth: "600px",
-
-    "@base": {
-      gap: "$sm",
-      ".heading": {
-        minHeight: "120px",
-      },
-    },
-    "@md": {
-      gap: "$xl",
-      ".heading": {
-        minHeight: "140px",
-      },
-    },
-
-    ".flex-child": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
   });
 
   return (
     <div className="content noscroll">
-      <PageContainer>
-        <HeadingGroup className="flex-child heading">
+      <ScreenContainer>
+        <HeadingGroup
+          className="heading"
+          css={{
+            div: {
+              width: "100%",
+              display: passcode.length > 0 ? "none" : "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            },
+            input: {
+              position: passcode.length > 0 ? "static" : "fixed",
+              top: passcode.length > 0 ? "unset" : "-3000px",
+            },
+          }}
+        >
           <div>
             <Heading
               color="gradient"
               css={{
                 textAlign: "center",
                 textTransform: "uppercase",
-                marginTop: "0",
+                marginTop: "$sm",
                 marginBottom: "$sm",
               }}
             >
@@ -186,7 +151,8 @@ export default function EnterPasscode({
             }}
           />
         </HeadingGroup>
-        <div className="flex-child keypad">
+
+        <div className="flex-child content">
           <Keypad>
             {keys.map((k) => {
               if (k === "ent") {
@@ -269,7 +235,7 @@ export default function EnterPasscode({
             })}
           </Keypad>
         </div>
-      </PageContainer>
+      </ScreenContainer>
       <IconButton
         onClick={() => {
           updateState({

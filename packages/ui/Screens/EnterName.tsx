@@ -77,18 +77,16 @@ export default function EnterName({
   }
 
   const handleNickname = (key: string, nickname: string) => {
-    console.log(key);
-
     const keyboardKey = key.slice(-1);
 
     if (key === "Enter" || key === "confirm") {
       checkNickName(nickname);
     } else if (key === "Backspace" || key === "bsp") {
-      setNickname(nickname.slice(0, -1));
+      setNickname(nickname.slice(0, -1).toUpperCase());
     } else if (key === "clr") {
-      setNickname(nickname.slice(0, -5));
+      setNickname(nickname.slice(0, -5).toUpperCase());
     } else if (keys.indexOf(keyboardKey) != -1) {
-      setNickname(`${nickname}${keyboardKey}`.slice(0, 5));
+      setNickname(`${nickname}${keyboardKey}`.slice(0, 5).toUpperCase());
     } else return;
   };
 

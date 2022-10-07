@@ -1,47 +1,71 @@
 export type Room = {
-  name: string;
-  id: string;
-  noOfParticipants: number;
+  room: string;
+  participants: number;
 } | null;
 
-export type Pages = "home" | "select-input" | "enter-password";
+export type Screens =
+  | "list-room-screen"
+  | "select-connection-input-screen"
+  | "enter-passcode-screen"
+  | "enter-name-screen"
+  | "in-session-screen";
 
 export type UpdateStateActions =
   | {
-      type: "go-home";
+      type: "back-to-list";
     }
   | {
-      type: "room-selected";
+      type: "back-to-connection-input";
+    }
+  | {
+      type: "select-room";
       properties: { room: Room };
     }
   | {
-      type: "connection-mode-selected";
+      type: "select-connection-mode";
       properties: {
         inputType: "voice" | "line";
       };
     }
   | {
-      type: "entered-password";
-      properties: {};
+      type: "submit-passcode";
+    }
+  | {
+      type: "submit-name";
+      properties: {
+        name: string;
+      };
     };
 
 export type RoomStateInit = {
-  page: "home";
-  properties: {
-    room: null;
-    rooms: Room[];
-  };
+  screen: "list-room-screen";
 };
 
-export type RoomStateSelectInput = {
-  page: "select-input";
+export type RoomStateSelectConnectionInput = {
+  screen: "select-connection-input-screen";
   properties: {
     room: Room;
   };
 };
 
-export type RoomStateEnterPassword = {
-  page: "enter-password";
+export type RoomStateEnterPasscode = {
+  screen: "enter-passcode-screen";
+  properties: {
+    room: Room;
+    inputType: "voice" | "line";
+  };
+};
+
+export type RoomStateEnterName = {
+  screen: "enter-name-screen";
+  properties: {
+    room: Room;
+    inputType: "voice" | "line";
+  };
+};
+
+export type RoomStateInSession = {
+  screen: "in-session-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -50,5 +74,7 @@ export type RoomStateEnterPassword = {
 
 export type ReducerStates =
   | RoomStateInit
-  | RoomStateSelectInput
-  | RoomStateEnterPassword;
+  | RoomStateSelectConnectionInput
+  | RoomStateEnterPasscode
+  | RoomStateEnterName
+  | RoomStateInSession;

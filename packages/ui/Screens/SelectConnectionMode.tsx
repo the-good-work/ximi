@@ -3,15 +3,13 @@ import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
 import { MicOutline, PulseOutline, ReturnDownBack } from "react-ionicons";
 import Button from "../Buttons/Button";
-import { RoomStateSelectInput, UpdateStateActions } from "../../../types/state";
+import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import IconButton from "../Buttons/IconButton";
 
-export default function SelectInput({
-  state,
+export default function SelectConnectionMode({
   updateState,
 }: {
-  state: RoomStateSelectInput;
   updateState: Dispatch<UpdateStateActions>;
 }) {
   const ButtonGroup = styled("div", {
@@ -22,6 +20,7 @@ export default function SelectInput({
     gap: "$3xl",
     width: "100%",
     maxWidth: "650px",
+
     ".button-and-text": {
       display: "flex",
       justifyContent: "flex-start",
@@ -33,7 +32,7 @@ export default function SelectInput({
   });
 
   return (
-    <div className="content">
+    <div className="content noscroll">
       <Heading
         color="gradient"
         css={{
@@ -50,6 +49,7 @@ export default function SelectInput({
         size="sm"
         css={{
           marginBottom: "$3xl",
+          maxWidth: "500px",
         }}
       >
         Choose your mode of audio connection to the room
@@ -60,7 +60,7 @@ export default function SelectInput({
           <Button
             onClick={() => {
               updateState({
-                type: "connection-mode-selected",
+                type: "select-connection-mode",
                 properties: { inputType: "voice" },
               });
             }}
@@ -87,7 +87,7 @@ export default function SelectInput({
             icon={<PulseOutline color="inherit" />}
             onClick={() => {
               updateState({
-                type: "connection-mode-selected",
+                type: "select-connection-mode",
                 properties: { inputType: "line" },
               });
             }}
@@ -103,7 +103,7 @@ export default function SelectInput({
       <IconButton
         onClick={() => {
           updateState({
-            type: "go-home",
+            type: "back-to-list",
           });
         }}
         css={{ position: "fixed", bottom: "$sm", left: "$sm" }}

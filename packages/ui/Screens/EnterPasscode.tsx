@@ -1,5 +1,7 @@
 import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
+import { ToastType } from "../../../types/component";
+import { ToastProvider } from "@radix-ui/react-toast";
 import {
   ReturnDownBack,
   ArrowForward,
@@ -13,6 +15,7 @@ import Input from "../Form/Input";
 import { ScreenContainer } from "../Composites/ScreenContainer";
 import Button from "../Buttons/Button";
 import { styled } from "../theme/theme";
+import Toast from "../Feedback/Toast";
 
 export default function EnterPasscode({
   updateState,
@@ -38,13 +41,25 @@ export default function EnterPasscode({
     "ent",
   ];
 
+  const [toast, setToast] = useState<ToastType>(null);
+
   function comparePasscode(passcode: string) {
     if (passcode === parentPasscode) {
       updateState({ type: "submit-passcode" });
     } else if (passcode.length <= 0) {
-      console.log("throw a toast saying 'Password is empty'");
+      setToast({
+        title: "Invalid Passcode",
+        description: "Passcode is empty",
+        duration: 5000,
+        isCloseable: true,
+      });
     } else {
-      console.log("throw a toast saying 'You have entered the wrong passcode'");
+      setToast({
+        title: "Invalid Passcode",
+        description: "You have entered the wrong passcode",
+        duration: 5000,
+        isCloseable: true,
+      });
     }
   }
 
@@ -102,7 +117,7 @@ export default function EnterPasscode({
     justifyContent: "center",
     alignItems: "center",
   });
-
+  console.log(toast);
   return (
     <div className="content noscroll">
       <ScreenContainer>
@@ -161,20 +176,28 @@ export default function EnterPasscode({
             {keys.map((k) => {
               if (k === "ent") {
                 return (
-                  <Button
-                    variant="keypad"
-                    type="primary"
-                    key={"ent"}
-                    className={"ent"}
-                    onClick={() => {
-                      handlePasscode("ent", passcode);
-                    }}
-                    css={{
-                      path: { stroke: "$text", fill: "transparent" },
-                    }}
-                    aria-label="Submit passcode"
-                    icon={<ArrowForward color="inherit" />}
-                  />
+                  <ToastProvider>
+                    <Toast
+                      toast={toast}
+                      setToast={setToast}
+                      title={"Hello"}
+                      description={"Hello World"}
+                    />
+                    <Button
+                      variant="keypad"
+                      type="primary"
+                      key={"ent"}
+                      className={"ent"}
+                      onClick={() => {
+                        handlePasscode("ent", passcode);
+                      }}
+                      css={{
+                        path: { stroke: "$text", fill: "transparent" },
+                      }}
+                      aria-label="Submit passcode"
+                      icon={<ArrowForward color="inherit" />}
+                    />
+                  </ToastProvider>
                 );
               } else if (k === "clr") {
                 return (

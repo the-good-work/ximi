@@ -213,11 +213,9 @@ export default function EnterName({
                       path: { stroke: "$text", fill: "transparent" },
                     }}
                     aria-label="Submit nickname"
-                  >
-                    <div aria-hidden="true">
-                      <ArrowForward color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<ArrowForward color="inherit" />}
+                    type="primary"
+                  />
                 );
               } else if (k === "clr") {
                 return (
@@ -232,11 +230,8 @@ export default function EnterName({
                       handleNickname("clr", nickname);
                     }}
                     aria-label="Clear nickname"
-                  >
-                    <div aria-hidden="true">
-                      <CloseCircleOutline color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<CloseCircleOutline color="inherit" />}
+                  />
                 );
               } else if (k === "bsp") {
                 return (
@@ -248,11 +243,8 @@ export default function EnterName({
                       handleNickname("bsp", nickname);
                     }}
                     aria-label="Backspace"
-                  >
-                    <div aria-hidden="true">
-                      <Backspace color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<Backspace color="inherit" />}
+                  />
                 );
               } else
                 return (

@@ -3,11 +3,11 @@ import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
 
 type Variants = "solid" | "keypad" | "keyboard";
+type ButtonTypes = "primary" | "normal";
 
 const StyledButton = styled("button", {
   borderRadius: "$xs",
   border: "2px solid $brand",
-  backgroundColor: "$background",
   color: "$text",
   width: "100%",
   display: "flex",
@@ -29,7 +29,36 @@ const StyledButton = styled("button", {
     },
   },
 
+  "@base": {
+    ".icon": {
+      width: "$md",
+      span: {
+        svg: {
+          width: "20px",
+          height: "auto",
+        },
+      },
+    },
+  },
+  "@md": {
+    ".icon": {
+      width: "$lg",
+      span: {
+        svg: {
+          width: "40px",
+          height: "auto",
+        },
+      },
+    },
+  },
+
   variants: {
+    type: {
+      primary: {
+        background: "linear-gradient($brandGradientC)",
+      },
+      normal: { backgroundColor: "$background" },
+    },
     variant: {
       solid: {
         justifyContent: "flex-start",
@@ -42,28 +71,15 @@ const StyledButton = styled("button", {
       keyboard: {
         justifyContent: "center",
         padding: "$xs $sm",
-      },
-    },
-  },
-
-  "@base": {
-    ".icon": {
-      width: "$sm",
-      span: {
-        svg: {
-          width: "20px",
-          height: "auto",
+        "@base": {
+          ".icon": {
+            width: "$sm",
+          },
         },
-      },
-    },
-  },
-  "@md": {
-    ".icon": {
-      width: "$md",
-      span: {
-        svg: {
-          width: "40px",
-          height: "auto",
+        "@md": {
+          ".icon": {
+            width: "$md",
+          },
         },
       },
     },
@@ -77,17 +93,17 @@ export default function Button({
   onClick,
   css,
   as,
-  type,
+  type = "normal",
   className,
   ...props
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   icon?: ReactNode;
   variant?: Variants;
   css?: any;
   onClick?: MouseEventHandler;
   as?: any;
-  type?: string;
+  type?: ButtonTypes;
   props?: any;
   className?: string;
 }) {
@@ -95,6 +111,7 @@ export default function Button({
     <StyledButton
       variant={variant}
       css={css}
+      type={type}
       className={className}
       as={as}
       onClick={onClick}
@@ -105,7 +122,7 @@ export default function Button({
           {icon}
         </div>
       )}
-      <Text size="md">{children}</Text>
+      {children && <Text size="md">{children}</Text>}
     </StyledButton>
   );
 }

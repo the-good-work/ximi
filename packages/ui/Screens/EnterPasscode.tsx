@@ -159,6 +159,7 @@ export default function EnterPasscode({
                 return (
                   <Button
                     variant="keypad"
+                    type="primary"
                     key={"ent"}
                     className={"ent"}
                     onClick={() => {
@@ -168,11 +169,8 @@ export default function EnterPasscode({
                       path: { stroke: "$text", fill: "transparent" },
                     }}
                     aria-label="Submit passcode"
-                  >
-                    <div aria-hidden="true">
-                      <ArrowForward color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<ArrowForward color="inherit" />}
+                  />
                 );
               } else if (k === "clr") {
                 return (
@@ -187,11 +185,8 @@ export default function EnterPasscode({
                       handlePasscode("clr", passcode);
                     }}
                     aria-label="Clear passcode"
-                  >
-                    <div aria-hidden="true">
-                      <CloseCircleOutline color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<CloseCircleOutline color="inherit" />}
+                  />
                 );
               } else if (k === "bsp") {
                 return (
@@ -203,11 +198,8 @@ export default function EnterPasscode({
                       handlePasscode("bsp", passcode);
                     }}
                     aria-label="Backspace"
-                  >
-                    <div aria-hidden="true">
-                      <Backspace color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<Backspace color="inherit" />}
+                  />
                 );
               } else if (k === "0") {
                 return (

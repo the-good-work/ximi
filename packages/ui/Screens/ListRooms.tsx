@@ -15,8 +15,8 @@ const options = {
   revalidateIfStale: false,
   shouldRetryOnError: false,
 };
-const getListRooms = "https://server.ximi.network/rooms/list";
-const createNewRoom = "https://server.ximi.network/rooms/create";
+const getListRooms = `${process.env.REACT_APP_SERVER_HOST}/rooms/list`;
+const createNewRoom = `${process.env.REACT_APP_SERVER_HOST}/rooms/create`;
 
 async function createRoomTest() {
   const options = { method: "POST" };

@@ -16,7 +16,9 @@ export const { styled, css } = createStitches({
         "163.02deg, #111113 58.37%, rgba(82, 55, 243, 0.17) 97.01%",
       brandGradientB:
         "160.26deg, #5237F3 46.37%, #E8E8F4 84.22%, #5237F3 154.83%",
+      brandGradientC: "294.47deg, #5237F3 9.25%, rgba(82, 55, 243, 0) 64.17%",
     },
+
     space: {
       "2xs": "0.25rem", //4px
       xs: "0.5rem", //8px
@@ -28,9 +30,10 @@ export const { styled, css } = createStitches({
       "3xl": "2.875rem", //46px
     },
     sizes: {
-      "3xs": "0.25rem", //4px
-      "2xs": "0.375rem", //6px
-      xs: "0.5rem", //8px
+      "4xs": "0.25rem", //4px
+      "3xs": "0.375rem", //6px
+      "2xs": "0.5rem", //8px
+      xs: "0.75rem", //12px
       sm: "1rem", //16px
       md: "1.25rem", //20px
       lg: "2rem", //32px

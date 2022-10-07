@@ -6,7 +6,7 @@ export const ScreenContainer = styled("div", {
   flexDirection: "column",
   width: "100%",
   height: "100%",
-  maxWidth: "600px",
+  maxWidth: "620px",
 
   "@base": {
     gap: "$3xs",

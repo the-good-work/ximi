@@ -6,7 +6,7 @@ export const { styled, css } = createStitches({
   theme: {
     colors: {
       brand: "#5237F3",
-      accent: "#6016FF",
+      accent: "#7976FF",
       "accent-translucent": "rgba(82, 55, 243, 0.5)",
       text: "#E8E8F4",
       negative: "#D73C37",

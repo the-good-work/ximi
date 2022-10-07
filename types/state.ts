@@ -4,11 +4,11 @@ export type Room = {
 } | null;
 
 export type Screens =
-  | "list-room-screen"
+  | "room-list-screen"
   | "select-connection-input-screen"
   | "enter-passcode-screen"
   | "enter-name-screen"
-  | "in-session-screen";
+  | "stage-screen";
 
 export type UpdateStateActions =
   | {
@@ -38,7 +38,7 @@ export type UpdateStateActions =
     };
 
 export type RoomStateInit = {
-  screen: "list-room-screen";
+  screen: "room-list-screen";
 };
 
 export type RoomStateSelectConnectionInput = {
@@ -64,11 +64,12 @@ export type RoomStateEnterName = {
   };
 };
 
-export type RoomStateInSession = {
-  screen: "in-session-screen";
+export type RoomStateStage = {
+  screen: "stage-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";
+    name: string;
   };
 };
 
@@ -77,4 +78,4 @@ export type ReducerStates =
   | RoomStateSelectConnectionInput
   | RoomStateEnterPasscode
   | RoomStateEnterName
-  | RoomStateInSession;
+  | RoomStateStage;

@@ -4,7 +4,7 @@ import {
   ReturnDownBack,
   ArrowForward,
   Backspace,
-  ArrowUndoOutline,
+  CloseCircleOutline,
 } from "react-ionicons";
 import { UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
@@ -41,6 +41,10 @@ export default function EnterPasscode({
   function comparePasscode(passcode: string) {
     if (passcode === parentPasscode) {
       updateState({ type: "submit-passcode" });
+    } else if (passcode.length <= 0) {
+      console.log("throw a toast saying 'Password is empty'");
+    } else {
+      console.log("throw a toast saying 'You have entered the wrong passcode'");
     }
   }
 
@@ -152,13 +156,14 @@ export default function EnterPasscode({
           />
         </HeadingGroup>
 
-        <div className="flex-child content">
+        <div className="body">
           <Keypad>
             {keys.map((k) => {
               if (k === "ent") {
                 return (
                   <Button
                     variant="keypad"
+                    type="primary"
                     key={"ent"}
                     className={"ent"}
                     onClick={() => {
@@ -168,15 +173,15 @@ export default function EnterPasscode({
                       path: { stroke: "$text", fill: "transparent" },
                     }}
                     aria-label="Submit passcode"
-                  >
-                    <div aria-hidden="true">
-                      <ArrowForward color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<ArrowForward color="inherit" />}
+                  />
                 );
               } else if (k === "clr") {
                 return (
                   <Button
+                    css={{
+                      path: { stroke: "$text", fill: "transparent" },
+                    }}
                     variant="keypad"
                     key={"clr"}
                     className={"clr"}
@@ -184,11 +189,8 @@ export default function EnterPasscode({
                       handlePasscode("clr", passcode);
                     }}
                     aria-label="Clear passcode"
-                  >
-                    <div aria-hidden="true">
-                      <ArrowUndoOutline color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<CloseCircleOutline color="inherit" />}
+                  />
                 );
               } else if (k === "bsp") {
                 return (
@@ -200,11 +202,8 @@ export default function EnterPasscode({
                       handlePasscode("bsp", passcode);
                     }}
                     aria-label="Backspace"
-                  >
-                    <div aria-hidden="true">
-                      <Backspace color="inherit" />
-                    </div>
-                  </Button>
+                    icon={<Backspace color="inherit" />}
+                  />
                 );
               } else if (k === "0") {
                 return (

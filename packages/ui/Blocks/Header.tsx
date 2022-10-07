@@ -8,6 +8,7 @@ import {
   CalendarClearOutline,
   TimeOutline,
   LayersOutline,
+  Home,
 } from "react-ionicons";
 
 const StyledHeader = styled("div", {
@@ -56,13 +57,7 @@ const StyledHeader = styled("div", {
   },
 });
 
-export default function Header({
-  room,
-  version,
-}: {
-  room: string;
-  version: string;
-}) {
+export default function Header({ room }: { room: string }) {
   let [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {
     setTimeout(() => {
@@ -72,9 +67,15 @@ export default function Header({
   return (
     <StyledHeader>
       <div className="status-box" aria-label="Current room">
-        <Text color="accent" aria-hidden="true" size="2xs">
-          Room
-        </Text>
+        <Icon
+          css={{
+            marginBottom: "1px",
+            path: { fill: "$accent" },
+          }}
+          size="sm"
+          color="accent"
+          icon={<Home color="inherit" />}
+        />
         <Text size="2xs">{room}</Text>
       </div>
 

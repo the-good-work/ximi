@@ -1,13 +1,10 @@
-import { styled } from "@stitches/react";
 import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
-import { MicOutline, PulseOutline, ReturnDownBack } from "react-ionicons";
-import Button from "../Buttons/Button";
+import { ReturnDownBack } from "react-ionicons";
 import { UpdateStateActions } from "../../../types/state";
-import Text from "../Texts/Text";
 import IconButton from "../Buttons/IconButton";
 
-export default function InSession({
+export default function Stage({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
@@ -23,7 +20,7 @@ export default function InSession({
           marginBottom: "$sm",
         }}
       >
-        In Session
+        Stage
       </Heading>
 
       <IconButton

@@ -7,7 +7,7 @@
     },
 
     "performer#build": {
-      "env": ["REACT_APP_VERSION"]
+      "env": ["REACT_APP_VERSION", "REACT_APP_SERVER_HOST"]
     },
     "lint": {
       "outputs": []

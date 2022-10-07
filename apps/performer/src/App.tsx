@@ -1,6 +1,6 @@
 import React, { useReducer } from "react";
 import "./App.css";
-import ListRooms from "ui/Screens/ListRooms";
+import RoomsList from "ui/Screens/RoomsList";
 import SelectConnectionMode from "ui/Screens/SelectConnectionMode";
 import EnterPasscode from "ui/Screens/EnterPasscode";
 import EnterName from "ui/Screens/EnterName";
@@ -18,7 +18,7 @@ import Container from "ui/Blocks/Container";
 
 function App() {
   const initialState: RoomStateInit = {
-    screen: "list-room-screen",
+    screen: "room-list-screen",
   };
 
   function reducer(_state: ReducerStates, action: UpdateStateActions) {
@@ -28,7 +28,7 @@ function App() {
         _state.screen === "select-connection-input-screen")
     ) {
       const __state: RoomStateInit = {
-        screen: "list-room-screen",
+        screen: "room-list-screen",
       };
       return __state;
     }
@@ -46,7 +46,7 @@ function App() {
       return __state;
     } else if (
       action.type === "select-room" &&
-      _state.screen === "list-room-screen"
+      _state.screen === "room-list-screen"
     ) {
       const __state: RoomStateSelectConnectionInput = {
         screen: "select-connection-input-screen",
@@ -99,11 +99,9 @@ function App() {
 
   const [state, updateState] = useReducer(reducer, initialState);
 
-  console.log(state);
-
   function ScreenRenderer({ state }: { state: ReducerStates }) {
-    if (state.screen === "list-room-screen") {
-      return <ListRooms updateState={updateState} />;
+    if (state.screen === "room-list-screen") {
+      return <RoomsList updateState={updateState} />;
     } else if (state.screen === "select-connection-input-screen") {
       return <SelectConnectionMode updateState={updateState} />;
     } else if (state.screen === "enter-passcode-screen") {
@@ -118,7 +116,7 @@ function App() {
     <div id="App">
       <Container
         room={
-          state.screen !== "list-room-screen"
+          state.screen !== "room-list-screen"
             ? state.properties.room
               ? state.properties.room.room
               : "-"

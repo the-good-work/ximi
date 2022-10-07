@@ -4,7 +4,7 @@ export type Room = {
 } | null;
 
 export type Screens =
-  | "list-room-screen"
+  | "room-list-screen"
   | "select-connection-input-screen"
   | "enter-passcode-screen"
   | "enter-name-screen"
@@ -38,7 +38,7 @@ export type UpdateStateActions =
     };
 
 export type RoomStateInit = {
-  screen: "list-room-screen";
+  screen: "room-list-screen";
 };
 
 export type RoomStateSelectConnectionInput = {

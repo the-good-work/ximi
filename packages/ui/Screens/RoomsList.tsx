@@ -15,7 +15,7 @@ const options = {
   revalidateIfStale: false,
   shouldRetryOnError: false,
 };
-const getListRooms = `${process.env.REACT_APP_SERVER_HOST}/rooms/list`;
+const getRoomsList = `${process.env.REACT_APP_SERVER_HOST}/rooms/list`;
 const createNewRoom = `${process.env.REACT_APP_SERVER_HOST}/rooms/create`;
 
 async function createRoomTest() {
@@ -24,7 +24,7 @@ async function createRoomTest() {
   return response;
 }
 
-export default function ListRooms({
+export default function RoomsList({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
@@ -34,7 +34,7 @@ export default function ListRooms({
     mutate,
     isValidating: isRefreshing,
     error,
-  } = useSWR(getListRooms, fetcher, options);
+  } = useSWR(getRoomsList, fetcher, options);
 
   const rooms: Room[] = data || [];
 

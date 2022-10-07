@@ -88,6 +88,7 @@ function App() {
         properties: {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
+          name: action.properties.name,
         },
       };
       return __state;
@@ -97,6 +98,8 @@ function App() {
   }
 
   const [state, updateState] = useReducer(reducer, initialState);
+
+  console.log(state);
 
   function ScreenRenderer({ state }: { state: ReducerStates }) {
     if (state.screen === "list-room-screen") {

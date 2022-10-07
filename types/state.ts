@@ -69,6 +69,7 @@ export type RoomStateStage = {
   properties: {
     room: Room;
     inputType: "voice" | "line";
+    name: string;
   };
 };
 

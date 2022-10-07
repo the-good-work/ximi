@@ -141,44 +141,46 @@ export default function ListRooms({
   });
 
   return (
-    <div className="content scroll">
-      <HeadingBox>
-        <Heading
-          color="gradient"
-          css={{
-            marginTop: "$sm",
-            marginBottom: "$sm",
-            textAlign: "center",
-            textTransform: "uppercase",
-          }}
-        >
-          Rooms Online
-        </Heading>
+    <div className="content-scroll">
+      <div className="scroll">
+        <HeadingBox>
+          <Heading
+            color="gradient"
+            css={{
+              marginTop: "$sm",
+              marginBottom: "$sm",
+              textAlign: "center",
+              textTransform: "uppercase",
+            }}
+          >
+            Rooms Online
+          </Heading>
+          <IconButton
+            css={{ borderRadius: "100%" }}
+            iconSize={{ "@base": "lg", "@md": "xl" }}
+            aria-label="Refresh list of rooms"
+            variant="ghost"
+            icon={<SyncOutline color="inherit" />}
+            onClick={onRefresh}
+            state={isRefreshing ? "loading" : "default"}
+          />
+        </HeadingBox>
+        <ListOfRooms rooms={rooms} />
         <IconButton
-          css={{ borderRadius: "100%" }}
+          css={{
+            borderRadius: "100%",
+            path: { fill: "$text" },
+            position: "fixed",
+            bottom: "$sm",
+            left: "$sm",
+          }}
           iconSize={{ "@base": "lg", "@md": "xl" }}
-          aria-label="Refresh list of rooms"
+          aria-label="Create room test"
           variant="ghost"
-          icon={<SyncOutline color="inherit" />}
-          onClick={onRefresh}
-          state={isRefreshing ? "loading" : "default"}
+          icon={<Create color="inherit" />}
+          onClick={onCreate}
         />
-      </HeadingBox>
-      <ListOfRooms rooms={rooms} />
-      <IconButton
-        css={{
-          borderRadius: "100%",
-          path: { fill: "$text" },
-          position: "fixed",
-          bottom: "$sm",
-          left: "$sm",
-        }}
-        iconSize={{ "@base": "lg", "@md": "xl" }}
-        aria-label="Create room test"
-        variant="ghost"
-        icon={<Create color="inherit" />}
-        onClick={onCreate}
-      />
+      </div>
     </div>
   );
 }

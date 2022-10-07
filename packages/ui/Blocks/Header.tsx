@@ -88,7 +88,7 @@ export default function Header({
             color="accent"
             icon={<LayersOutline color="inherit" />}
           />
-          <Text size="2xs">{version}</Text>
+          <Text size="2xs">{process.env.REACT_APP_VERSION}</Text>
         </div>
         <div className="status-box" aria-label="Date">
           <Text size="2xs" color="accent" aria-hidden="true">

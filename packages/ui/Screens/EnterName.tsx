@@ -67,6 +67,8 @@ export default function EnterName({
     const sameName = "AAAAA";
     if (nickname === sameName) {
       console.log("throw a toast saying 'This name is already in use'");
+    } else if (nickname.length <= 0) {
+      console.log("throw a toast saying 'Name cannot be empty'");
     } else {
       updateState({
         type: "submit-name",

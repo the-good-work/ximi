@@ -41,6 +41,10 @@ export default function EnterPasscode({
   function comparePasscode(passcode: string) {
     if (passcode === parentPasscode) {
       updateState({ type: "submit-passcode" });
+    } else if (passcode.length <= 0) {
+      console.log("throw a toast saying 'Password is empty'");
+    } else {
+      console.log("throw a toast saying 'You have entered the wrong passcode'");
     }
   }
 

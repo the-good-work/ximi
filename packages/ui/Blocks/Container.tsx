@@ -129,7 +129,7 @@ export default function Container({
     <>
       <StyledContainer isFullWidth={isFullWidth}>
         <div className="frame">
-          <Header room={room} version={"1.2.5"} />
+          <Header room={room} version={process.env.REACT_APP_VERSION} />
           {children}
           <IconButton
             onClick={() => {

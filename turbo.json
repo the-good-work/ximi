@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+
+    "performer#build": {
+      "env": ["REACT_APP_VERSION"]
+    },
     "lint": {
       "outputs": []
     },

@@ -1,9 +1,9 @@
-import React, { Dispatch, useEffect, useState } from "react";
-import Heading from "ui/Texts/Heading";
 import IconButton from "ui/Buttons/IconButton";
-import { SyncOutline, SadOutline, Create } from "react-ionicons";
 import { styled } from "ui/theme/theme";
 import ListButton from "../Buttons/ListButton";
+import React, { Dispatch } from "react";
+import Heading from "ui/Texts/Heading";
+import { SyncOutline, SadOutline, Create } from "react-ionicons";
 import { Room, UpdateStateActions } from "../../../types/state";
 import Text from "../Texts/Text";
 import Icon from "../Texts/Icon";
@@ -41,6 +41,7 @@ export default function ListRooms({
   async function onCreate() {
     createRoomTest()
       .then((res) => {
+        mutate();
         console.log(res);
       })
       .catch((err) => {

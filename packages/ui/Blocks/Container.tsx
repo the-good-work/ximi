@@ -52,12 +52,31 @@ const StyledContainer = styled("main", {
     width: "100%",
     height: "100%",
     alignItems: "center",
+    overflow: "hidden",
+  },
+
+  ".content-scroll": {
+    boxSizing: "border-box",
+    flexDirection: "column",
+    position: "static",
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    alignItems: "flex-start",
+    overflow: "hidden",
   },
 
   ".scroll": {
+    display: "flex",
+    flexDirection: "column",
     justifyContent: "flex-start",
-    overflow: "scroll",
+    alignItems: "center",
+    overflowY: "scroll",
+    overflowX: "hidden",
+    boxSizing: "border-box",
+    width: "calc(100% + 30px)",
   },
+
   ".noscroll": {
     justifyContent: "center",
     overflow: "hidden",
@@ -84,12 +103,14 @@ const StyledContainer = styled("main", {
   "@base": {
     ".frame": { display: "none" },
     ".content": { padding: "$md" },
+    ".content-scroll .scroll": { padding: "$md" },
   },
   "@sm": {
     ".frame": { display: "flex" },
   },
   "@md": {
     ".content": { padding: "$3xl" },
+    ".content-scroll .scroll": { padding: "$3xl" },
   },
 });
 
@@ -108,7 +129,7 @@ export default function Container({
     <>
       <StyledContainer isFullWidth={isFullWidth}>
         <div className="frame">
-          <Header room={room} version={"1.2.5"} />
+          <Header room={room} version={process.env.REACT_APP_VERSION} />
           {children}
           <IconButton
             onClick={() => {

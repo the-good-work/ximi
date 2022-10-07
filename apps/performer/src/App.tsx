@@ -4,13 +4,13 @@ import ListRooms from "ui/Screens/ListRooms";
 import SelectConnectionMode from "ui/Screens/SelectConnectionMode";
 import EnterPasscode from "ui/Screens/EnterPasscode";
 import EnterName from "ui/Screens/EnterName";
-import InSession from "ui/Screens/InSession";
+import Stage from "ui/Screens/Stage";
 import {
   ReducerStates,
   RoomStateEnterName,
   RoomStateEnterPasscode,
   RoomStateInit,
-  RoomStateInSession,
+  RoomStateStage,
   RoomStateSelectConnectionInput,
   UpdateStateActions,
 } from "../../../types/state";
@@ -24,7 +24,7 @@ function App() {
   function reducer(_state: ReducerStates, action: UpdateStateActions) {
     if (
       action.type === "back-to-list" &&
-      (_state.screen === "in-session-screen" ||
+      (_state.screen === "stage-screen" ||
         _state.screen === "select-connection-input-screen")
     ) {
       const __state: RoomStateInit = {
@@ -83,8 +83,8 @@ function App() {
       action.type === "submit-name" &&
       _state.screen === "enter-name-screen"
     ) {
-      const __state: RoomStateInSession = {
-        screen: "in-session-screen",
+      const __state: RoomStateStage = {
+        screen: "stage-screen",
         properties: {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
@@ -107,8 +107,8 @@ function App() {
       return <EnterPasscode updateState={updateState} />;
     } else if (state.screen === "enter-name-screen") {
       return <EnterName updateState={updateState} />;
-    } else if (state.screen === "in-session-screen") {
-      return <InSession updateState={updateState} />;
+    } else if (state.screen === "stage-screen") {
+      return <Stage updateState={updateState} />;
     } else return <></>;
   }
   return (

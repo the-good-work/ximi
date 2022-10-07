@@ -152,7 +152,7 @@ export default function EnterPasscode({
           />
         </HeadingGroup>
 
-        <div className="flex-child content">
+        <div className="body">
           <Keypad>
             {keys.map((k) => {
               if (k === "ent") {

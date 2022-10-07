@@ -20,7 +20,6 @@ export default function SelectConnectionMode({
     flexDirection: "row",
     gap: "$3xl",
     width: "100%",
-    maxWidth: "650px",
 
     ".button-and-text": {
       display: "flex",
@@ -70,7 +69,7 @@ export default function SelectConnectionMode({
             Choose your mode of audio connection to the room
           </Text>
         </HeadingGroup>
-        <div className="flex-child content">
+        <div className="body">
           <ButtonGroup>
             <div className="button-and-text">
               <Button

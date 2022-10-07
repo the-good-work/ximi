@@ -6,29 +6,27 @@ export const ScreenContainer = styled("div", {
   flexDirection: "column",
   width: "100%",
   height: "100%",
-  maxWidth: "620px",
 
   "@base": {
-    gap: "$3xs",
+    gap: "$md",
+    maxWidth: "600px",
     ".heading": {
       minHeight: "126px",
     },
   },
   "@md": {
     gap: "$xl",
+    maxWidth: "650px",
     ".heading": {
       minHeight: "140px",
     },
   },
 
-  ".flex-child": {
-    display: "flex",
-  },
-
   ".heading": {
+    display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    maxWidth: "600px",
+    width: "100%",
 
     "@base": {
       span: {
@@ -41,8 +39,11 @@ export const ScreenContainer = styled("div", {
       },
     },
   },
-  ".content": {
-    justifyContent: "flex-start",
+  ".body": {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
     alignItems: "center",
+    flexDirection: "column",
   },
 });

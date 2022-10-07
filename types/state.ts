@@ -8,7 +8,7 @@ export type Screens =
   | "select-connection-input-screen"
   | "enter-passcode-screen"
   | "enter-name-screen"
-  | "in-session-screen";
+  | "stage-screen";
 
 export type UpdateStateActions =
   | {
@@ -64,8 +64,8 @@ export type RoomStateEnterName = {
   };
 };
 
-export type RoomStateInSession = {
-  screen: "in-session-screen";
+export type RoomStateStage = {
+  screen: "stage-screen";
   properties: {
     room: Room;
     inputType: "voice" | "line";
@@ -77,4 +77,4 @@ export type ReducerStates =
   | RoomStateSelectConnectionInput
   | RoomStateEnterPasscode
   | RoomStateEnterName
-  | RoomStateInSession;
+  | RoomStateStage;

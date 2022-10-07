@@ -13,5 +13,5 @@ export * from "./Screens/ListRooms";
 export * from "./Screens/SelectConnectionMode";
 export * from "./Screens/EnterPasscode";
 export * from "./Screens/EnterName";
-export * from "./Screens/InSession";
+export * from "./Screens/Stage";
 export * from "./Composites/ScreenContainer";

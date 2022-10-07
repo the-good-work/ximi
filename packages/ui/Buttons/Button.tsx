@@ -70,13 +70,14 @@ const StyledButton = styled("button", {
       },
       keyboard: {
         justifyContent: "center",
-        padding: "$xs $sm",
         "@base": {
+          padding: "$xs $sm",
           ".icon": {
             width: "$sm",
           },
         },
         "@md": {
+          padding: "$xs $sm",
           ".icon": {
             width: "$md",
           },

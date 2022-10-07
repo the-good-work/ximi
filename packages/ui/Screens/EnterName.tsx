@@ -12,6 +12,7 @@ import IconButton from "../Buttons/IconButton";
 import Input from "../Form/Input";
 import { styled } from "../theme/theme";
 import Button from "../Buttons/Button";
+import { ScreenContainer } from "../Composites/ScreenContainer";
 
 export default function EnterName({
   updateState,
@@ -103,12 +104,11 @@ export default function EnterName({
       gap: "$xs",
     },
     "@md": {
-      gap: "$md",
+      gap: "$sm",
     },
   });
 
   const HeadingGroup = styled("div", {
-    maxWidth: "600px",
     marginBottom: "0",
     display: "flex",
     flexDirection: "column",
@@ -134,58 +134,39 @@ export default function EnterName({
     },
   });
 
-  const PageContainer = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    maxWidth: "600px",
-
-    "@base": {
-      gap: "$sm",
-      ".heading": {
-        minHeight: "120px",
-      },
-    },
-    "@md": {
-      gap: "$xl",
-      ".heading": {
-        minHeight: "140px",
-      },
-    },
-
-    ".flex-child": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-  });
-
   return (
     <div className="content noscroll">
-      <PageContainer>
-        <HeadingGroup className="flex-child heading">
-          <div>
-            <Heading
-              color="gradient"
-              css={{
-                textAlign: "center",
-                textTransform: "uppercase",
-                marginTop: "0",
-                marginBottom: "$sm",
-              }}
-            >
-              Enter Nickname
-            </Heading>
-            <Text color="white" size="sm">
-              Choose a 5-letter nickname
-            </Text>
-          </div>
+      <ScreenContainer
+        css={{
+          gap: "0",
+          ".body": {
+            "@base": { gap: "$md" },
+            "@md": { gap: "$lg" },
+          },
+        }}
+      >
+        <HeadingGroup className="heading">
+          <Heading
+            color="gradient"
+            css={{
+              textAlign: "center",
+              textTransform: "uppercase",
+              marginTop: "0",
+              marginBottom: "$sm",
+            }}
+          >
+            Enter Nickname
+          </Heading>
+          <Text color="white" size="sm">
+            Choose a 5-letter nickname
+          </Text>
+        </HeadingGroup>
+        <div className="body">
           <Input
             autoFocus
             readOnly
             css={{
-              letterSpacing: "1rem",
+              letterSpacing: "0.5rem",
               fontSize: "$2xl",
               maxWidth: "450px",
             }}
@@ -196,8 +177,6 @@ export default function EnterName({
               handleNickname(target, nickname);
             }}
           />
-        </HeadingGroup>
-        <div className="flex-child keypad">
           <Keypad>
             {keys.map((k) => {
               if (k === "confirm") {
@@ -262,7 +241,7 @@ export default function EnterName({
             })}
           </Keypad>
         </div>
-      </PageContainer>
+      </ScreenContainer>
       <IconButton
         onClick={() => {
           updateState({

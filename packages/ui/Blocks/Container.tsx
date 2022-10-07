@@ -52,7 +52,6 @@ const StyledContainer = styled("main", {
     width: "100%",
     height: "100%",
     alignItems: "center",
-    overflow: "hidden",
   },
 
   ".content-scroll": {
@@ -126,49 +125,47 @@ export default function Container({
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   return (
-    <>
-      <StyledContainer isFullWidth={isFullWidth}>
-        <div className="frame">
-          <Header room={room} version={process.env.REACT_APP_VERSION} />
-          {children}
-          <IconButton
-            onClick={() => {
-              setIsFullScreen(!isFullScreen);
-              let elem = document.getElementById("App");
+    <StyledContainer isFullWidth={isFullWidth}>
+      <div className="frame">
+        <Header room={room} />
+        {children}
+        <IconButton
+          onClick={() => {
+            setIsFullScreen(!isFullScreen);
+            let elem = document.getElementById("App");
 
-              if (!document.fullscreenElement) {
-                elem?.requestFullscreen().catch((err) => {
-                  alert(
-                    `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-                  );
-                });
-              } else {
-                document.exitFullscreen();
-              }
-            }}
-            css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
-            iconSize="md"
-            variant="outline"
-            aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
-              isFullScreen ? "active" : "inactive"
-            }`}
-            icon={
-              isFullScreen ? (
-                <Contract color="inherit" />
-              ) : (
-                <Expand color="inherit" />
-              )
+            if (!document.fullscreenElement) {
+              elem?.requestFullscreen().catch((err) => {
+                alert(
+                  `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+                );
+              });
+            } else {
+              document.exitFullscreen();
             }
-          />
-        </div>
-        <RoadBlock>
-          <Logo css={{ position: "static" }} size="sm" />
-          <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
-            You are currently viewing XIMI from an unsupported viewport. Change
-            your device or increase your viewport width to 600px and above.
-          </Heading>
-        </RoadBlock>
-      </StyledContainer>
-    </>
+          }}
+          css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+          iconSize="md"
+          variant="outline"
+          aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
+            isFullScreen ? "active" : "inactive"
+          }`}
+          icon={
+            isFullScreen ? (
+              <Contract color="inherit" />
+            ) : (
+              <Expand color="inherit" />
+            )
+          }
+        />
+      </div>
+      <RoadBlock>
+        <Logo css={{ position: "static" }} size="sm" />
+        <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
+          You are currently viewing XIMI from an unsupported viewport. Change
+          your device or increase your viewport width to 600px and above.
+        </Heading>
+      </RoadBlock>
+    </StyledContainer>
   );
 }

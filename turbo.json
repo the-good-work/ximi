@@ -8,7 +8,7 @@
 
     "performer#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
+      "outputs": ["build/**"],
       "env": ["REACT_APP_VERSION", "REACT_APP_SERVER_HOST"]
     },
     "lint": {

@@ -1,79 +1,153 @@
-import React, { useEffect, useRef } from "react";
-import {
-  Root,
-  ToastClose,
-  ToastDescription,
-  ToastTitle,
-  ToastViewport,
-} from "@radix-ui/react-toast";
+import React, { createContext, useContext, useState } from "react";
+import * as RadixToast from "@radix-ui/react-toast";
+
 import { styled } from "../theme/theme";
-import { keyframes } from "@stitches/react";
-import { ToastType } from "../../../types/component";
+import { VariantProps, keyframes } from "@stitches/react";
+import { CloseCircleOutline } from "react-ionicons";
 
-const StyledToast = styled(Root, {});
+const Ctx = createContext<{
+  toasts: XMToast[];
+  toast: (toast: XMToast) => void;
+}>({
+  toasts: [],
+  toast: () => {},
+});
+Ctx.displayName = "XimiToastContext";
 
-const VIEWPORT_PADDING = 25;
+/* START STYLING */
 
-const hide = keyframes({
-  "0%": { opacity: 1 },
-  "100%": { opacity: 0 },
+const animToastIn = keyframes({
+  "0%": {
+    opacity: 0,
+    transform: "translate(0, 100%)",
+  },
+  "100%": {
+    opacity: 1,
+    transform: "translate(0, 0)",
+  },
 });
 
-const slideIn = keyframes({
-  from: { transform: `translateX(calc(100% + ${VIEWPORT_PADDING}px))` },
-  to: { transform: "translateX(0)" },
+const animToastOut = keyframes({
+  "0%": {
+    opacity: 1,
+    transform: "translate(0, 0)",
+  },
+  "100%": {
+    opacity: 0,
+    transform: "translate(0, 100%)",
+  },
 });
 
-const swipeOut = keyframes({
-  from: { transform: "translateX(var(--radix-toast-swipe-end-x))" },
-  to: { transform: `translateX(calc(100% + ${VIEWPORT_PADDING}px))` },
+const Root = styled(RadixToast.Root, {
+  background: "linear-gradient($brandGradientC), $background",
+  color: "$text",
+  position: "relative",
+  padding: "$sm $xl $sm $sm",
+  listStyle: "none",
+  margin: "$sm 0",
+  borderRadius: "$xs",
+  fontSize: "$md",
+  width: "100%",
+  boxSizing: "border-box",
+
+  "&[data-state=open]": {
+    animation: `${animToastIn} .5s ease-in`,
+  },
+  "&[data-state=closed]": {
+    animation: `${animToastOut} .5s ease-out`,
+  },
+
+  variants: {
+    tone: { warning: { background: "purple" } },
+    jumbo: { true: { fontSize: "$lg" }, false: { fontSize: "$md" } },
+  },
 });
 
-export default function Toast({
-  title,
-  description,
-  toast,
-  setToast,
-}: {
-  title: string;
-  description: string;
-  toast: ToastType;
-  setToast: any;
-}) {
-  const timerRef = useRef(0);
+const Title = styled(RadixToast.Title, {
+  variants: {
+    jumbo: { true: { fontSize: "$lg" }, false: { fontSize: "$md" } },
+  },
+});
 
-  const toastTimer = toast?.duration || 5000;
+const Close = styled(RadixToast.Close, {
+  display: "block",
+  position: "absolute",
+  right: "12px",
+  top: "50%",
+  transform: "translate(0, -50%)",
+  appearance: "none",
+  border: 0,
+  color: "$text",
+  background: "transparent",
+  cursor: "pointer",
 
-  useEffect(() => {
-    return () => clearTimeout(timerRef.current);
-  }, []);
+  svg: {
+    display: "block",
+  },
+});
 
-  useEffect(() => {
-    if (toast != null) {
-      handleToast();
-    } else return;
-  }, [toast]);
+const Viewport = styled(RadixToast.Viewport, {
+  margin: "0",
+  padding: "0",
+  width: "80%",
+  boxSizing: "border-box",
+  position: "fixed",
+  bottom: "20px",
+  transform: "translate(-50%, 0)",
+});
 
-  function handleToast() {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      setToast(null);
-    }, toastTimer);
-  }
+const Description = styled(RadixToast.Description, {
+  variants: {
+    jumbo: { true: { fontSize: "$md" }, false: { fontSize: "$sm" } },
+  },
+});
 
-  const openToast = toast != null;
+/* END STYLING */
 
+const XimiToast = ({ children }: { children: React.ReactChildren }) => {
+  const [toasts, setToasts] = useState<XMToast[]>([]);
   return (
-    <>
-      <StyledToast open={openToast}>
-        <ToastTitle>{title}</ToastTitle>
-        {toast?.description && (
-          <ToastDescription>{description}</ToastDescription>
-        )}
-        {toast?.isCloseable && <ToastClose />}
-      </StyledToast>
-
-      <ToastViewport />
-    </>
+    <Ctx.Provider
+      value={{
+        toasts,
+        toast: (t: XMToast) => {
+          setToasts((toasts) => [...toasts, t]);
+        },
+      }}
+    >
+      {children}
+      <RadixToast.Provider duration={5000}>
+        {toasts.map((toast, n) => (
+          <SingleToast {...toast} key={`toast_${n}`} />
+        ))}
+        <Viewport />
+      </RadixToast.Provider>
+    </Ctx.Provider>
   );
-}
+};
+
+const SingleToast = ({ title, description, tone, jumbo }: XMToast) => {
+  return (
+    <Root tone={tone} jumbo={jumbo}>
+      <Title jumbo={jumbo}>{title}</Title>
+      {description && <Description jumbo={jumbo}>{description}</Description>}
+      <Close>
+        <CloseCircleOutline color="inherit" width={"24px"} height={"24px"} />
+      </Close>
+    </Root>
+  );
+};
+
+const useToast = () => {
+  const { toast } = useContext(Ctx);
+  return { toast };
+};
+
+export { XimiToast, useToast };
+
+export type XMToast = {
+  title: string;
+  description?: string;
+  tone?: VariantProps<typeof Root>["tone"];
+  jumbo?: boolean;
+};

@@ -5,6 +5,7 @@ import { styled } from "../theme/theme";
 import Header from "./Header";
 import Logo from "./Logo";
 import { Contract, Expand } from "react-ionicons";
+import { XimiToast } from "../Feedback/Toast";
 
 const RoadBlock = styled("div", {
   width: "100%",
@@ -29,6 +30,7 @@ const RoadBlock = styled("div", {
 const StyledContainer = styled("main", {
   width: "100vw",
   height: "100vh",
+  overflow: "hidden",
   background:
     "url('/images/background/dot-grid.png'), linear-gradient($brandGradientA), $background",
   display: "flex",
@@ -126,46 +128,48 @@ export default function Container({
 
   return (
     <StyledContainer isFullWidth={isFullWidth}>
-      <div className="frame">
-        <Header room={room} />
-        {children}
-        <IconButton
-          onClick={() => {
-            setIsFullScreen(!isFullScreen);
-            let elem = document.getElementById("App");
+      <XimiToast>
+        <div className="frame">
+          <Header room={room} />
+          {children}
+          <IconButton
+            onClick={() => {
+              setIsFullScreen(!isFullScreen);
+              let elem = document.getElementById("App");
 
-            if (!document.fullscreenElement) {
-              elem?.requestFullscreen().catch((err) => {
-                alert(
-                  `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-                );
-              });
-            } else {
-              document.exitFullscreen();
+              if (!document.fullscreenElement) {
+                elem?.requestFullscreen().catch((err) => {
+                  alert(
+                    `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+                  );
+                });
+              } else {
+                document.exitFullscreen();
+              }
+            }}
+            css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+            iconSize="md"
+            variant="outline"
+            aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
+              isFullScreen ? "active" : "inactive"
+            }`}
+            icon={
+              isFullScreen ? (
+                <Contract color="inherit" />
+              ) : (
+                <Expand color="inherit" />
+              )
             }
-          }}
-          css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
-          iconSize="md"
-          variant="outline"
-          aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
-            isFullScreen ? "active" : "inactive"
-          }`}
-          icon={
-            isFullScreen ? (
-              <Contract color="inherit" />
-            ) : (
-              <Expand color="inherit" />
-            )
-          }
-        />
-      </div>
-      <RoadBlock>
-        <Logo css={{ position: "static" }} size="sm" />
-        <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
-          You are currently viewing XIMI from an unsupported viewport. Change
-          your device or increase your viewport width to 600px and above.
-        </Heading>
-      </RoadBlock>
+          />
+        </div>
+        <RoadBlock>
+          <Logo css={{ position: "static" }} size="sm" />
+          <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
+            You are currently viewing XIMI from an unsupported viewport. Change
+            your device or increase your viewport width to 600px and above.
+          </Heading>
+        </RoadBlock>
+      </XimiToast>
     </StyledContainer>
   );
 }

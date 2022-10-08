@@ -1,7 +1,5 @@
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch, useRef, useState } from "react";
 import Heading from "ui/Texts/Heading";
-import { ToastType } from "../../../types/component";
-import { ToastProvider } from "@radix-ui/react-toast";
 import {
   ReturnDownBack,
   ArrowForward,
@@ -15,7 +13,7 @@ import Input from "../Form/Input";
 import { ScreenContainer } from "../Composites/ScreenContainer";
 import Button from "../Buttons/Button";
 import { styled } from "../theme/theme";
-import Toast from "../Feedback/Toast";
+import { useToast } from "../Feedback/Toast";
 
 export default function EnterPasscode({
   updateState,
@@ -24,6 +22,7 @@ export default function EnterPasscode({
 }) {
   const parentPasscode = "11111";
   const [passcode, setPasscode] = useState<string>("");
+  const { toast } = useToast();
 
   const keys = [
     "1",
@@ -41,24 +40,22 @@ export default function EnterPasscode({
     "ent",
   ];
 
-  const [toast, setToast] = useState<ToastType>(null);
-
   function comparePasscode(passcode: string) {
     if (passcode === parentPasscode) {
       updateState({ type: "submit-passcode" });
     } else if (passcode.length <= 0) {
-      setToast({
+      toast({
         title: "Invalid Passcode",
         description: "Passcode is empty",
-        duration: 5000,
-        isCloseable: true,
+        tone: "warning",
+        jumbo: false,
       });
     } else {
-      setToast({
+      toast({
         title: "Invalid Passcode",
         description: "You have entered the wrong passcode",
-        duration: 5000,
-        isCloseable: true,
+        tone: "warning",
+        jumbo: true,
       });
     }
   }
@@ -117,7 +114,6 @@ export default function EnterPasscode({
     justifyContent: "center",
     alignItems: "center",
   });
-  console.log(toast);
   return (
     <div className="content noscroll">
       <ScreenContainer>
@@ -176,28 +172,20 @@ export default function EnterPasscode({
             {keys.map((k) => {
               if (k === "ent") {
                 return (
-                  <ToastProvider>
-                    <Toast
-                      toast={toast}
-                      setToast={setToast}
-                      title={"Hello"}
-                      description={"Hello World"}
-                    />
-                    <Button
-                      variant="keypad"
-                      type="primary"
-                      key={"ent"}
-                      className={"ent"}
-                      onClick={() => {
-                        handlePasscode("ent", passcode);
-                      }}
-                      css={{
-                        path: { stroke: "$text", fill: "transparent" },
-                      }}
-                      aria-label="Submit passcode"
-                      icon={<ArrowForward color="inherit" />}
-                    />
-                  </ToastProvider>
+                  <Button
+                    variant="keypad"
+                    type="primary"
+                    key={"ent"}
+                    className={"ent"}
+                    onClick={() => {
+                      handlePasscode("ent", passcode);
+                    }}
+                    css={{
+                      path: { stroke: "$text", fill: "transparent" },
+                    }}
+                    aria-label="Submit passcode"
+                    icon={<ArrowForward color="inherit" />}
+                  />
                 );
               } else if (k === "clr") {
                 return (

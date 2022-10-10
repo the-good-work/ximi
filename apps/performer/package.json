@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "dev": "export PORT=3100 && craco start",
+    "dev": "export PORT=3100; craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject"

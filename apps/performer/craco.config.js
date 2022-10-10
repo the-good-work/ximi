@@ -33,7 +33,6 @@ module.exports = {
         const include = Array.isArray(match.loader.include)
           ? match.loader.include
           : [match.loader.include];
-        // match.loader.include = include.concat(absolutePath, schonComponents);
         match.loader.include = include.concat(absolutePath);
       }
       return {

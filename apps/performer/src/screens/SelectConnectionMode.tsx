@@ -2,11 +2,11 @@ import React, { Dispatch } from "react";
 import { styled } from "@stitches/react";
 import { MicOutline, PulseOutline, ReturnDownBack } from "react-ionicons";
 import Heading from "ui/Texts/Heading";
-import Button from "../Buttons/Button";
-import Text from "../Texts/Text";
-import IconButton from "../Buttons/IconButton";
-import { ScreenContainer } from "../Composites/ScreenContainer";
-import { UpdateStateActions } from "../../../types/state";
+import Button from "ui/Buttons/Button";
+import IconButton from "ui/Buttons/IconButton";
+import Text from "ui/Texts/Text";
+import { ScreenContainer } from "ui/Composites/ScreenContainer";
+import { UpdateStateActions } from "../../../../types/state";
 
 export default function SelectConnectionMode({
   updateState,

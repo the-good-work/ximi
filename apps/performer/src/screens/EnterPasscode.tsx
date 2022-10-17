@@ -1,4 +1,4 @@
-import React, { Dispatch, useRef, useState } from "react";
+import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
 import {
   ReturnDownBack,
@@ -6,14 +6,14 @@ import {
   Backspace,
   CloseCircleOutline,
 } from "react-ionicons";
-import { UpdateStateActions } from "../../../types/state";
-import Text from "../Texts/Text";
-import IconButton from "../Buttons/IconButton";
-import Input from "../Form/Input";
-import { ScreenContainer } from "../Composites/ScreenContainer";
-import Button from "../Buttons/Button";
-import { styled } from "../theme/theme";
-import { useToast } from "../Feedback/Toast";
+import { UpdateStateActions } from "../../../../types/state";
+import Text from "ui/Texts/Text";
+import IconButton from "ui/Buttons/IconButton";
+import Input from "ui/Form/Input";
+import { ScreenContainer } from "ui/Composites/ScreenContainer";
+import Button from "ui/Buttons/Button";
+import { styled } from "ui/theme/theme";
+import { useToast } from "ui/Feedback/Toast";
 
 export default function EnterPasscode({
   updateState,
@@ -69,7 +69,7 @@ export default function EnterPasscode({
       setPasscode(passcode.slice(0, -1));
     } else if (key === "clr") {
       setPasscode(passcode.slice(0, -5));
-    } else if (keys.indexOf(numberKey) != -1) {
+    } else if (keys.indexOf(numberKey) !== -1) {
       setPasscode(`${passcode}${numberKey}`.slice(0, 5));
     } else return;
   };

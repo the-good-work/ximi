@@ -1,12 +1,12 @@
 import IconButton from "ui/Buttons/IconButton";
+import ListButton from "ui/Buttons/ListButton";
 import { styled } from "ui/theme/theme";
-import ListButton from "../Buttons/ListButton";
 import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
 import { SyncOutline, SadOutline, Create } from "react-ionicons";
-import { Room, UpdateStateActions } from "../../../types/state";
-import Text from "../Texts/Text";
-import Icon from "../Texts/Icon";
+import { Room, UpdateStateActions } from "../../../../types/state";
+import Text from "ui/Texts/Text";
+import Icon from "ui/Texts/Icon";
 import useSWR from "swr";
 
 const fetcher = (args: any) => fetch(args).then((res) => res.json());
@@ -96,6 +96,7 @@ export default function RoomsList({
                 </ListButton>
               );
             }
+            return null;
           })}
         </List>
       );

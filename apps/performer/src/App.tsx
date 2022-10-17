@@ -1,10 +1,10 @@
 import React, { useReducer } from "react";
 import "./App.css";
-import RoomsList from "ui/Screens/RoomsList";
-import SelectConnectionMode from "ui/Screens/SelectConnectionMode";
-import EnterPasscode from "ui/Screens/EnterPasscode";
-import EnterName from "ui/Screens/EnterName";
-import Stage from "ui/Screens/Stage";
+import RoomsList from "./screens/RoomsList";
+import SelectConnectionMode from "./screens/SelectConnectionMode";
+import EnterPasscode from "./screens/EnterPasscode";
+import EnterName from "./screens/EnterName";
+import Stage from "./screens/Stage";
 import {
   ReducerStates,
   RoomStateEnterName,

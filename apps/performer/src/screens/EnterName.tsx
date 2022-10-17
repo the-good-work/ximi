@@ -6,13 +6,13 @@ import {
   ArrowForward,
   CloseCircleOutline,
 } from "react-ionicons";
-import { UpdateStateActions } from "../../../types/state";
-import Text from "../Texts/Text";
-import IconButton from "../Buttons/IconButton";
-import Input from "../Form/Input";
-import { styled } from "../theme/theme";
-import Button from "../Buttons/Button";
-import { ScreenContainer } from "../Composites/ScreenContainer";
+import { UpdateStateActions } from "../../../../types/state";
+import Text from "ui/Texts/Text";
+import IconButton from "ui/Buttons/IconButton";
+import Input from "ui/Form/Input";
+import { styled } from "ui/theme/theme";
+import Button from "ui/Buttons/Button";
+import { ScreenContainer } from "ui/Composites/ScreenContainer";
 
 export default function EnterName({
   updateState,
@@ -88,7 +88,7 @@ export default function EnterName({
       setNickname(nickname.slice(0, -1).toUpperCase());
     } else if (key === "clr") {
       setNickname(nickname.slice(0, -5).toUpperCase());
-    } else if (keys.indexOf(keyboardKey) != -1) {
+    } else if (keys.indexOf(keyboardKey) !== -1) {
       setNickname(`${nickname}${keyboardKey}`.slice(0, 5).toUpperCase());
     } else return;
   };

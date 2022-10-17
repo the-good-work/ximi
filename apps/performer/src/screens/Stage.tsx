@@ -1,8 +1,8 @@
 import React, { Dispatch } from "react";
+import IconButton from "ui/Buttons/IconButton";
 import Heading from "ui/Texts/Heading";
 import { ReturnDownBack } from "react-ionicons";
-import { UpdateStateActions } from "../../../types/state";
-import IconButton from "../Buttons/IconButton";
+import { UpdateStateActions } from "../../../../types/state";
 
 export default function Stage({
   updateState,

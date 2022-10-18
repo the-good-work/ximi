@@ -6,7 +6,10 @@ import {
   Backspace,
   CloseCircleOutline,
 } from "react-ionicons";
-import { UpdateStateActions } from "../../../../types/state";
+import {
+  RoomStateEnterPasscode,
+  UpdateStateActions,
+} from "../../../../types/state";
 import Text from "ui/Texts/Text";
 import IconButton from "ui/Buttons/IconButton";
 import Input from "ui/Form/Input";
@@ -17,10 +20,12 @@ import { useToast } from "ui/Feedback/Toast";
 
 export default function EnterPasscode({
   updateState,
+  state,
 }: {
   updateState: Dispatch<UpdateStateActions>;
+  state: RoomStateEnterPasscode;
 }) {
-  const parentPasscode = "11111";
+  // const parentPasscode = "11111";
   const [passcode, setPasscode] = useState<string>("");
   const { toast } = useToast();
 
@@ -40,30 +45,78 @@ export default function EnterPasscode({
     "ent",
   ];
 
-  function comparePasscode(passcode: string) {
-    if (passcode === parentPasscode) {
-      updateState({
-        type: "submit-passcode",
-        properties: {
-          passcode: passcode,
-        },
-      });
-    } else if (passcode.length <= 0) {
-      toast({
-        title: "Invalid Passcode",
-        description: "Passcode is empty",
-        tone: "warning",
-        jumbo: false,
-      });
-    } else {
-      toast({
-        title: "Invalid Passcode",
-        description: "You have entered the wrong passcode",
-        tone: "warning",
-        jumbo: true,
-      });
-    }
+  async function checkPasscode(passcode: string) {
+    const data = {
+      room_name: state.properties.room,
+      participant_name: state.properties.name,
+      participant_type: state.properties.inputType,
+      passcode: passcode,
+    };
+    const options = { method: "POST", body: JSON.stringify(data) };
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
+
+      options
+    );
+    return response;
   }
+
+  async function comparePasscode(passcode: string) {
+    checkPasscode(passcode)
+      .then((res) => {
+        console.log(res);
+        // if (passcode === parentPasscode) {
+        //   updateState({
+        //     type: "submit-passcode",
+        //     properties: {
+        //       passcode: passcode,
+        //     },
+        //   });
+        // }
+
+        // else {
+        //   toast({
+        //     title: "Invalid Passcode",
+        //     description: "Passcode is empty",
+        //     tone: "warning",
+        //     jumbo: false,
+        //   });
+        // }
+      })
+      .catch((err) => {
+        toast({
+          title: "An Error Has Occurred",
+          description: "Please try again later.",
+          tone: "warning",
+          jumbo: false,
+        });
+      });
+  }
+
+  // function comparePasscode(passcode: string) {
+  //   if (passcode === "11111") {
+  //     updateState({
+  //       type: "submit-passcode",
+  //       properties: {
+  //         passcode: passcode,
+  //       },
+  //     });
+  //   } else if (passcode.length <= 0) {
+  //     toast({
+  //       title: "Invalid Passcode",
+  //       description: "Passcode is empty",
+  //       tone: "warning",
+  //       jumbo: false,
+  //     });
+  //   } else {
+  //     toast({
+  //       title: "Invalid Passcode",
+  //       description: "You have entered the wrong passcode",
+  //       tone: "warning",
+  //       jumbo: true,
+  //     });
+  //   }
+  // }
 
   const handlePasscode = (key: string, pass: string) => {
     const numberKey = key.slice(-1);

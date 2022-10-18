@@ -124,7 +124,7 @@ function App() {
     } else if (state.screen === "select-connection-input-screen") {
       return <SelectConnectionMode updateState={updateState} />;
     } else if (state.screen === "enter-passcode-screen") {
-      return <EnterPasscode updateState={updateState} />;
+      return <EnterPasscode state={state} updateState={updateState} />;
     } else if (state.screen === "enter-name-screen") {
       return <EnterName state={state} updateState={updateState} />;
     } else if (state.screen === "stage-screen") {

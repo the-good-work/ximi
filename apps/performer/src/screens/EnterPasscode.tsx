@@ -47,15 +47,20 @@ export default function EnterPasscode({
 
   async function checkPasscode(passcode: string) {
     const data = {
-      room_name: state.properties.room,
+      room_name: state.properties.room?.room,
       participant_name: state.properties.name,
-      participant_type: state.properties.inputType,
+      participant_type: "PERFORMER",
       passcode: passcode,
     };
-    const options = { method: "POST", body: JSON.stringify(data) };
+    const options = {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
     const response = await fetch(
       `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
-
       options
     );
     return response;

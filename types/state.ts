@@ -80,6 +80,7 @@ export type RoomStateStage = {
     room: Room;
     inputType: InputTypes;
     name: string;
+    passcode: string;
   };
 };
 

@@ -34,8 +34,7 @@ function App() {
     }
     if (
       action.type === "back-to-connection-input" &&
-      (_state.screen === "enter-passcode-screen" ||
-        _state.screen === "enter-name-screen")
+      _state.screen === "enter-name-screen"
     ) {
       const __state: RoomStateSelectConnectionInput = {
         screen: "select-connection-input-screen",
@@ -44,31 +43,9 @@ function App() {
         },
       };
       return __state;
-    } else if (
-      action.type === "select-room" &&
-      _state.screen === "room-list-screen"
-    ) {
-      const __state: RoomStateSelectConnectionInput = {
-        screen: "select-connection-input-screen",
-        properties: {
-          room: action.properties.room,
-        },
-      };
-      return __state;
-    } else if (
-      action.type === "select-connection-mode" &&
-      _state.screen === "select-connection-input-screen"
-    ) {
-      const __state: RoomStateEnterPasscode = {
-        screen: "enter-passcode-screen",
-        properties: {
-          room: _state.properties.room,
-          inputType: action.properties.inputType,
-        },
-      };
-      return __state;
-    } else if (
-      action.type === "submit-passcode" &&
+    }
+    if (
+      action.type === "back-to-enter-name" &&
       _state.screen === "enter-passcode-screen"
     ) {
       const __state: RoomStateEnterName = {
@@ -76,19 +53,59 @@ function App() {
         properties: {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
+          name: _state.properties.name,
+          // name: action.properties.name,
         },
       };
       return __state;
-    } else if (
+    }
+    if (action.type === "select-room" && _state.screen === "room-list-screen") {
+      const __state: RoomStateSelectConnectionInput = {
+        screen: "select-connection-input-screen",
+        properties: {
+          room: action.properties.room,
+        },
+      };
+      return __state;
+    }
+    if (
+      action.type === "select-connection-mode" &&
+      _state.screen === "select-connection-input-screen"
+    ) {
+      const __state: RoomStateEnterName = {
+        screen: "enter-name-screen",
+        properties: {
+          room: _state.properties.room,
+          inputType: action.properties.inputType,
+          name: "",
+        },
+      };
+      return __state;
+    }
+    if (
       action.type === "submit-name" &&
       _state.screen === "enter-name-screen"
+    ) {
+      const __state: RoomStateEnterPasscode = {
+        screen: "enter-passcode-screen",
+        properties: {
+          name: action.properties.name,
+          room: _state.properties.room,
+          inputType: _state.properties.inputType,
+        },
+      };
+      return __state;
+    }
+    if (
+      action.type === "submit-passcode" &&
+      _state.screen === "enter-passcode-screen"
     ) {
       const __state: RoomStateStage = {
         screen: "stage-screen",
         properties: {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
-          name: action.properties.name,
+          name: _state.properties.name,
         },
       };
       return __state;
@@ -98,6 +115,7 @@ function App() {
   }
 
   const [state, updateState] = useReducer(reducer, initialState);
+  console.log(state);
 
   function ScreenRenderer({ state }: { state: ReducerStates }) {
     if (state.screen === "room-list-screen") {
@@ -107,7 +125,7 @@ function App() {
     } else if (state.screen === "enter-passcode-screen") {
       return <EnterPasscode updateState={updateState} />;
     } else if (state.screen === "enter-name-screen") {
-      return <EnterName updateState={updateState} />;
+      return <EnterName state={state} updateState={updateState} />;
     } else if (state.screen === "stage-screen") {
       return <Stage updateState={updateState} />;
     } else return <></>;

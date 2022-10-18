@@ -249,7 +249,7 @@ export default function EnterPasscode({
       <IconButton
         onClick={() => {
           updateState({
-            type: "back-to-connection-input",
+            type: "back-to-enter-name",
           });
         }}
         css={{ position: "fixed", bottom: "$sm", left: "$sm" }}

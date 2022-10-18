@@ -6,7 +6,10 @@ import {
   ArrowForward,
   CloseCircleOutline,
 } from "react-ionicons";
-import { UpdateStateActions } from "../../../../types/state";
+import {
+  RoomStateEnterName,
+  UpdateStateActions,
+} from "../../../../types/state";
 import Text from "ui/Texts/Text";
 import IconButton from "ui/Buttons/IconButton";
 import Input from "ui/Form/Input";
@@ -16,10 +19,14 @@ import { ScreenContainer } from "ui/Composites/ScreenContainer";
 
 export default function EnterName({
   updateState,
+  state,
 }: {
   updateState: Dispatch<UpdateStateActions>;
+  state: RoomStateEnterName;
 }) {
-  const [nickname, setNickname] = useState<string>("");
+  const [nickname, setNickname] = useState<string>(
+    state.properties.name.length > 0 ? state.properties.name : ""
+  );
 
   const keys = [
     "1",

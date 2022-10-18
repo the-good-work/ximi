@@ -42,7 +42,12 @@ export default function EnterPasscode({
 
   function comparePasscode(passcode: string) {
     if (passcode === parentPasscode) {
-      updateState({ type: "submit-passcode" });
+      updateState({
+        type: "submit-passcode",
+        properties: {
+          passcode: passcode,
+        },
+      });
     } else if (passcode.length <= 0) {
       toast({
         title: "Invalid Passcode",

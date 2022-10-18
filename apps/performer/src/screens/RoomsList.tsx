@@ -15,12 +15,21 @@ const options = {
   revalidateIfStale: false,
   shouldRetryOnError: false,
 };
-const getRoomsList = `${process.env.REACT_APP_SERVER_HOST}/rooms/list`;
-const createNewRoom = `${process.env.REACT_APP_SERVER_HOST}/rooms/create`;
 
 async function createRoomTest() {
-  const options = { method: "POST" };
-  const response = await fetch(createNewRoom, options);
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/create`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        name: `ROOM_${Math.floor(Math.random() * 50)}`,
+        passcode: "00000",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   return response;
 }
 
@@ -34,7 +43,11 @@ export default function RoomsList({
     mutate,
     isValidating: isRefreshing,
     error,
-  } = useSWR(getRoomsList, fetcher, options);
+  } = useSWR(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/list`,
+    fetcher,
+    options
+  );
 
   const rooms: Room[] = data || [];
 
@@ -77,39 +90,45 @@ export default function RoomsList({
     } else {
       return (
         <List {...props}>
-          {rooms.map((r) => {
-            if (r) {
-              return (
-                <ListButton
-                  onClick={() => {
-                    updateState({
-                      type: "select-room",
-                      properties: { room: r },
-                    });
-                  }}
-                  key={r.room}
-                  as="button"
-                  aria-label={`Room: ${r.room}, participants: ${r.participants}`}
-                  noOfParticipants={r.participants}
-                >
-                  {r.room}
-                </ListButton>
-              );
-            }
-            return null;
-          })}
+          {rooms.length &&
+            rooms.map((r) => {
+              if (r) {
+                return (
+                  <ListButton
+                    onClick={() => {
+                      updateState({
+                        type: "select-room",
+                        properties: { room: r },
+                      });
+                    }}
+                    key={r.room}
+                    as="button"
+                    aria-label={`Room: ${r.room}, participants: ${r.participants}`}
+                    noOfParticipants={r.participants}
+                  >
+                    {r.room}
+                  </ListButton>
+                );
+              }
+              return null;
+            })}
         </List>
       );
     }
   }
 
   const HeadingBox = styled("div", {
-    width: "100%",
+    width: "auto",
     maxWidth: "600px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     gap: "$lg",
+    position: "relative",
+    "> .refresh-icon-container": {
+      position: "absolute",
+      left: "calc( 100% + 20px )",
+    },
   });
 
   const EmptyState = styled("div", {
@@ -154,17 +173,19 @@ export default function RoomsList({
               textTransform: "uppercase",
             }}
           >
-            Rooms Online
+            Rooms
           </Heading>
-          <IconButton
-            css={{ borderRadius: "100%" }}
-            iconSize={{ "@base": "lg", "@md": "xl" }}
-            aria-label="Refresh list of rooms"
-            variant="ghost"
-            icon={<SyncOutline color="inherit" />}
-            onClick={onRefresh}
-            state={isRefreshing ? "loading" : "default"}
-          />
+          <div className="refresh-icon-container">
+            <IconButton
+              css={{ borderRadius: "100%" }}
+              iconSize={{ "@base": "lg", "@md": "xl" }}
+              aria-label="Refresh list of rooms"
+              variant="ghost"
+              icon={<SyncOutline color="inherit" />}
+              onClick={onRefresh}
+              state={isRefreshing ? "loading" : "default"}
+            />
+          </div>
         </HeadingBox>
         <ListOfRooms rooms={rooms} />
         <IconButton

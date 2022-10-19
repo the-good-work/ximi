@@ -6,20 +6,28 @@ import {
   ArrowForward,
   CloseCircleOutline,
 } from "react-ionicons";
-import { UpdateStateActions } from "../../../../types/state";
+import {
+  RoomStateEnterName,
+  UpdateStateActions,
+} from "../../../../types/state";
 import Text from "ui/Texts/Text";
 import IconButton from "ui/Buttons/IconButton";
 import Input from "ui/Form/Input";
 import { styled } from "ui/theme/theme";
 import Button from "ui/Buttons/Button";
 import { ScreenContainer } from "ui/Composites/ScreenContainer";
+import { useToast } from "ui/Feedback/Toast";
 
 export default function EnterName({
   updateState,
+  state,
 }: {
   updateState: Dispatch<UpdateStateActions>;
+  state: RoomStateEnterName;
 }) {
-  const [nickname, setNickname] = useState<string>("");
+  const [nickname, setNickname] = useState<string>(
+    state.properties.name.length > 0 ? state.properties.name : ""
+  );
 
   const keys = [
     "1",
@@ -63,27 +71,77 @@ export default function EnterName({
     "confirm",
   ];
 
-  function checkNickName(nickname: string) {
-    const sameName = "AAAAA";
-    if (nickname === sameName) {
-      console.log("throw a toast saying 'This name is already in use'");
-    } else if (nickname.length <= 0) {
-      console.log("throw a toast saying 'Name cannot be empty'");
-    } else {
-      updateState({
-        type: "submit-name",
-        properties: {
-          name: nickname,
-        },
+  const { toast } = useToast();
+
+  async function checkNickname(nickname: string) {
+    const data = {
+      name: nickname,
+    };
+    const options = {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-name`,
+      options
+    );
+    return response;
+  }
+
+  async function compareNickname(nickname: string) {
+    checkNickname(nickname)
+      .then((res) => {
+        res
+          .json()
+          .then((r) => {
+            if (res.status === 422) {
+              if (nickname.length <= 0) {
+                toast({
+                  title: "Nickname cannot be empty",
+                  tone: "warning",
+                  jumbo: false,
+                });
+              } else {
+                toast({
+                  title: r.message,
+                  tone: "warning",
+                  jumbo: false,
+                });
+              }
+            } else {
+              updateState({
+                type: "submit-name",
+                properties: {
+                  name: nickname,
+                },
+              });
+            }
+          })
+          .catch(() => {
+            toast({
+              title: "An error has occurred, please try again later",
+              tone: "warning",
+              jumbo: false,
+            });
+          });
+      })
+      .catch(() => {
+        toast({
+          title: "An error has occurred, please try again later",
+          tone: "warning",
+          jumbo: false,
+        });
       });
-    }
   }
 
   const handleNickname = (key: string, nickname: string) => {
     const keyboardKey = key.slice(-1);
 
     if (key === "Enter" || key === "confirm") {
-      checkNickName(nickname);
+      compareNickname(nickname);
     } else if (key === "Backspace" || key === "bsp") {
       setNickname(nickname.slice(0, -1).toUpperCase());
     } else if (key === "clr") {

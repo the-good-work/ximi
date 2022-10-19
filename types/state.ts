@@ -3,6 +3,8 @@ export type Room = {
   participants: number;
 } | null;
 
+export type InputTypes = "voice" | "line";
+
 export type Screens =
   | "room-list-screen"
   | "select-connection-input-screen"
@@ -18,23 +20,26 @@ export type UpdateStateActions =
       type: "back-to-connection-input";
     }
   | {
+      type: "back-to-enter-name";
+    }
+  | {
       type: "select-room";
       properties: { room: Room };
     }
   | {
       type: "select-connection-mode";
       properties: {
-        inputType: "voice" | "line";
+        inputType: InputTypes;
       };
-    }
-  | {
-      type: "submit-passcode";
     }
   | {
       type: "submit-name";
       properties: {
         name: string;
       };
+    }
+  | {
+      type: "submit-passcode";
     };
 
 export type RoomStateInit = {
@@ -48,19 +53,21 @@ export type RoomStateSelectConnectionInput = {
   };
 };
 
-export type RoomStateEnterPasscode = {
-  screen: "enter-passcode-screen";
-  properties: {
-    room: Room;
-    inputType: "voice" | "line";
-  };
-};
-
 export type RoomStateEnterName = {
   screen: "enter-name-screen";
   properties: {
     room: Room;
-    inputType: "voice" | "line";
+    inputType: InputTypes;
+    name: string;
+  };
+};
+
+export type RoomStateEnterPasscode = {
+  screen: "enter-passcode-screen";
+  properties: {
+    room: Room;
+    inputType: InputTypes;
+    name: string;
   };
 };
 
@@ -68,7 +75,7 @@ export type RoomStateStage = {
   screen: "stage-screen";
   properties: {
     room: Room;
-    inputType: "voice" | "line";
+    inputType: InputTypes;
     name: string;
   };
 };
@@ -76,6 +83,6 @@ export type RoomStateStage = {
 export type ReducerStates =
   | RoomStateInit
   | RoomStateSelectConnectionInput
-  | RoomStateEnterPasscode
   | RoomStateEnterName
+  | RoomStateEnterPasscode
   | RoomStateStage;

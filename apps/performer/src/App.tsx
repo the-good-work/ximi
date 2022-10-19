@@ -106,6 +106,7 @@ function App() {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
           name: _state.properties.name,
+          token: action.properties.token,
         },
       };
       return __state;
@@ -127,7 +128,7 @@ function App() {
     } else if (state.screen === "enter-name-screen") {
       return <EnterName state={state} updateState={updateState} />;
     } else if (state.screen === "stage-screen") {
-      return <Stage updateState={updateState} />;
+      return <Stage state={state} updateState={updateState} />;
     } else return <></>;
   }
   return (

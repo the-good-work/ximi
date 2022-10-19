@@ -41,7 +41,7 @@ const animToastOut = keyframes({
 const Root = styled(RadixToast.Root, {
   color: "$text",
   position: "relative",
-  padding: "$sm $xl $sm $sm",
+
   listStyle: "none",
   margin: "$sm 0",
   borderRadius: "$xs",
@@ -66,6 +66,14 @@ const Root = styled(RadixToast.Root, {
         background: "$toastBackgroundYellow",
         border: "2px solid $toastYellow",
         boxShadow: "$toastYellow",
+      },
+    },
+    jumbo: {
+      true: {
+        padding: "$md $xl $md $md",
+      },
+      false: {
+        padding: "$sm $xl $sm $sm",
       },
     },
   },
@@ -137,7 +145,7 @@ const XimiToast = ({ children }: { children: ReactNode }) => {
 
 const SingleToast = ({ title, description, tone, jumbo }: XMToast) => {
   return (
-    <Root tone={tone}>
+    <Root jumbo={jumbo} tone={tone}>
       <Title>{title}</Title>
       {description && <Description jumbo={jumbo}>{description}</Description>}
       <Close css={{ color: "$text", path: { fill: "$text" } }}>

@@ -138,7 +138,7 @@ const XimiToast = ({ children }: { children: ReactNode }) => {
 const SingleToast = ({ title, description, tone, jumbo }: XMToast) => {
   return (
     <Root tone={tone}>
-      <Title jumbo={jumbo}>{title}</Title>
+      <Title>{title}</Title>
       {description && <Description jumbo={jumbo}>{description}</Description>}
       <Close css={{ color: "$text", path: { fill: "$text" } }}>
         <CloseIcon color="inherit" width={"24px"} height={"24px"} />

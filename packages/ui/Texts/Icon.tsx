@@ -42,7 +42,7 @@ const StyledIcon = styled("div", {
       accent: { color: "$accent" },
       gradient: {
         color: "none",
-        background: "linear-gradient($brandGradientB)",
+        background: "headingGradient",
         "-webkit-background-clip": "text",
         "-webkit-text-fill-color": "transparent",
         "-moz-background-clip": "text",

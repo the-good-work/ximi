@@ -15,7 +15,7 @@ export default function Stage({
   const { connect, room, participants } = useRoom();
 
   async function connectRoom() {
-    await connect(process.env.LIVEKIT_HOST as string, state.properties.token);
+    await connect(`${process.env.LIVEKIT_HOST}`, state.properties.token);
   }
 
   useEffect(() => {

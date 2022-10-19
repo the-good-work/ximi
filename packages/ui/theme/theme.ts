@@ -12,11 +12,18 @@ export const { styled, css } = createStitches({
       negative: "#D73C37",
       disabled: "#99999F",
       background: "#111113",
-      brandGradientA:
-        "163.02deg, #111113 58.37%, rgba(82, 55, 243, 0.17) 97.01%",
-      brandGradientB:
-        "160.26deg, #5237F3 46.37%, #E8E8F4 84.22%, #5237F3 154.83%",
-      brandGradientC: "294.47deg, #5237F3 9.25%, rgba(82, 55, 243, 0) 64.17%",
+      backgroundGradient:
+        "linear-gradient(163.02deg, #111113 58.37%, rgba(82, 55, 243, 0.17) 97.01%)",
+      headingGradient:
+        "linear-gradient(160.26deg, #5237F3 46.37%, #E8E8F4 84.22%, #5237F3 154.83%)",
+      primaryButtonGradient:
+        "linear-gradient(294.47deg, #5237F3 9.25%, rgba(82, 55, 243, 0) 64.17%)",
+      toastBackgroundPurple:
+        "linear-gradient(294.47deg, #5237F3 9.25%, #000000 64.17%)",
+      toastShadowPurple: "#5237F3",
+      toastBackgroundYellow:
+        "linear-gradient(294.47deg, rgba(243, 179, 55, 0.47) 9.25%, #000000 64.17%), #000000",
+      toastYellow: "#F3B337",
     },
 
     space: {
@@ -74,7 +81,10 @@ export const { styled, css } = createStitches({
     letterSpacings: {},
     borderWidths: {},
     borderStyles: {},
-    shadows: {},
+    shadows: {
+      toastPurple: "0px 0px 15px #5237F3",
+      toastYellow: "0px 0px 15px #F3B337",
+    },
     zIndices: {},
     transitions: {},
   },

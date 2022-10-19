@@ -55,7 +55,7 @@ const StyledButton = styled("button", {
   variants: {
     type: {
       primary: {
-        background: "linear-gradient($brandGradientC)",
+        background: "$primaryButtonGradient",
       },
       normal: { backgroundColor: "$background" },
     },

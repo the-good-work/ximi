@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 import * as RadixToast from "@radix-ui/react-toast";
 
 import { styled } from "../theme/theme";
 import { VariantProps, keyframes } from "@stitches/react";
-import { CloseCircleOutline } from "react-ionicons";
+import { Close as CloseIcon } from "react-ionicons";
 
 const Ctx = createContext<{
   toasts: XMToast[];
@@ -39,14 +39,12 @@ const animToastOut = keyframes({
 });
 
 const Root = styled(RadixToast.Root, {
-  background: "linear-gradient($brandGradientC), $background",
   color: "$text",
   position: "relative",
   padding: "$sm $xl $sm $sm",
   listStyle: "none",
   margin: "$sm 0",
   borderRadius: "$xs",
-  fontSize: "$md",
   width: "100%",
   boxSizing: "border-box",
 
@@ -58,15 +56,26 @@ const Root = styled(RadixToast.Root, {
   },
 
   variants: {
-    tone: { warning: { background: "purple" } },
-    jumbo: { true: { fontSize: "$lg" }, false: { fontSize: "$md" } },
+    tone: {
+      default: {
+        background: "$toastBackgroundPurple",
+        border: "2px solid $accent",
+        boxShadow: "$toastPurple",
+      },
+      warning: {
+        background: "$toastBackgroundYellow",
+        border: "2px solid $toastYellow",
+        boxShadow: "$toastYellow",
+      },
+    },
+  },
+  defaultVariants: {
+    tone: "default",
   },
 });
 
 const Title = styled(RadixToast.Title, {
-  variants: {
-    jumbo: { true: { fontSize: "$lg" }, false: { fontSize: "$md" } },
-  },
+  fontSize: "$md",
 });
 
 const Close = styled(RadixToast.Close, {
@@ -98,13 +107,13 @@ const Viewport = styled(RadixToast.Viewport, {
 
 const Description = styled(RadixToast.Description, {
   variants: {
-    jumbo: { true: { fontSize: "$md" }, false: { fontSize: "$sm" } },
+    jumbo: { true: { fontSize: "$2xl" }, false: { fontSize: "$sm" } },
   },
 });
 
 /* END STYLING */
 
-const XimiToast = ({ children }: { children: React.ReactChildren }) => {
+const XimiToast = ({ children }: { children: ReactNode }) => {
   const [toasts, setToasts] = useState<XMToast[]>([]);
   return (
     <Ctx.Provider
@@ -128,11 +137,11 @@ const XimiToast = ({ children }: { children: React.ReactChildren }) => {
 
 const SingleToast = ({ title, description, tone, jumbo }: XMToast) => {
   return (
-    <Root tone={tone} jumbo={jumbo}>
+    <Root tone={tone}>
       <Title jumbo={jumbo}>{title}</Title>
       {description && <Description jumbo={jumbo}>{description}</Description>}
-      <Close>
-        <CloseCircleOutline color="inherit" width={"24px"} height={"24px"} />
+      <Close css={{ color: "$text", path: { fill: "$text" } }}>
+        <CloseIcon color="inherit" width={"24px"} height={"24px"} />
       </Close>
     </Root>
   );

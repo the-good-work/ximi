@@ -22,7 +22,7 @@ async function createRoomTest() {
     {
       method: "POST",
       body: JSON.stringify({
-        name: `ROOM_${Math.floor(Math.random() * 50)}`,
+        name: `ROOM${Math.floor(Math.random() * 50)}`,
         passcode: "00000",
       }),
       headers: {

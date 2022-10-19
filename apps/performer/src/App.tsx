@@ -106,7 +106,6 @@ function App() {
           room: _state.properties.room,
           inputType: _state.properties.inputType,
           name: _state.properties.name,
-          passcode: action.properties.passcode,
         },
       };
       return __state;

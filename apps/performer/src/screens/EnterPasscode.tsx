@@ -25,7 +25,6 @@ export default function EnterPasscode({
   updateState: Dispatch<UpdateStateActions>;
   state: RoomStateEnterPasscode;
 }) {
-  // const parentPasscode = "11111";
   const [passcode, setPasscode] = useState<string>("");
   const { toast } = useToast();
 
@@ -45,12 +44,12 @@ export default function EnterPasscode({
     "ent",
   ];
 
-  async function checkPasscode(passcode: string) {
+  async function checkPasscode(pass: string) {
     const data = {
       room_name: state.properties.room?.room,
       participant_name: state.properties.name,
       participant_type: "PERFORMER",
-      passcode: passcode,
+      passcode: pass,
     };
     const options = {
       method: "POST",
@@ -66,62 +65,59 @@ export default function EnterPasscode({
     return response;
   }
 
-  async function comparePasscode(passcode: string) {
-    checkPasscode(passcode)
+  async function comparePasscode(pass: string) {
+    checkPasscode(pass)
       .then((res) => {
-        console.log(res);
-        // if (passcode === parentPasscode) {
-        //   updateState({
-        //     type: "submit-passcode",
-        //     properties: {
-        //       passcode: passcode,
-        //     },
-        //   });
-        // }
-
-        // else {
-        //   toast({
-        //     title: "Invalid Passcode",
-        //     description: "Passcode is empty",
-        //     tone: "warning",
-        //     jumbo: false,
-        //   });
-        // }
+        if (res.status === 200) {
+          res
+            .text()
+            .then((r) => {
+              updateState({
+                type: "submit-passcode",
+              });
+            })
+            .catch(() => {
+              toast({
+                title: "An error has occurred, please try again later",
+                tone: "warning",
+                jumbo: false,
+              });
+            });
+        } else {
+          res
+            .json()
+            .then((r) => {
+              if (passcode.length <= 0) {
+                toast({
+                  title: "Please enter passcode",
+                  tone: "warning",
+                  jumbo: false,
+                });
+              } else {
+                toast({
+                  title: r.message,
+                  tone: "warning",
+                  jumbo: false,
+                });
+              }
+            })
+            .catch(() => {
+              toast({
+                title: "An error has occurred, please try again later",
+                tone: "warning",
+                jumbo: false,
+              });
+            });
+        }
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
-          title: "An Error Has Occurred",
-          description: "Please try again later.",
+          title: "An error has occurred, please try again later",
           tone: "warning",
           jumbo: false,
         });
       });
   }
-
-  // function comparePasscode(passcode: string) {
-  //   if (passcode === "11111") {
-  //     updateState({
-  //       type: "submit-passcode",
-  //       properties: {
-  //         passcode: passcode,
-  //       },
-  //     });
-  //   } else if (passcode.length <= 0) {
-  //     toast({
-  //       title: "Invalid Passcode",
-  //       description: "Passcode is empty",
-  //       tone: "warning",
-  //       jumbo: false,
-  //     });
-  //   } else {
-  //     toast({
-  //       title: "Invalid Passcode",
-  //       description: "You have entered the wrong passcode",
-  //       tone: "warning",
-  //       jumbo: true,
-  //     });
-  //   }
-  // }
 
   const handlePasscode = (key: string, pass: string) => {
     const numberKey = key.slice(-1);

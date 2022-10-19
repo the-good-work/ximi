@@ -40,9 +40,6 @@ export type UpdateStateActions =
     }
   | {
       type: "submit-passcode";
-      properties: {
-        passcode: string;
-      };
     };
 
 export type RoomStateInit = {
@@ -80,7 +77,6 @@ export type RoomStateStage = {
     room: Room;
     inputType: InputTypes;
     name: string;
-    passcode: string;
   };
 };
 

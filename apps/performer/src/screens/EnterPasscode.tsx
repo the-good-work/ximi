@@ -74,6 +74,9 @@ export default function EnterPasscode({
             .then((r) => {
               updateState({
                 type: "submit-passcode",
+                properties: {
+                  token: r,
+                },
               });
             })
             .catch(() => {

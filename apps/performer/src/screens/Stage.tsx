@@ -1,14 +1,37 @@
-import React, { Dispatch } from "react";
+import React, { Dispatch, useEffect } from "react";
 import IconButton from "ui/Buttons/IconButton";
 import Heading from "ui/Texts/Heading";
 import { ReturnDownBack } from "react-ionicons";
-import { UpdateStateActions } from "../../../../types/state";
+import { RoomStateStage, UpdateStateActions } from "../../../../types/state";
+import { useRoom } from "@livekit/react-core";
 
 export default function Stage({
+  state,
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
+  state: RoomStateStage;
 }) {
+  const { connect, room, error, participants } = useRoom();
+
+  async function connectRoom() {
+    await connect(
+      `${process.env.REACT_APP_LIVEKIT_HOST}`,
+      state.properties.token
+    );
+  }
+
+  useEffect(() => {
+    connectRoom().catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
+  if (error) {
+    console.log(error);
+  }
+  console.log(room, participants);
+
   return (
     <div className="content noscroll">
       <Heading

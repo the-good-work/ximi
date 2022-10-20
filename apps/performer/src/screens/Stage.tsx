@@ -12,23 +12,25 @@ export default function Stage({
   updateState: Dispatch<UpdateStateActions>;
   state: RoomStateStage;
 }) {
-  const { connect, room, error } = useRoom();
+  const { connect, room, error, participants } = useRoom();
 
   async function connectRoom() {
-    await connect(`${process.env.LIVEKIT_HOST}`, state.properties.token);
+    await connect(
+      `${process.env.REACT_APP_LIVEKIT_HOST}`,
+      state.properties.token
+    );
   }
 
   useEffect(() => {
-    connectRoom()
-      .then(() => {})
-      .catch((err) => {
-        console.log(err);
-      });
+    connectRoom().catch((err) => {
+      console.log(err);
+    });
   }, []);
 
-  useEffect(() => {
-    console.log(room, error);
-  }, [room, error]);
+  if (error) {
+    console.log(error);
+  }
+  console.log(room, participants);
 
   return (
     <div className="content noscroll">

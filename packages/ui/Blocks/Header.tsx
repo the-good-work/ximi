@@ -9,6 +9,7 @@ import {
   TimeOutline,
   LayersOutline,
   Home,
+  PersonOutline,
 } from "react-ionicons";
 
 const StyledHeader = styled("div", {
@@ -57,7 +58,13 @@ const StyledHeader = styled("div", {
   },
 });
 
-export default function Header({ room }: { room: string }) {
+export default function Header({
+  room,
+  variant,
+}: {
+  room: string;
+  variant: "performer" | "control";
+}) {
   let [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {
     setTimeout(() => {
@@ -66,17 +73,31 @@ export default function Header({ room }: { room: string }) {
   }, [currentDate]);
   return (
     <StyledHeader>
-      <div className="status-box" aria-label="Current room">
-        <Icon
-          css={{
-            marginBottom: "1px",
-            path: { fill: "$accent" },
-          }}
-          size="sm"
-          color="accent"
-          icon={<Home color="inherit" />}
-        />
-        <Text size="2xs">{room}</Text>
+      <div className="status-group">
+        <div className="status-box" aria-label="Current room">
+          <Icon
+            css={{
+              marginBottom: "1px",
+              path: { fill: "$accent" },
+            }}
+            size="sm"
+            color="accent"
+            icon={<Home color="inherit" />}
+          />
+          <Text size="2xs">{room}</Text>
+        </div>
+        <div className="status-box" aria-label="Nickname">
+          <Icon
+            css={{
+              marginBottom: "1px",
+              path: { fill: "$accent" },
+            }}
+            size="sm"
+            color="accent"
+            icon={<PersonOutline color="inherit" />}
+          />
+          <Text size="2xs">{"control_myroomname_1"}</Text>
+        </div>
       </div>
 
       <Logo position="center" size="xs" />

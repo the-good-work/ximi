@@ -2,7 +2,10 @@ import React, { Dispatch, useEffect } from "react";
 import IconButton from "ui/Buttons/IconButton";
 import Heading from "ui/Texts/Heading";
 import { ReturnDownBack } from "react-ionicons";
-import { RoomStateStage, UpdateStateActions } from "../../../../types/state";
+import {
+  RoomStateStage,
+  UpdateStateActions,
+} from "../../../../types/performerStates";
 import { useRoom } from "@livekit/react-core";
 
 export default function Stage({

@@ -53,6 +53,16 @@ const StyledButton = styled("button", {
   },
 
   variants: {
+    size: {
+      lg: {
+        "@base": { fontSize: "$md" },
+        "@md": { fontSize: "$xl" },
+      },
+      md: {
+        "@base": { fontSize: "$sm" },
+        "@md": { fontSize: "$md" },
+      },
+    },
     type: {
       primary: {
         background: "$primaryButtonGradient",
@@ -96,6 +106,7 @@ export default function Button({
   as,
   type = "normal",
   className,
+  size = "md",
   ...props
 }: {
   children?: ReactNode;
@@ -107,6 +118,7 @@ export default function Button({
   type?: ButtonTypes;
   props?: any;
   className?: string;
+  size?: "md" | "lg";
 }) {
   return (
     <StyledButton
@@ -123,7 +135,7 @@ export default function Button({
           {icon}
         </div>
       )}
-      {children && <Text size="md">{children}</Text>}
+      {children && <Text size={size || "md"}>{children}</Text>}
     </StyledButton>
   );
 }

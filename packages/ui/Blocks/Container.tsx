@@ -96,22 +96,36 @@ const StyledContainer = styled("main", {
         },
       },
     },
+    variant: {
+      performer: {
+        "@base": {
+          ".frame": { display: "none" },
+          ".content": { padding: "$md" },
+          ".content-scroll .scroll": { padding: "$md" },
+        },
+        "@sm": {
+          ".frame": { display: "flex" },
+        },
+        "@md": {
+          ".content": { padding: "$3xl" },
+          ".content-scroll .scroll": { padding: "$3xl" },
+        },
+      },
+      control: {
+        "@base": {
+          ".content": { padding: "$md" },
+          ".content-scroll .scroll": { padding: "$md" },
+        },
+        "@md": {
+          ".content": { padding: "$3xl" },
+          ".content-scroll .scroll": { padding: "$3xl" },
+        },
+      },
+    },
   },
   defaultVariants: {
     isFullWidth: false,
-  },
-
-  "@base": {
-    ".frame": { display: "none" },
-    ".content": { padding: "$md" },
-    ".content-scroll .scroll": { padding: "$md" },
-  },
-  "@sm": {
-    ".frame": { display: "flex" },
-  },
-  "@md": {
-    ".content": { padding: "$3xl" },
-    ".content-scroll .scroll": { padding: "$3xl" },
+    variant: "performer",
   },
 });
 
@@ -119,58 +133,64 @@ export default function Container({
   children,
   isFullWidth = false,
   room,
+  variant,
 }: {
   children: ReactNode;
   isFullWidth?: boolean;
   room: string;
+  variant: "performer" | "control";
 }) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   return (
-    <StyledContainer isFullWidth={isFullWidth}>
+    <StyledContainer variant={variant} isFullWidth={isFullWidth}>
       <XimiToast>
         <>
           <div className="frame">
-            <Header room={room} />
+            <Header variant={variant} room={room} />
             {children}
-            <IconButton
-              onClick={() => {
-                setIsFullScreen(!isFullScreen);
-                let elem = document.getElementById("App");
+            {variant === "performer" && (
+              <IconButton
+                onClick={() => {
+                  setIsFullScreen(!isFullScreen);
+                  let elem = document.getElementById("App");
 
-                if (!document.fullscreenElement) {
-                  elem?.requestFullscreen().catch((err) => {
-                    alert(
-                      `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-                    );
-                  });
-                } else {
-                  document.exitFullscreen();
+                  if (!document.fullscreenElement) {
+                    elem?.requestFullscreen().catch((err) => {
+                      alert(
+                        `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+                      );
+                    });
+                  } else {
+                    document.exitFullscreen();
+                  }
+                }}
+                css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+                iconSize="md"
+                variant="outline"
+                aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
+                  isFullScreen ? "active" : "inactive"
+                }`}
+                icon={
+                  isFullScreen ? (
+                    <Contract color="inherit" />
+                  ) : (
+                    <Expand color="inherit" />
+                  )
                 }
-              }}
-              css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
-              iconSize="md"
-              variant="outline"
-              aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
-                isFullScreen ? "active" : "inactive"
-              }`}
-              icon={
-                isFullScreen ? (
-                  <Contract color="inherit" />
-                ) : (
-                  <Expand color="inherit" />
-                )
-              }
-            />
+              />
+            )}
           </div>
-          <RoadBlock>
-            <Logo css={{ position: "static" }} size="sm" />
-            <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
-              You are currently viewing XIMI from an unsupported viewport.
-              Change your device or increase your viewport width to 600px and
-              above.
-            </Heading>
-          </RoadBlock>
+          {variant === "performer" && (
+            <RoadBlock>
+              <Logo css={{ position: "static" }} size="sm" />
+              <Heading level={1} color="white" css={{ fontSize: "$xs" }}>
+                You are currently viewing XIMI from an unsupported viewport.
+                Change your device or increase your viewport width to 600px and
+                above.
+              </Heading>
+            </RoadBlock>
+          )}
         </>
       </XimiToast>
     </StyledContainer>

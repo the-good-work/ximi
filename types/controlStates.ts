@@ -42,6 +42,7 @@ export type RoomStateCreate = {
 export type RoomStateJoin = {
   screen: "join-room-screen";
   room: Room;
+  name: string;
 };
 
 export type RoomStateStage = {

@@ -1,5 +1,4 @@
 import React, { useReducer } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import {
   ReducerStates,
@@ -10,6 +9,7 @@ import {
   UpdateStateActions,
 } from "../../../types/controlStates";
 import RoomsList from "./screens/RoomsList";
+import JoinRoom from "./screens/JoinRoom";
 import Container from "ui/Blocks/Container";
 
 function App() {
@@ -48,6 +48,7 @@ function App() {
       const __state: RoomStateJoin = {
         screen: "join-room-screen",
         room: action.room,
+        name: "control_node_name",
       };
       return __state;
     }
@@ -71,6 +72,8 @@ function App() {
   function RenderScreen({ state }: { state: ReducerStates }) {
     if (state.screen === "room-list-screen") {
       return <RoomsList updateState={updateState} />;
+    } else if (state.screen === "join-room-screen") {
+      return <JoinRoom state={state} updateState={updateState} />;
     } else return <></>;
   }
 

@@ -48,7 +48,7 @@ export default function EnterPasscode({
     const data = {
       room_name: state.room?.room,
       participant_name: state.name,
-      participant_type: "PERFORMER",
+      participant_type: "CONTROL",
       passcode: pass,
     };
     const options = {

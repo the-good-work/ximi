@@ -1,10 +1,13 @@
 import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
-import { ReturnDownBack, ReturnDownForward } from "react-ionicons";
 import {
-  RoomStateJoin,
-  UpdateStateActions,
-} from "../../../../types/controlStates";
+  ReturnDownBack,
+  ArrowForward,
+  Backspace,
+  CloseCircleOutline,
+  ReturnDownForward,
+} from "react-ionicons";
+import { UpdateStateActions } from "../../../../types/controlStates";
 import Text from "ui/Texts/Text";
 import Input from "ui/Form/Input";
 import { ScreenContainer } from "ui/Composites/ScreenContainer";
@@ -12,17 +15,16 @@ import Button from "ui/Buttons/Button";
 import { styled } from "ui/theme/theme";
 import { useToast } from "ui/Feedback/Toast";
 
-export default function JoinRoom({
+export default function CreateRoom({
   updateState,
-  state,
 }: {
   updateState: Dispatch<UpdateStateActions>;
-  state: RoomStateJoin;
 }) {
   const [passcode, setPasscode] = useState<string>("");
+  const [roomName, setRoomName] = useState<string>("");
   const { toast } = useToast();
 
-  const keys = [
+  const passcodeKeys = [
     "1",
     "2",
     "3",
@@ -38,93 +40,109 @@ export default function JoinRoom({
     "ent",
   ];
 
-  async function checkPasscode(pass: string) {
-    const data = {
-      room_name: state.room?.room,
-      participant_name: state.name,
-      participant_type: "CONTROL",
-      passcode: pass,
-    };
-    const options = {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+  const roomNameKeys = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0",
+    "Q",
+    "W",
+    "E",
+    "R",
+    "T",
+    "Y",
+    "U",
+    "I",
+    "O",
+    "P",
+    "A",
+    "S",
+    "D",
+    "F",
+    "G",
+    "H",
+    "J",
+    "K",
+    "L",
+    "bsp",
+    "Z",
+    "X",
+    "C",
+    "V",
+    "B",
+    "N",
+    "M",
+    "clr",
+    "confirm",
+  ];
+
+  async function createRoom() {
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
-      options
+      `${process.env.REACT_APP_SERVER_HOST}/rooms/create`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: roomName,
+          passcode: passcode,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
     return response;
   }
 
-  async function comparePasscode(pass: string) {
-    checkPasscode(pass)
+  async function onCreate() {
+    createRoom()
       .then((res) => {
-        if (res.status === 200) {
-          res
-            .text()
-            .then((r) => {
-              updateState({
-                type: "submit-passcode",
-                token: r,
-              });
-            })
-            .catch(() => {
-              toast({
-                title: "An error has occurred, please try again later",
-                tone: "warning",
-                jumbo: false,
-              });
-            });
-        } else {
-          res
-            .json()
-            .then((r) => {
-              if (passcode.length <= 0) {
-                toast({
-                  title: "Please enter passcode",
-                  tone: "warning",
-                  jumbo: false,
-                });
-              } else {
-                toast({
-                  title: r.message,
-                  tone: "warning",
-                  jumbo: false,
-                });
-              }
-            })
-            .catch(() => {
-              toast({
-                title: "An error has occurred, please try again later",
-                tone: "warning",
-                jumbo: false,
-              });
-            });
-        }
+        console.log(res);
+        // updateState({
+        //   type: "confirm-create-room",
+        //   room: {room: res},
+        //   token: "",
+        // });
       })
-      .catch(() => {
-        toast({
-          title: "An error has occurred, please try again later",
-          tone: "warning",
-          jumbo: false,
-        });
+      .catch((err) => {
+        console.log(err);
       });
   }
 
-  const handlePasscode = (key: string, pass: string) => {
+  async function checkRoom() {
+    return;
+  }
+
+  const handlePasscode = (key: string) => {
     const numberKey = key.slice(-1);
 
     if (key === "Enter" || key === "ent") {
-      comparePasscode(pass);
+      checkRoom();
     } else if (key === "Backspace" || key === "bsp") {
       setPasscode(passcode.slice(0, -1));
     } else if (key === "clr") {
       setPasscode(passcode.slice(0, -5));
-    } else if (keys.indexOf(numberKey) !== -1) {
+    } else if (passcodeKeys.indexOf(numberKey) !== -1) {
       setPasscode(`${passcode}${numberKey}`.slice(0, 5));
+    } else return;
+  };
+
+  const handleName = (key: string) => {
+    const textKey = key.slice(-1);
+
+    if (key === "Enter" || key === "ent") {
+      checkRoom();
+    } else if (key === "Backspace" || key === "bsp") {
+      setRoomName(roomName.slice(0, -1));
+    } else if (key === "clr") {
+      setRoomName(roomName.slice(0, -5));
+    } else if (roomNameKeys.indexOf(textKey) !== -1) {
+      setRoomName(`${roomName}${textKey}`.slice(0, 5));
     } else return;
   };
 
@@ -170,28 +188,49 @@ export default function JoinRoom({
                 marginBottom: "$sm",
               }}
             >
-              Join Room: {state.room?.room || ""}
+              Create Room
             </Heading>
-            <Text
-              color="white"
-              size="sm"
-              css={{ textTransform: "uppercase", fontWeight: "$medium" }}
-            >
-              Passcode (5-digits)
-            </Text>
           </div>
+          <Text
+            color="white"
+            size="sm"
+            css={{ textTransform: "uppercase", fontWeight: "$medium" }}
+          >
+            Room Name (max 10 chars)
+          </Text>
           <Input
-            onKeyDown={(e) => {
-              const target = e.code;
-              handlePasscode(target, passcode);
+            // onKeyDown={(e) => {
+            //   const target = e.code;
+            //   handleName(target);
+            // }}
+            // value={roomName}
+            maxLength={"10"}
+            inputMode="text"
+            css={{
+              fontSize: "$2xl",
+              maxWidth: "450px",
             }}
-            value={passcode}
+            type="text"
+          />
+
+          <Text
+            color="white"
+            size="sm"
+            css={{ textTransform: "uppercase", fontWeight: "$medium" }}
+          >
+            Passcode (5 digits)
+          </Text>
+
+          <Input
+            // onKeyDown={(e) => {
+            //   const target = e.code;
+            //   handlePasscode(target);
+            // }}
+            // value={passcode}
             pattern="[0-9]*"
             maxLength={"5"}
             inputMode="numeric"
-            autoFocus
             css={{
-              letterSpacing: "1rem",
               fontSize: "$2xl",
               maxWidth: "450px",
             }}
@@ -212,7 +251,7 @@ export default function JoinRoom({
             <Button
               type="primary"
               onClick={() => {
-                handlePasscode("ent", passcode);
+                // handlePasscode("ent", passcode);
               }}
               css={{ path: { fill: "transparent" }, justifyContent: "center" }}
               icon={<ReturnDownForward color="inherit" />}

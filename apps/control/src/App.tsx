@@ -12,6 +12,7 @@ import RoomsList from "./screens/RoomsList";
 import JoinRoom from "./screens/JoinRoom";
 import Container from "ui/Blocks/Container";
 import Stage from "./screens/Stage";
+import CreateRoom from "./screens/CreateRoom";
 
 function App() {
   const initialState: RoomStateInit = {
@@ -75,6 +76,8 @@ function App() {
       return <RoomsList updateState={updateState} />;
     } else if (state.screen === "join-room-screen") {
       return <JoinRoom state={state} updateState={updateState} />;
+    } else if (state.screen === "create-room-screen") {
+      return <CreateRoom updateState={updateState} />;
     } else if (state.screen === "stage-screen") {
       return <Stage state={state} updateState={updateState} />;
     } else return <></>;

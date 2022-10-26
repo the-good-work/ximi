@@ -61,9 +61,11 @@ const StyledHeader = styled("div", {
 export default function Header({
   room,
   variant,
+  participantName,
 }: {
   room: string;
   variant: "performer" | "control";
+  participantName: string;
 }) {
   let [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {
@@ -96,7 +98,7 @@ export default function Header({
             color="accent"
             icon={<PersonOutline color="inherit" />}
           />
-          <Text size="2xs">{"control_myroomname_1"}</Text>
+          <Text size="2xs">{participantName}</Text>
         </div>
       </div>
 

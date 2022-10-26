@@ -134,11 +134,13 @@ export default function Container({
   isFullWidth = false,
   room,
   variant,
+  participantName,
 }: {
   children: ReactNode;
   isFullWidth?: boolean;
   room: string;
   variant: "performer" | "control";
+  participantName?: string;
 }) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
@@ -147,7 +149,11 @@ export default function Container({
       <XimiToast>
         <>
           <div className="frame">
-            <Header variant={variant} room={room} />
+            <Header
+              variant={variant}
+              room={room}
+              participantName={participantName || "-"}
+            />
             {children}
             {variant === "performer" && (
               <IconButton

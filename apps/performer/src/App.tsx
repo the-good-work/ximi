@@ -134,6 +134,14 @@ function App() {
   return (
     <div id="App">
       <Container
+        participantName={((s) => {
+          if (
+            s.screen === "stage-screen" ||
+            s.screen === "enter-passcode-screen"
+          ) {
+            return s.properties.name;
+          }
+        })(state)}
         variant="performer"
         room={
           state.screen !== "room-list-screen"

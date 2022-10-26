@@ -5,7 +5,7 @@ import { ReturnDownBack } from "react-ionicons";
 import {
   RoomStateStage,
   UpdateStateActions,
-} from "../../../../types/performerStates";
+} from "../../../../types/controlStates";
 import { useRoom } from "@livekit/react-core";
 
 export default function Stage({
@@ -18,10 +18,7 @@ export default function Stage({
   const { connect, room, error, participants } = useRoom();
 
   async function connectRoom() {
-    await connect(
-      `${process.env.REACT_APP_LIVEKIT_HOST}`,
-      state.properties.token
-    );
+    await connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token);
   }
 
   useEffect(() => {
@@ -51,9 +48,6 @@ export default function Stage({
 
       <IconButton
         onClick={() => {
-          room?.disconnect().catch((err) => {
-            console.log(err);
-          });
           updateState({
             type: "back-to-list",
           });

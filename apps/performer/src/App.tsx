@@ -13,7 +13,7 @@ import {
   RoomStateStage,
   RoomStateSelectConnectionInput,
   UpdateStateActions,
-} from "../../../types/state";
+} from "../../../types/performerStates";
 import Container from "ui/Blocks/Container";
 
 function App() {
@@ -134,6 +134,7 @@ function App() {
   return (
     <div id="App">
       <Container
+        variant="performer"
         room={
           state.screen !== "room-list-screen"
             ? state.properties.room
@@ -141,7 +142,7 @@ function App() {
               : "-"
             : "-"
         }
-        isFullWidth={false}
+        isFullWidth={state.screen === "stage-screen" ? true : false}
       >
         <ScreenRenderer state={state} />
       </Container>

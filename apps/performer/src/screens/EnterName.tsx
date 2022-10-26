@@ -9,7 +9,7 @@ import {
 import {
   RoomStateEnterName,
   UpdateStateActions,
-} from "../../../../types/state";
+} from "../../../../types/performerStates";
 import Text from "ui/Texts/Text";
 import IconButton from "ui/Buttons/IconButton";
 import Input from "ui/Form/Input";

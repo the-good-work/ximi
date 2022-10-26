@@ -12,6 +12,12 @@
       "env": ["REACT_APP_VERSION", "REACT_APP_SERVER_HOST"],
       "inputs": ["src/**/*.tsx", "src/**/*.ts", "src/**/*.jsx", "src/**/*.js"]
     },
+    "control#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"],
+      "env": ["REACT_APP_VERSION", "REACT_APP_SERVER_HOST"],
+      "inputs": ["src/**/*.tsx", "src/**/*.ts", "src/**/*.jsx", "src/**/*.js"]
+    },
 
     "lint": {
       "outputs": []

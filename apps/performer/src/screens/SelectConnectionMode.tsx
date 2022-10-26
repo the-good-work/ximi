@@ -6,7 +6,7 @@ import Button from "ui/Buttons/Button";
 import IconButton from "ui/Buttons/IconButton";
 import Text from "ui/Texts/Text";
 import { ScreenContainer } from "ui/Composites/ScreenContainer";
-import { UpdateStateActions } from "../../../../types/state";
+import { UpdateStateActions } from "../../../../types/performerStates";
 
 export default function SelectConnectionMode({
   updateState,

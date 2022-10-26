@@ -65,6 +65,7 @@ export default function Input({
   type = "text",
   pattern,
   value,
+  maxLength,
   ...props
 }: {
   css?: any;
@@ -77,10 +78,12 @@ export default function Input({
   autoFocus?: any;
   readOnly?: any;
   inputMode?: string;
+  maxLength?: string;
   onKeyDown?: EventHandler<KeyboardEvent>;
 }) {
   return (
     <StyledInput
+      maxLength={maxLength}
       readOnly={readOnly}
       autoFocus={autoFocus}
       css={css}
@@ -94,4 +97,3 @@ export default function Input({
     ></StyledInput>
   );
 }
-//test

@@ -51,6 +51,9 @@ export default function Stage({
 
       <IconButton
         onClick={() => {
+          room?.disconnect().catch((err) => {
+            console.log(err);
+          });
           updateState({
             type: "back-to-list",
           });

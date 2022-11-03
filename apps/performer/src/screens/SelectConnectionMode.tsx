@@ -124,7 +124,12 @@ export default function SelectConnectionMode({
             type: "back-to-list",
           });
         }}
-        css={{ position: "fixed", bottom: "$sm", left: "$sm" }}
+        css={{
+          position: "fixed",
+          bottom: "$sm",
+          left: "$sm",
+          span: { path: { fill: "none" } },
+        }}
         iconSize="md"
         variant="outline"
         aria-label={`Back to home`}

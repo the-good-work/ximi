@@ -5,10 +5,13 @@ import { styled } from "ui/theme/theme";
 
 const StyledPanelButton = styled(Button, {
   textTransform: "uppercase",
+
   borderRadius: 0,
   variants: {
     active: {
       true: {
+        alignItems: "center",
+        justifyContent: "center",
         span: {
           color: "$accent",
         },
@@ -23,6 +26,8 @@ const StyledPanelButton = styled(Button, {
         },
       },
       false: {
+        alignItems: "center",
+        justifyContent: "center",
         border: "none",
         borderRadius: 0,
         color: "$text",

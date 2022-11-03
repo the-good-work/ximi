@@ -16,6 +16,7 @@ import {
 
 const StyledSidebar = styled("div", {
   display: "flex",
+  width: "300px",
   flexDirection: "column",
   boxSizing: "border-box",
   alignItems: "start",
@@ -27,20 +28,21 @@ const StyledSidebar = styled("div", {
   ".topSpacer": {
     borderLeft: "2px solid $brand",
     boxSizing: "border-box",
-    padding: "$sm",
+    padding: "$xs",
   },
 
   ".controls": {
     borderLeft: "2px solid $brand",
     height: "100%",
     width: "100%",
-    padding: "$md",
+    padding: "$sm",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-between",
     boxSizing: "border-box",
     gap: "$sm",
+
     "> div": {
       display: "flex",
       flexDirection: "column",

@@ -55,9 +55,14 @@ const StyledButton = styled("button", {
       },
     },
     state: {
-      default: {},
+      default: {
+        span: { path: { fill: "$text" } },
+      },
       loading: {
         animation: `${spin} ease-in-out 500ms infinite`,
+      },
+      active: {
+        span: { path: { fill: "$accent" } },
       },
     },
     variant: {
@@ -99,7 +104,7 @@ export default function IconButton({
 }: {
   icon: ReactNode;
   iconSize: any;
-  state?: "default" | "loading";
+  state?: "default" | "loading" | "active";
   props?: any;
   variant?: "solid" | "ghost" | "outline";
   css?: any;

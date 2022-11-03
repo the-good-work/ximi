@@ -177,7 +177,7 @@ export default function RoomsList({
           </Heading>
           <div className="refresh-icon-container">
             <IconButton
-              css={{ borderRadius: "100%" }}
+              css={{ borderRadius: "100%", span: { path: { fill: "none" } } }}
               iconSize={{ "@base": "lg", "@md": "xl" }}
               aria-label="Refresh list of rooms"
               variant="ghost"

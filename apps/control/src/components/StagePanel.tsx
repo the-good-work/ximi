@@ -1,6 +1,7 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Heading from "ui/Texts/Heading";
 import { styled } from "ui/theme/theme";
+import { PanelStates } from "../../../../types/controlStates";
 
 const StyledPanel = styled("div", {
   height: "100%",
@@ -14,7 +15,13 @@ const StyledPanel = styled("div", {
   alignItems: "center",
 });
 
-export default function StagePanel() {
+export default function StagePanel({
+  activePanel,
+  setActivePanel,
+}: {
+  activePanel: PanelStates;
+  setActivePanel: Dispatch<SetStateAction<PanelStates>>;
+}) {
   return (
     <StyledPanel>
       <Heading>Panel</Heading>

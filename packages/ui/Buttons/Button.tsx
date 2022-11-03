@@ -3,7 +3,7 @@ import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
 
 type Variants = "solid" | "keypad" | "keyboard";
-type ButtonTypes = "primary" | "normal";
+type ButtonTypes = "primary" | "normal" | "negative";
 
 const StyledButton = styled("button", {
   borderRadius: "$xs",
@@ -21,7 +21,6 @@ const StyledButton = styled("button", {
 
   ".icon": {
     span: {
-      path: { fill: "$text" },
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -67,6 +66,26 @@ const StyledButton = styled("button", {
         background: "$primaryButtonGradient",
       },
       normal: { backgroundColor: "$background" },
+      negative: {
+        backgroundColor: "$background",
+        "&:hover": {
+          backgroundColor: "$negative",
+          span: { color: "$text" },
+          ".icon": {
+            span: { path: { fill: "$text" } },
+          },
+        },
+        span: {
+          color: "$negative",
+        },
+        ".icon": {
+          span: {
+            path: {
+              fill: "$negative",
+            },
+          },
+        },
+      },
     },
     variant: {
       solid: {

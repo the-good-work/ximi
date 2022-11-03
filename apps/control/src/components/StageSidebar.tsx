@@ -1,8 +1,18 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Button from "ui/Buttons/Button";
 import { styled } from "ui/theme/theme";
 import PanelButton from "./PanelButton";
-import { Chatbubble, VolumeHigh, Videocam } from "react-ionicons";
+import Presets from "./Presets";
+import {
+  ChatboxSharp,
+  VolumeHighSharp,
+  VideocamSharp,
+  ExitSharp,
+} from "react-ionicons";
+import {
+  PanelStates,
+  UpdateStateActions,
+} from "../../../../types/controlStates";
 
 const StyledSidebar = styled("div", {
   display: "flex",
@@ -11,27 +21,45 @@ const StyledSidebar = styled("div", {
   alignItems: "start",
   justifyContent: "start",
   height: "100%",
-  minWidth: "200px",
+
   color: "white",
 
   ".topSpacer": {
     borderLeft: "2px solid $brand",
     boxSizing: "border-box",
-    padding: "$md",
+    padding: "$sm",
   },
 
   ".controls": {
     borderLeft: "2px solid $brand",
     height: "100%",
+    width: "100%",
     padding: "$md",
     display: "flex",
     flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
     boxSizing: "border-box",
+    gap: "$sm",
+    "> div": {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "$sm",
+    },
   },
 });
 
-export default function StageSidebar() {
-  const [activePanel, setActivePanel] = useState<"audio" | "video">("audio");
+export default function StageSidebar({
+  activePanel,
+  setActivePanel,
+  updateState,
+}: {
+  activePanel: PanelStates;
+  setActivePanel: Dispatch<SetStateAction<PanelStates>>;
+  updateState: Dispatch<UpdateStateActions>;
+}) {
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -40,7 +68,19 @@ export default function StageSidebar() {
           setActivePanel("audio");
         }}
         active={activePanel === "audio"}
-        icon={<VolumeHigh />}
+        icon={<VolumeHighSharp />}
+        css={{
+          ".icon": {
+            span: {
+              svg: {
+                color: activePanel === "audio" ? "$accent" : "$text",
+              },
+              "path:not(:last-child)": {
+                fill: "none",
+              },
+            },
+          },
+        }}
       >
         Audio
       </PanelButton>
@@ -49,12 +89,41 @@ export default function StageSidebar() {
           setActivePanel("video");
         }}
         active={activePanel === "video"}
-        icon={<Videocam />}
+        icon={<VideocamSharp />}
       >
         Video
       </PanelButton>
       <div className="controls">
-        <Button icon={<Chatbubble />}>Message</Button>
+        <div>
+          <Button
+            icon={<ChatboxSharp />}
+            css={{
+              textTransform: "uppercase",
+              ".icon": {
+                span: {
+                  path: { fill: "$text" },
+                },
+              },
+            }}
+          >
+            Message
+          </Button>
+          <Presets />
+        </div>
+        <Button
+          css={{
+            textTransform: "uppercase",
+          }}
+          icon={<ExitSharp />}
+          type="negative"
+          onClick={() => {
+            updateState({
+              type: "back-to-list",
+            });
+          }}
+        >
+          Exit
+        </Button>
       </div>
     </StyledSidebar>
   );

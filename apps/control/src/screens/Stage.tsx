@@ -1,8 +1,9 @@
-import React, { Dispatch, useEffect } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import IconButton from "ui/Buttons/IconButton";
 import { ReturnDownBack } from "react-ionicons";
 import StageSidebar from "../components/StageSidebar";
 import {
+  PanelStates,
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/controlStates";
@@ -27,6 +28,7 @@ export default function Stage({
   state: RoomStateStage;
 }) {
   const { connect, room, error, participants } = useRoom();
+  const [activePanel, setActivePanel] = useState<PanelStates>("audio");
 
   async function connectRoom() {
     await connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token);
@@ -46,22 +48,13 @@ export default function Stage({
   return (
     <div className="content noscroll">
       <StyledStage>
-        <StagePanel />
-        <StageSidebar />
+        <StagePanel activePanel={activePanel} setActivePanel={setActivePanel} />
+        <StageSidebar
+          updateState={updateState}
+          activePanel={activePanel}
+          setActivePanel={setActivePanel}
+        />
       </StyledStage>
-
-      <IconButton
-        onClick={() => {
-          updateState({
-            type: "back-to-list",
-          });
-        }}
-        css={{ position: "fixed", bottom: "$sm", left: "$sm" }}
-        iconSize="md"
-        variant="outline"
-        aria-label={`Back to home`}
-        icon={<ReturnDownBack color="inherit" />}
-      />
     </div>
   );
 }

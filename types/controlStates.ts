@@ -56,3 +56,5 @@ export type ReducerStates =
   | RoomStateCreate
   | RoomStateJoin
   | RoomStateStage;
+
+export type PanelStates = "audio" | "video";

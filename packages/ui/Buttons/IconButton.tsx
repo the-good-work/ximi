@@ -64,6 +64,10 @@ const StyledButton = styled("button", {
       active: {
         span: { path: { fill: "$accent" } },
       },
+      disabled: {
+        span: { path: { fill: "none" } },
+        pointerEvents: "none",
+      },
     },
     variant: {
       solid: {
@@ -97,14 +101,16 @@ export default function IconButton({
   icon,
   iconSize,
   css,
+  disabled,
   onClick,
   state = "default",
   variant = "solid",
   ...props
 }: {
   icon: ReactNode;
+  disabled?: boolean;
   iconSize: any;
-  state?: "default" | "loading" | "active";
+  state?: "default" | "loading" | "active" | "disabled";
   props?: any;
   variant?: "solid" | "ghost" | "outline";
   css?: any;

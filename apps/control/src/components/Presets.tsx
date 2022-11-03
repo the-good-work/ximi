@@ -1,8 +1,10 @@
-import React from "react";
+import React, { Dispatch } from "react";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
 import { SaveSharp, Play } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
+import { Preset, PresetAction } from "../../../../types/stageStates";
+import Input from "ui/Form/Input";
 
 const StyledPresets = styled("div", {
   border: "2px solid $brand",
@@ -46,14 +48,43 @@ const StyledPresetSingle = styled("div", {
   },
 });
 
-function PresetSingle() {
+function PresetSingle({
+  preset,
+  setPresets,
+}: {
+  preset: Preset;
+  setPresets: Dispatch<PresetAction>;
+}) {
   return (
     <StyledPresetSingle>
       <div className="name">
-        <Text>Pres1</Text>
+        <Input
+          maxLength="6"
+          variant="presets"
+          placeholder={preset.name}
+          onBlur={(e: any) => {
+            if (e.target.value.length > 0) {
+              setPresets({
+                type: "update-preset",
+                name: e.target.value,
+                saved: preset.saved,
+                index: preset.index,
+              });
+            }
+          }}
+          css={{ color: preset.saved ? "$accent" : "$text" }}
+        />
       </div>
       <div className="save">
         <IconButton
+          onClick={() => {
+            setPresets({
+              type: "update-preset",
+              name: preset.name,
+              saved: true,
+              index: preset.index,
+            });
+          }}
           css={{ borderRadius: "0" }}
           variant="ghost"
           iconSize="sm"
@@ -62,7 +93,10 @@ function PresetSingle() {
       </div>
       <div className="load">
         <IconButton
-          state={"active"}
+          onClick={() => {
+            console.log(`load ${preset.name}`);
+          }}
+          state={preset.saved ? "active" : "disabled"}
           css={{ borderRadius: "0 $xs $xs 0" }}
           variant="ghost"
           iconSize="sm"
@@ -73,16 +107,32 @@ function PresetSingle() {
   );
 }
 
-export default function Presets() {
+export default function Presets({
+  presets,
+  setPresets,
+}: {
+  presets: any[];
+  setPresets: Dispatch<PresetAction>;
+}) {
   return (
     <StyledPresets>
       <Text size="md" css={{ textTransform: "uppercase" }}>
         Presets
       </Text>
       <div className="presetsList">
-        {Array.apply(null, Array(10)).map((_a, i) => {
-          return <PresetSingle key={i} />;
-        })}
+        {presets.length > 0 ? (
+          presets.map((_a, i) => {
+            return (
+              <PresetSingle
+                preset={presets[i]}
+                setPresets={setPresets}
+                key={i}
+              />
+            );
+          })
+        ) : (
+          <Text>No presets found</Text>
+        )}
       </div>
     </StyledPresets>
   );

@@ -69,8 +69,6 @@ function App() {
 
   const [state, updateState] = useReducer(reducer, initialState);
 
-  console.log(state);
-
   function RenderScreen({ state }: { state: ReducerStates }) {
     if (state.screen === "room-list-screen") {
       return <RoomsList updateState={updateState} />;

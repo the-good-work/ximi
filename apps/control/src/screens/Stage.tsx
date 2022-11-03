@@ -1,12 +1,14 @@
-import React, { Dispatch, useEffect, useState } from "react";
-import IconButton from "ui/Buttons/IconButton";
-import { ReturnDownBack } from "react-ionicons";
+import React, { Dispatch, useEffect, useState, useReducer } from "react";
 import StageSidebar from "../components/StageSidebar";
 import {
-  PanelStates,
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/controlStates";
+import {
+  PanelStates,
+  Preset,
+  PresetAction,
+} from "../../../../types/stageStates";
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
 import StagePanel from "../components/StagePanel";
@@ -27,8 +29,29 @@ export default function Stage({
   updateState: Dispatch<UpdateStateActions>;
   state: RoomStateStage;
 }) {
+  const initialState = Array.apply(null, Array(12)).map((_a, i) => {
+    return {
+      name: `SLOT${i < 9 ? `0${i + 1}` : i + 1}`,
+      saved: false,
+      index: i,
+    };
+  });
   const { connect, room, error, participants } = useRoom();
+  const [presets, setPresets] = useReducer(reducer, initialState);
   const [activePanel, setActivePanel] = useState<PanelStates>("audio");
+
+  function reducer(_state: Preset[], action: PresetAction) {
+    if (action.type === "update-preset") {
+      const updatedPreset = {
+        name: action.name,
+        saved: action.saved,
+        index: action.index,
+      };
+      _state.splice(action.index, 1, updatedPreset);
+      const __state = _state.slice();
+      return __state;
+    } else return initialState;
+  }
 
   async function connectRoom() {
     await connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token);
@@ -43,13 +66,14 @@ export default function Stage({
   if (error) {
     console.log(error);
   }
-  console.log(room, participants);
 
   return (
     <div className="content noscroll">
       <StyledStage>
         <StagePanel activePanel={activePanel} setActivePanel={setActivePanel} />
         <StageSidebar
+          presets={presets}
+          setPresets={setPresets}
           updateState={updateState}
           activePanel={activePanel}
           setActivePanel={setActivePanel}

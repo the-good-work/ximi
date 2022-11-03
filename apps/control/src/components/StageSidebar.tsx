@@ -9,10 +9,8 @@ import {
   VideocamSharp,
   ExitSharp,
 } from "react-ionicons";
-import {
-  PanelStates,
-  UpdateStateActions,
-} from "../../../../types/controlStates";
+import { UpdateStateActions } from "../../../../types/controlStates";
+import { PanelStates, PresetAction } from "../../../../types/stageStates";
 
 const StyledSidebar = styled("div", {
   display: "flex",
@@ -57,10 +55,14 @@ export default function StageSidebar({
   activePanel,
   setActivePanel,
   updateState,
+  presets,
+  setPresets,
 }: {
   activePanel: PanelStates;
   setActivePanel: Dispatch<SetStateAction<PanelStates>>;
   updateState: Dispatch<UpdateStateActions>;
+  presets: any[];
+  setPresets: Dispatch<PresetAction>;
 }) {
   return (
     <StyledSidebar>
@@ -110,7 +112,7 @@ export default function StageSidebar({
           >
             Message
           </Button>
-          <Presets />
+          <Presets presets={presets} setPresets={setPresets} />
         </div>
         <Button
           css={{

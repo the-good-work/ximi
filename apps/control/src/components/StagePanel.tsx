@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Heading from "ui/Texts/Heading";
 import { styled } from "ui/theme/theme";
-import { PanelStates } from "../../../../types/controlStates";
+import { PanelStates } from "../../../../types/stageStates";
 
 const StyledPanel = styled("div", {
   height: "100%",

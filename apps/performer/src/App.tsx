@@ -116,7 +116,6 @@ function App() {
   }
 
   const [state, updateState] = useReducer(reducer, initialState);
-  console.log(state);
 
   function ScreenRenderer({ state }: { state: ReducerStates }) {
     if (state.screen === "room-list-screen") {

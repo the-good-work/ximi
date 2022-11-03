@@ -18,11 +18,10 @@ const StyledButton = styled("button", {
   "&:hover": {
     backgroundColor: "$brand",
   },
-  path: {
-    fill: "CurrentColor",
-  },
+
   ".icon": {
     span: {
+      path: { fill: "$text" },
       display: "flex",
       justifyContent: "center",
       alignItems: "center",

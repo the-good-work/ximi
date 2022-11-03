@@ -1,12 +1,23 @@
 import React, { Dispatch, useEffect } from "react";
 import IconButton from "ui/Buttons/IconButton";
-import Heading from "ui/Texts/Heading";
 import { ReturnDownBack } from "react-ionicons";
+import StageSidebar from "../components/StageSidebar";
 import {
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/controlStates";
 import { useRoom } from "@livekit/react-core";
+import { styled } from "ui/theme/theme";
+import StagePanel from "../components/StagePanel";
+
+const StyledStage = styled("div", {
+  display: "flex",
+  width: "100%",
+  height: "100%",
+  justifyContent: "space-between",
+  alignItems: "center",
+  flexDirection: "row",
+});
 
 export default function Stage({
   state,
@@ -34,17 +45,10 @@ export default function Stage({
 
   return (
     <div className="content noscroll">
-      <Heading
-        color="gradient"
-        css={{
-          textAlign: "center",
-          textTransform: "uppercase",
-          marginTop: "$sm",
-          marginBottom: "$sm",
-        }}
-      >
-        Stage
-      </Heading>
+      <StyledStage>
+        <StagePanel />
+        <StageSidebar />
+      </StyledStage>
 
       <IconButton
         onClick={() => {

@@ -36,8 +36,7 @@ const StyledPresetSingle = styled("div", {
   ".name": {
     width: "100%",
     textTransform: "uppercase",
-
-    padding: "$2xs $xs",
+    padding: "$2xs $xs $2xs $2xs",
   },
   ".save": {
     borderLeft: "1px solid $text",

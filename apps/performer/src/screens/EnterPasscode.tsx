@@ -275,6 +275,7 @@ export default function EnterPasscode({
                       handlePasscode("bsp", passcode);
                     }}
                     aria-label="Backspace"
+                    css={{ span: { path: { fill: "$text" } } }}
                     icon={<Backspace color="inherit" />}
                   />
                 );
@@ -314,7 +315,12 @@ export default function EnterPasscode({
             type: "back-to-enter-name",
           });
         }}
-        css={{ position: "fixed", bottom: "$sm", left: "$sm" }}
+        css={{
+          position: "fixed",
+          bottom: "$sm",
+          left: "$sm",
+          span: { path: { fill: "none" } },
+        }}
         iconSize="md"
         variant="outline"
         aria-label={`Back to home`}

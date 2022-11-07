@@ -278,6 +278,7 @@ export default function EnterName({
                     variant="keyboard"
                     key={"bsp"}
                     className={"bsp"}
+                    css={{ span: { path: { fill: "$text" } } }}
                     onClick={() => {
                       handleNickname("bsp", nickname);
                     }}
@@ -308,7 +309,12 @@ export default function EnterName({
             type: "back-to-connection-input",
           });
         }}
-        css={{ position: "fixed", bottom: "$sm", left: "$sm" }}
+        css={{
+          position: "fixed",
+          bottom: "$sm",
+          left: "$sm",
+          span: { path: { fill: "none" } },
+        }}
         iconSize="md"
         variant="outline"
         aria-label={`Back to home`}

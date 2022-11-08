@@ -64,9 +64,10 @@ export default function Stage({
   }, []);
 
   useEffect(() => {
-    console.log(room);
     if (room) {
       if (room.localParticipant) {
+        console.log(room, participants);
+
         // set name of current control node as room.localParticipant.identity
       }
     }

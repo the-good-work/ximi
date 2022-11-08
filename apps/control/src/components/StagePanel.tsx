@@ -47,7 +47,6 @@ export default function StagePanel({
   participants: Participant[];
 }) {
   if (activePanel === "audio") {
-    console.log(participants);
     if (participants.length <= 0) {
       return (
         <StyledEmptyState>

@@ -22,7 +22,6 @@ export type UpdateStateActions =
   | {
       type: "submit-passcode";
       token: string;
-      name: string;
     }
   | {
       type: "create-room";
@@ -31,7 +30,6 @@ export type UpdateStateActions =
       type: "confirm-create-room";
       room: Room;
       token: string;
-      name: string;
     };
 
 export type RoomStateInit = {
@@ -50,7 +48,6 @@ export type RoomStateStage = {
   screen: "stage-screen";
   room: Room;
   token: string;
-  name: string;
 };
 
 export type ReducerStates =

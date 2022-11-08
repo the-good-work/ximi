@@ -58,7 +58,7 @@ export default function JoinRoom({
   async function checkPasscode(pass: string) {
     const data = {
       room_name: state.room?.room,
-      participant_name: "temp_control_node",
+      participant_name: "",
       participant_type: "CONTROL",
       passcode: pass,
     };
@@ -84,10 +84,10 @@ export default function JoinRoom({
           res
             .json()
             .then((r) => {
+              console.log(r);
               updateState({
                 type: "submit-passcode",
                 token: r.data,
-                name: "asdf",
               });
             })
             .catch(() => {

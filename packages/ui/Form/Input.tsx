@@ -102,7 +102,7 @@ export default function Input({
   as?: any;
   props?: any;
   pattern?: string;
-  value?: string;
+  value?: string | number;
   type?: string;
   autoFocus?: any;
   readOnly?: any;

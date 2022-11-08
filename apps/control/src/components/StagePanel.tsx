@@ -59,8 +59,14 @@ export default function StagePanel({
     } else
       return (
         <StyledPanel>
-          {participants.map((p) => {
-            return <AudioMixCard participant={p} participants={participants} />;
+          {participants.map((p: any) => {
+            return (
+              <AudioMixCard
+                type={JSON.parse(p.metadata).type.toLowerCase()}
+                participant={p}
+                participants={participants}
+              />
+            );
           })}
         </StyledPanel>
       );

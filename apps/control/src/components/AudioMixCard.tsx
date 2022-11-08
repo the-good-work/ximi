@@ -1,8 +1,7 @@
 import { Participant } from "livekit-client";
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import {
   HourglassOutline,
-  HourglassSharp,
   LinkOutline,
   MicOffSharp,
   MicSharp,
@@ -19,17 +18,25 @@ import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
 
 const StyledDiv = styled("div", {
+  variants: {
+    type: {
+      control: { border: "3px solid $accent" },
+      performer: {
+        border: "1px solid $brand",
+      },
+    },
+  },
   display: "flex",
   height: "100%",
   width: "100%",
+  maxHeight: "240px",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "space-between",
   boxSizing: "border-box",
   padding: "$sm",
-  paddingBottom: "0",
   borderRadius: "$xs",
-  border: "3px solid $accent",
+
   backgroundColor: "$background",
   color: "$text",
   gap: "$sm",
@@ -49,10 +56,10 @@ const StyledDiv = styled("div", {
     borderTop: "1px solid $text",
     boxSizing: "border-box",
     padding: "$xs 0",
+    paddingBottom: "0",
     display: "grid",
     gridTemplateColumns: "1fr 1px 1fr",
-    // gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gridGap: "$xs",
+    gridGap: "$sm",
 
     ".footer-box": {
       width: "100%",
@@ -62,7 +69,6 @@ const StyledDiv = styled("div", {
       justifyContent: "start",
       alignItems: "start",
       boxSizing: "borderBox",
-      padding: "$xs 0",
     },
 
     ".spacer": {
@@ -77,19 +83,21 @@ const StyledDiv = styled("div", {
         lineHeight: 0,
         gap: "$xs",
         borderBottom: "none",
+        paddingBottom: "$xs",
       },
       ".buttons": {
         display: "flex",
         gap: "$xs",
         width: "100%",
+        height: "100%",
       },
     },
     ".audio-delay": {
-      paddingRight: "0",
       ".header": {
         justifyContent: "start",
         lineHeight: 0,
         gap: "$xs",
+        paddingBottom: "$xs",
         borderBottom: "none",
         "path:last-child": {
           fill: "$text",
@@ -98,15 +106,22 @@ const StyledDiv = styled("div", {
       ".inputs": {
         display: "flex",
         flexDirection: "row",
-        gap: "$2xs",
+        gap: "$xs",
+        height: "100%",
+
+        ".input-group": {
+          display: "flex",
+          gap: 0,
+          flexDirection: "row",
+        },
       },
     },
   },
   ".body": {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
     width: "100%",
-    gap: "$md",
+    gap: "$sm",
     flexWrap: "wrap",
   },
   ".header": {
@@ -132,7 +147,7 @@ const StyledDiv = styled("div", {
       flexDirection: "row",
       justifyContent: "start",
       alignItems: "center",
-      gap: "$sm",
+      gap: "$xs",
       path: { fill: "$text" },
       span: {
         lineHeight: 0,
@@ -172,7 +187,7 @@ const StyledSubcard = styled("div", {
   padding: "$xs $sm",
   display: "flex",
   flexDirection: "row",
-  gap: "$sm",
+  gap: "$xs",
   alignItems: "center",
   justifyContent: "start",
   span: {
@@ -200,11 +215,11 @@ function ParticipantSubcard({ participant }: { participant: Participant }) {
   return (
     <StyledSubcard active={participant.audioTracks.size > 0}>
       {participant.audioTracks.size > 0 ? (
-        <VolumeHighSharp color="inherit" />
+        <VolumeHighSharp color="inherit" width="14px" />
       ) : (
-        <VolumeMuteSharp color="inherit" />
+        <VolumeMuteSharp color="inherit" width="14px" />
       )}
-      <Text size="xs">{participant.identity}</Text>
+      <Text size="2xs">{participant.identity}</Text>
     </StyledSubcard>
   );
 }
@@ -212,30 +227,38 @@ function ParticipantSubcard({ participant }: { participant: Participant }) {
 export default function AudioMixCard({
   participant,
   participants,
+  type = "performer",
 }: {
   participant: Participant | any;
   participants: Participant[];
+  type?: "performer" | "control";
 }) {
   return (
-    <StyledDiv>
+    <StyledDiv type={type}>
       <div>
         <div className="header">
           <div>
             <div className="identity">
               <PersonCircle color="inherit" width="20px" height="20px" />
-              <Text>{participant.identity}</Text>
+              <Text size="xs">{participant.identity}</Text>
             </div>
             <div className="latency">
               <SwapHorizontal color="inherit" width="20px" height="20px" />
-              <Text>{participant?.signalClient?.pingInterval || 0}</Text>
+              <Text size="xs">
+                {participant?.signalClient?.pingInterval || 0}
+              </Text>
             </div>
           </div>
           <div className="icons">
-            {participant.audioTracks.size > 0 ? <MicSharp /> : <MicOffSharp />}
-            {participant.videoTracks.size > 0 ? (
-              <VideocamSharp />
+            {participant.audioTracks.size > 0 ? (
+              <MicSharp width="20px" />
             ) : (
-              <VideocamOffSharp />
+              <MicOffSharp width="20px" />
+            )}
+            {participant.videoTracks.size > 0 ? (
+              <VideocamSharp width="20px" />
+            ) : (
+              <VideocamOffSharp width="20px" />
             )}
           </div>
         </div>
@@ -251,7 +274,7 @@ export default function AudioMixCard({
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
-              <LinkOutline color="inherit" />
+              <LinkOutline color="inherit" width="14px" />
               <Text size="2xs">Copy Stream Link</Text>
             </div>
             <div className="buttons">
@@ -270,7 +293,7 @@ export default function AudioMixCard({
                   },
                 }}
               >
-                <VideocamSharp color="inherit" />
+                <VideocamSharp color="inherit" width="20px" />
               </Button>
               <Button
                 size="sm"
@@ -293,21 +316,22 @@ export default function AudioMixCard({
                   justifyContent: "center",
                 }}
               >
-                <VideocamSharp color="inherit" /> +{" "}
-                <VolumeHighSharp color="inherit" />
+                <VideocamSharp color="inherit" width="20px" /> +{" "}
+                <VolumeHighSharp color="inherit" width="20px" />
               </Button>
             </div>
           </div>
           <div className="spacer" />
           <div className="footer-box audio-delay">
             <div className="header">
-              <HourglassOutline color="inherit" />
+              <HourglassOutline color="inherit" width="14px" />
               <Text size="2xs">Output Audio Delay</Text>
             </div>
             <div className="inputs">
               <Input
                 value={30}
                 css={{
+                  fontSize: "$sm",
                   backgroundColor: "$text",
                   color: "$background",
                   fontWeight: "$bold",
@@ -315,23 +339,38 @@ export default function AudioMixCard({
                   borderRadius: 0,
                   "&:hover": {
                     color: "$text",
+                    backgroundColor: "$brand",
                   },
                 }}
               />
               <div className="input-group">
                 <Input
-                  value={30}
                   css={{
-                    backgroundColor: "$text",
-                    color: "$background",
-                    fontWeight: "$bold",
-                    border: 0,
+                    fontSize: "$sm",
+                    border: "1px solid $text",
+                    backgroundColor: "$grey",
+                    color: "$text",
                     borderRadius: 0,
                     "&:hover": {
-                      color: "$text",
+                      color: "$background",
+                      backgroundColor: "$text",
                     },
                   }}
+                  maxLength="4"
                 />
+                <Button
+                  size="sm"
+                  css={{
+                    padding: "0",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textTransform: "uppercase",
+                    border: "1px solid $text",
+                    borderRadius: 0,
+                  }}
+                >
+                  Set
+                </Button>
               </div>
             </div>
           </div>

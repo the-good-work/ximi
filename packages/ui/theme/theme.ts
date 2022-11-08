@@ -9,6 +9,7 @@ export const { styled, css } = createStitches({
       accent: "#7976FF",
       "accent-translucent": "rgba(82, 55, 243, 0.5)",
       text: "#E8E8F4",
+      grey: "#3C3C40",
       negative: "#D73C37",
       disabled: "#99999F",
       background: "#111113",

@@ -47,6 +47,7 @@ export const { styled, css } = createStitches({
       xl: "2.25rem", //36px
       "2xl": "2.5rem", //40px
       "3xl": "2.875rem", //46px
+      "4xl": "3.25rem", //46px
     },
     fontSizes: {
       "3xs": "0.5rem", //8px

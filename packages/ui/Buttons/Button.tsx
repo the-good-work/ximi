@@ -1,6 +1,7 @@
 import React, { MouseEventHandler, ReactNode } from "react";
 import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
+import { CSS } from "@stitches/react";
 
 type Variants = "solid" | "keypad" | "keyboard" | "outline";
 type ButtonTypes = "primary" | "normal" | "negative";
@@ -135,7 +136,7 @@ export default function Button({
   children?: ReactNode;
   icon?: ReactNode;
   variant?: Variants;
-  css?: any;
+  css?: CSS;
   onClick?: MouseEventHandler;
   as?: any;
   type?: ButtonTypes;

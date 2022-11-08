@@ -1,5 +1,6 @@
 import React, { Dispatch, useEffect } from "react";
 import IconButton from "ui/Buttons/IconButton";
+import ToggleIconButton from "ui/Buttons/ToggleIconButton";
 import Heading from "ui/Texts/Heading";
 import { ReturnDownBack } from "react-ionicons";
 import {
@@ -7,6 +8,7 @@ import {
   UpdateStateActions,
 } from "../../../../types/performerStates";
 import { useRoom } from "@livekit/react-core";
+import ControlTray from "../components/ControlTray";
 
 export default function Stage({
   state,
@@ -48,30 +50,7 @@ export default function Stage({
         Stage
       </Heading>
 
-      <IconButton
-        onClick={() => {
-          room?.disconnect().catch((err) => {
-            console.log(err);
-          });
-          updateState({
-            type: "back-to-list",
-          });
-        }}
-        css={{
-          position: "fixed",
-          bottom: "$sm",
-          left: "$sm",
-          span: {
-            path: {
-              fill: "none",
-            },
-          },
-        }}
-        iconSize="md"
-        variant="outline"
-        aria-label={`Back to home`}
-        icon={<ReturnDownBack color="inherit" />}
-      />
+      <ControlTray room={room} updateState={updateState} />
     </div>
   );
 }

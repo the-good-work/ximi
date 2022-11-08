@@ -2,7 +2,7 @@ import React, { MouseEventHandler, ReactNode } from "react";
 import { styled } from "../theme/theme";
 import Text from "../Texts/Text";
 
-type Variants = "solid" | "keypad" | "keyboard";
+type Variants = "solid" | "keypad" | "keyboard" | "outline";
 type ButtonTypes = "primary" | "normal" | "negative";
 
 const StyledButton = styled("button", {
@@ -88,6 +88,11 @@ const StyledButton = styled("button", {
       },
     },
     variant: {
+      outline: {
+        justifyContent: "flex-start",
+        padding: "$sm $md",
+        borderColor: "$text",
+      },
       solid: {
         justifyContent: "flex-start",
         padding: "$sm $md",

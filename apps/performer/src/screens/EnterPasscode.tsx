@@ -111,12 +111,12 @@ export default function EnterPasscode({
       .then((res) => {
         if (res.status === 200) {
           res
-            .text()
+            .json()
             .then((r) => {
               updateState({
                 type: "submit-passcode",
                 properties: {
-                  token: r,
+                  token: r.data,
                 },
               });
             })

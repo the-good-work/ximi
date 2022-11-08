@@ -71,7 +71,7 @@ export default function RoomsList({
     fetcher,
     options
   );
-  const rooms: Room[] = data || [];
+  const rooms: Room[] = data?.data || [];
 
   async function onRefresh() {
     mutate();

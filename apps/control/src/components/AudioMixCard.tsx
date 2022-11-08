@@ -14,6 +14,7 @@ import {
   VolumeMuteSharp,
 } from "react-ionicons";
 import Button from "ui/Buttons/Button";
+import Input from "ui/Form/Input";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
 
@@ -44,9 +45,6 @@ const StyledDiv = styled("div", {
 
   ".footer": {
     width: "100%",
-    minHeight: "80px",
-    maxHeight: "80px",
-    height: "80px",
     position: "relative",
     borderTop: "1px solid $text",
     boxSizing: "border-box",
@@ -54,16 +52,17 @@ const StyledDiv = styled("div", {
     display: "grid",
     gridTemplateColumns: "1fr 1px 1fr",
     // gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gridGap: "$sm",
+    gridGap: "$xs",
 
     ".footer-box": {
       width: "100%",
+      height: "100%",
       display: "flex",
       flexDirection: "column",
       justifyContent: "start",
       alignItems: "start",
       boxSizing: "borderBox",
-      padding: "$xs",
+      padding: "$xs 0",
     },
 
     ".spacer": {
@@ -73,8 +72,6 @@ const StyledDiv = styled("div", {
     },
 
     ".stream-link": {
-      paddingLeft: "0",
-
       ".header": {
         justifyContent: "start",
         lineHeight: 0,
@@ -97,6 +94,11 @@ const StyledDiv = styled("div", {
         "path:last-child": {
           fill: "$text",
         },
+      },
+      ".inputs": {
+        display: "flex",
+        flexDirection: "row",
+        gap: "$2xs",
       },
     },
   },
@@ -239,13 +241,13 @@ export default function AudioMixCard({
         </div>
         <div className="body">
           {participants
-            .filter((p) => p.metadata === "PERFORMER")
+            .filter((p: any) => JSON.parse(p.metadata).type === "PERFORMER")
             .map((p) => {
               return <ParticipantSubcard key={p.identity} participant={p} />;
             })}
         </div>
       </div>
-      {participant.metadata === "PERFORMER" && (
+      {JSON.parse(participant.metadata).type === "PERFORMER" && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
@@ -254,19 +256,32 @@ export default function AudioMixCard({
             </div>
             <div className="buttons">
               <Button
+                size="sm"
                 variant="outline"
                 css={{
                   path: {
                     fill: "$text",
+                  },
+                  span: {
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   },
                 }}
               >
                 <VideocamSharp color="inherit" />
               </Button>
               <Button
+                size="sm"
                 variant="outline"
                 css={{
                   span: {
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 0,
                     path: {
                       fill: "$text",
                     },
@@ -274,6 +289,8 @@ export default function AudioMixCard({
                       fill: "none",
                     },
                   },
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <VideocamSharp color="inherit" /> +{" "}
@@ -287,7 +304,36 @@ export default function AudioMixCard({
               <HourglassOutline color="inherit" />
               <Text size="2xs">Output Audio Delay</Text>
             </div>
-            <div className="inputs"></div>
+            <div className="inputs">
+              <Input
+                value={30}
+                css={{
+                  backgroundColor: "$text",
+                  color: "$background",
+                  fontWeight: "$bold",
+                  border: 0,
+                  borderRadius: 0,
+                  "&:hover": {
+                    color: "$text",
+                  },
+                }}
+              />
+              <div className="input-group">
+                <Input
+                  value={30}
+                  css={{
+                    backgroundColor: "$text",
+                    color: "$background",
+                    fontWeight: "$bold",
+                    border: 0,
+                    borderRadius: 0,
+                    "&:hover": {
+                      color: "$text",
+                    },
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}

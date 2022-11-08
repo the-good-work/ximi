@@ -120,7 +120,7 @@ export default function CreateRoom({
   async function joinRoom() {
     const data = {
       room_name: room.name,
-      participant_name: "CONTROL",
+      participant_name: "",
       participant_type: "CONTROL",
       passcode: room.passcode,
     };
@@ -153,7 +153,6 @@ export default function CreateRoom({
                       participants: 1,
                     },
                     token: r.data,
-                    name: "asdf",
                   });
                 });
               }

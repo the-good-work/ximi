@@ -54,12 +54,19 @@ const StyledButton = styled("button", {
   variants: {
     size: {
       lg: {
+        padding: "$sm $md",
         "@base": { fontSize: "$md" },
         "@md": { fontSize: "$xl" },
       },
       md: {
+        padding: "$sm $md",
         "@base": { fontSize: "$sm" },
         "@md": { fontSize: "$md" },
+      },
+      sm: {
+        padding: "$2xs",
+        "@base": { fontSize: "$xs" },
+        "@md": { fontSize: "$sm" },
       },
     },
     type: {
@@ -91,16 +98,13 @@ const StyledButton = styled("button", {
     variant: {
       outline: {
         justifyContent: "flex-start",
-        padding: "$sm $md",
         borderColor: "$text",
       },
       solid: {
         justifyContent: "flex-start",
-        padding: "$sm $md",
       },
       keypad: {
         justifyContent: "center",
-        padding: "$sm $md",
       },
       keyboard: {
         justifyContent: "center",
@@ -118,6 +122,12 @@ const StyledButton = styled("button", {
         },
       },
     },
+  },
+
+  defaultVariants: {
+    variant: "solid",
+    size: "md",
+    type: "normal",
   },
 });
 
@@ -142,10 +152,11 @@ export default function Button({
   type?: ButtonTypes;
   props?: any;
   className?: string;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
 }) {
   return (
     <StyledButton
+      size={size}
       variant={variant}
       css={css}
       type={type}

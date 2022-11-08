@@ -17,23 +17,22 @@ export default function Stage({
 }) {
   const { connect, room, error, participants } = useRoom();
 
-  async function connectRoom() {
-    await connect(
+  useEffect(() => {
+    connect(
       `${process.env.REACT_APP_LIVEKIT_HOST}`,
       state.properties.token
-    );
-  }
-
-  useEffect(() => {
-    connectRoom().catch((err) => {
+    ).catch((err) => {
       console.log(err);
     });
+
+    return () => {
+      room?.disconnect(true);
+    };
   }, []);
 
   if (error) {
     console.log(error);
   }
-  console.log(room, participants);
 
   return (
     <div className="content noscroll">

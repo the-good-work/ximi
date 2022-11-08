@@ -18,6 +18,49 @@ import Button from "ui/Buttons/Button";
 import { ScreenContainer } from "ui/Composites/ScreenContainer";
 import { useToast } from "ui/Feedback/Toast";
 
+const Keypad = styled("div", {
+  display: "grid",
+  gridTemplateColumns: "repeat(10, 1fr)",
+  gridTemplateRows: "repeat(4, 1fr)",
+
+  ".confirm": {
+    gridColumn: "span 2",
+  },
+
+  "@base": {
+    gap: "$xs",
+  },
+  "@md": {
+    gap: "$sm",
+  },
+});
+
+const HeadingGroup = styled("div", {
+  marginBottom: "0",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  div: {
+    width: "100%",
+
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  "@base": {
+    span: {
+      maxWidth: "400px",
+    },
+  },
+  "@md": {
+    span: {
+      maxWidth: "500px",
+    },
+  },
+});
+
 export default function EnterName({
   updateState,
   state,
@@ -150,49 +193,6 @@ export default function EnterName({
       setNickname(`${nickname}${keyboardKey}`.slice(0, 5).toUpperCase());
     } else return;
   };
-
-  const Keypad = styled("div", {
-    display: "grid",
-    gridTemplateColumns: "repeat(10, 1fr)",
-    gridTemplateRows: "repeat(4, 1fr)",
-
-    ".confirm": {
-      gridColumn: "span 2",
-    },
-
-    "@base": {
-      gap: "$xs",
-    },
-    "@md": {
-      gap: "$sm",
-    },
-  });
-
-  const HeadingGroup = styled("div", {
-    marginBottom: "0",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    div: {
-      width: "100%",
-
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-
-    "@base": {
-      span: {
-        maxWidth: "400px",
-      },
-    },
-    "@md": {
-      span: {
-        maxWidth: "500px",
-      },
-    },
-  });
 
   return (
     <div className="content noscroll">

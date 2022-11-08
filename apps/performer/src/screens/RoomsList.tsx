@@ -3,7 +3,7 @@ import ListButton from "ui/Buttons/ListButton";
 import { styled } from "ui/theme/theme";
 import React, { Dispatch } from "react";
 import Heading from "ui/Texts/Heading";
-import { SyncOutline, SadOutline, Create } from "react-ionicons";
+import { SyncOutline, SadOutline } from "react-ionicons";
 import { Room, UpdateStateActions } from "../../../../types/performerStates";
 import Text from "ui/Texts/Text";
 import Icon from "ui/Texts/Icon";
@@ -16,22 +16,48 @@ const options = {
   shouldRetryOnError: false,
 };
 
-async function createRoomTest() {
-  const response = await fetch(
-    `${process.env.REACT_APP_SERVER_HOST}/rooms/create`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        name: `ROOM${Math.floor(Math.random() * 50)}`,
-        passcode: "00000",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  return response;
-}
+const HeadingBox = styled("div", {
+  width: "auto",
+  maxWidth: "600px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "$lg",
+  position: "relative",
+  "> .refresh-icon-container": {
+    position: "absolute",
+    left: "calc( 100% + 20px )",
+  },
+});
+
+const EmptyState = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  minWidth: "500px",
+  width: "100%",
+  maxWidth: "600px",
+  marginTop: "$lg",
+  gap: "$sm",
+});
+
+const List = styled("ul", {
+  display: "flex",
+  flexDirection: "column",
+  minWidth: "500px",
+  width: "100%",
+  maxWidth: "600px",
+  paddingLeft: "0",
+  listStyle: "none",
+
+  "@base": {
+    gap: "$xs",
+  },
+  "@md": {
+    gap: "$sm",
+  },
+});
 
 export default function RoomsList({
   updateState,
@@ -49,18 +75,7 @@ export default function RoomsList({
     options
   );
 
-  const rooms: Room[] = data || [];
-
-  async function onCreate() {
-    createRoomTest()
-      .then((res) => {
-        mutate();
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  const rooms: Room[] = data?.data || [];
 
   async function onRefresh() {
     mutate();
@@ -117,49 +132,6 @@ export default function RoomsList({
     }
   }
 
-  const HeadingBox = styled("div", {
-    width: "auto",
-    maxWidth: "600px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "$lg",
-    position: "relative",
-    "> .refresh-icon-container": {
-      position: "absolute",
-      left: "calc( 100% + 20px )",
-    },
-  });
-
-  const EmptyState = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    minWidth: "500px",
-    width: "100%",
-    maxWidth: "600px",
-    marginTop: "$lg",
-    gap: "$sm",
-  });
-
-  const List = styled("ul", {
-    display: "flex",
-    flexDirection: "column",
-    minWidth: "500px",
-    width: "100%",
-    maxWidth: "600px",
-    paddingLeft: "0",
-    listStyle: "none",
-
-    "@base": {
-      gap: "$xs",
-    },
-    "@md": {
-      gap: "$sm",
-    },
-  });
-
   return (
     <div className="content-scroll">
       <div className="scroll">
@@ -188,20 +160,6 @@ export default function RoomsList({
           </div>
         </HeadingBox>
         <ListOfRooms rooms={rooms} />
-        <IconButton
-          css={{
-            borderRadius: "100%",
-            path: { fill: "$text" },
-            position: "fixed",
-            bottom: "$sm",
-            left: "$sm",
-          }}
-          iconSize={{ "@base": "lg", "@md": "xl" }}
-          aria-label="Create room test"
-          variant="ghost"
-          icon={<Create color="inherit" />}
-          onClick={onCreate}
-        />
       </div>
     </div>
   );

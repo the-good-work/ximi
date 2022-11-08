@@ -15,13 +15,31 @@ import Button from "ui/Buttons/Button";
 import { styled } from "ui/theme/theme";
 import { useToast } from "ui/Feedback/Toast";
 
+const Group = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "$lg",
+
+  ".button-group": {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    gap: "$lg",
+    flexDirection: "row",
+  },
+});
+
 export default function CreateRoom({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
 }) {
-  const [passcode, setPasscode] = useState<string>("");
-  const [roomName, setRoomName] = useState<string>("");
+  type Room = { name: string; passcode: string };
+
+  const [room, setRoom] = useState<Room>({ name: "", passcode: "" });
   const { toast } = useToast();
 
   const passcodeKeys = [
@@ -88,8 +106,8 @@ export default function CreateRoom({
       {
         method: "POST",
         body: JSON.stringify({
-          name: roomName,
-          passcode: passcode,
+          name: room.name,
+          passcode: room.passcode,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -99,18 +117,78 @@ export default function CreateRoom({
     return response;
   }
 
+  async function joinRoom() {
+    const data = {
+      room_name: room.name,
+      participant_name: "CONTROL",
+      participant_type: "CONTROL",
+      passcode: room.passcode,
+    };
+    const options = {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
+      options
+    );
+    return response;
+  }
+
   async function onCreate() {
     createRoom()
       .then((res) => {
-        console.log(res);
-        // updateState({
-        //   type: "confirm-create-room",
-        //   room: {room: res},
-        //   token: "",
-        // });
+        if (res.status === 200) {
+          joinRoom()
+            .then((_res) => {
+              if (_res.status === 200) {
+                _res.json().then((r) => {
+                  updateState({
+                    type: "confirm-create-room",
+                    room: {
+                      room: room.name,
+                      participants: 1,
+                    },
+                    token: r.data,
+                    name: "asdf",
+                  });
+                });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              toast({
+                title: "Error joining created room",
+                description: "Please try again later",
+                tone: "warning",
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              toast({
+                title: "Error joining created room",
+                description: "Please try again later",
+                tone: "warning",
+              });
+            });
+        } else {
+          toast({
+            title: "Error creating room",
+            description: "Please try again later",
+            tone: "warning",
+          });
+        }
       })
       .catch((err) => {
         console.log(err);
+        toast({
+          title: "Error creating room",
+          description: "Please try again later",
+          tone: "warning",
+        });
       });
   }
 
@@ -124,11 +202,14 @@ export default function CreateRoom({
     if (key === "Enter" || key === "ent") {
       checkRoom();
     } else if (key === "Backspace" || key === "bsp") {
-      setPasscode(passcode.slice(0, -1));
+      setRoom({ ...room, passcode: room.passcode.slice(0, -1) });
     } else if (key === "clr") {
-      setPasscode(passcode.slice(0, -5));
+      setRoom({ ...room, passcode: room.passcode.slice(0, -5) });
     } else if (passcodeKeys.indexOf(numberKey) !== -1) {
-      setPasscode(`${passcode}${numberKey}`.slice(0, 5));
+      setRoom({
+        ...room,
+        passcode: `${room.passcode}${numberKey}`.slice(0, 5),
+      });
     } else return;
   };
 
@@ -138,30 +219,13 @@ export default function CreateRoom({
     if (key === "Enter" || key === "ent") {
       checkRoom();
     } else if (key === "Backspace" || key === "bsp") {
-      setRoomName(roomName.slice(0, -1));
+      setRoom({ ...room, name: room.name.slice(0, -1) });
     } else if (key === "clr") {
-      setRoomName(roomName.slice(0, -5));
+      setRoom({ ...room, name: room.name.slice(0, -10) });
     } else if (roomNameKeys.indexOf(textKey) !== -1) {
-      setRoomName(`${roomName}${textKey}`.slice(0, 5));
+      setRoom({ ...room, name: `${room.name}${textKey}`.slice(0, 10) });
     } else return;
   };
-
-  const Group = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "$lg",
-
-    ".button-group": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "100%",
-      gap: "$lg",
-      flexDirection: "row",
-    },
-  });
 
   return (
     <div className="content noscroll">
@@ -199,11 +263,11 @@ export default function CreateRoom({
             Room Name (max 10 chars)
           </Text>
           <Input
-            // onKeyDown={(e) => {
-            //   const target = e.code;
-            //   handleName(target);
-            // }}
-            // value={roomName}
+            onKeyDown={(e) => {
+              const target = e.code;
+              handleName(target);
+            }}
+            value={room.name}
             maxLength={"10"}
             inputMode="text"
             css={{
@@ -222,11 +286,11 @@ export default function CreateRoom({
           </Text>
 
           <Input
-            // onKeyDown={(e) => {
-            //   const target = e.code;
-            //   handlePasscode(target);
-            // }}
-            // value={passcode}
+            onKeyDown={(e) => {
+              const target = e.code;
+              handlePasscode(target);
+            }}
+            value={room.passcode}
             pattern="[0-9]*"
             maxLength={"5"}
             inputMode="numeric"
@@ -251,7 +315,7 @@ export default function CreateRoom({
             <Button
               type="primary"
               onClick={() => {
-                // handlePasscode("ent", passcode);
+                onCreate();
               }}
               css={{ path: { fill: "transparent" }, justifyContent: "center" }}
               icon={<ReturnDownForward color="inherit" />}

@@ -44,6 +44,7 @@ const Root = styled(RadixToast.Root, {
 
   listStyle: "none",
   margin: "$sm 0",
+  padding: "$sm",
   borderRadius: "$xs",
   width: "100%",
   boxSizing: "border-box",

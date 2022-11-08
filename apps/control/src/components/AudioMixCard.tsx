@@ -252,8 +252,9 @@ export default function AudioMixCard({
               <LinkOutline color="inherit" />
               <Text size="2xs">Copy Stream Link</Text>
             </div>
-            {/* <div className="buttons">
+            <div className="buttons">
               <Button
+                variant="outline"
                 css={{
                   path: {
                     fill: "$text",
@@ -263,6 +264,7 @@ export default function AudioMixCard({
                 <VideocamSharp color="inherit" />
               </Button>
               <Button
+                variant="outline"
                 css={{
                   span: {
                     path: {
@@ -277,7 +279,7 @@ export default function AudioMixCard({
                 <VideocamSharp color="inherit" /> +{" "}
                 <VolumeHighSharp color="inherit" />
               </Button>
-            </div> */}
+            </div>
           </div>
           <div className="spacer" />
           <div className="footer-box audio-delay">

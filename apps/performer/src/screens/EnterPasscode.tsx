@@ -18,6 +18,47 @@ import Button from "ui/Buttons/Button";
 import { styled } from "ui/theme/theme";
 import { useToast } from "ui/Feedback/Toast";
 
+const Keypad = styled("div", {
+  display: "grid",
+  gap: "0",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gridTemplateRows: "repeat(4, 1fr)",
+
+  ".clr": {
+    gridColumn: "3",
+    gridRow: "4",
+  },
+  ".bsp": {
+    gridColumnStart: "4",
+    gridRowStart: "1",
+    gridRowEnd: "3",
+  },
+  ".ent": {
+    gridColumnStart: "4",
+    gridRowStart: "3",
+    gridRowEnd: "5",
+  },
+  ".zero": {
+    gridColumn: "span 2",
+  },
+  ".number": {
+    gridRow: "span 1",
+  },
+  "@base": {
+    gap: "$xs",
+  },
+  "@md": {
+    gap: "$md",
+  },
+});
+
+const HeadingGroup = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
 export default function EnterPasscode({
   updateState,
   state,
@@ -136,46 +177,6 @@ export default function EnterPasscode({
     } else return;
   };
 
-  const Keypad = styled("div", {
-    display: "grid",
-    gap: "0",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gridTemplateRows: "repeat(4, 1fr)",
-
-    ".clr": {
-      gridColumn: "3",
-      gridRow: "4",
-    },
-    ".bsp": {
-      gridColumnStart: "4",
-      gridRowStart: "1",
-      gridRowEnd: "3",
-    },
-    ".ent": {
-      gridColumnStart: "4",
-      gridRowStart: "3",
-      gridRowEnd: "5",
-    },
-    ".zero": {
-      gridColumn: "span 2",
-    },
-    ".number": {
-      gridRow: "span 1",
-    },
-    "@base": {
-      gap: "$xs",
-    },
-    "@md": {
-      gap: "$md",
-    },
-  });
-
-  const HeadingGroup = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  });
   return (
     <div className="content noscroll">
       <ScreenContainer>

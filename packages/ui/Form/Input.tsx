@@ -88,8 +88,12 @@ export default function Input({
   value,
   placeholder,
   maxLength,
+  max,
+  min,
   ...props
 }: {
+  min?: number;
+  max?: number;
   css?: any;
   variant?: "default" | "presets";
   placeholder?: string;
@@ -122,6 +126,8 @@ export default function Input({
       {...props}
       value={value}
       inputMode={inputMode}
+      max={max}
+      min={min}
     ></StyledInput>
   );
 }

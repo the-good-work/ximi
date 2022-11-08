@@ -33,6 +33,49 @@ async function createRoomTest() {
   return response;
 }
 
+const HeadingBox = styled("div", {
+  width: "auto",
+  maxWidth: "600px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "$lg",
+  position: "relative",
+  "> .refresh-icon-container": {
+    position: "absolute",
+    left: "calc( 100% + 20px )",
+  },
+});
+
+const EmptyState = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  minWidth: "500px",
+  width: "100%",
+  maxWidth: "600px",
+  marginTop: "$lg",
+  gap: "$sm",
+});
+
+const List = styled("ul", {
+  display: "flex",
+  flexDirection: "column",
+  minWidth: "500px",
+  width: "100%",
+  maxWidth: "600px",
+  paddingLeft: "0",
+  listStyle: "none",
+
+  "@base": {
+    gap: "$xs",
+  },
+  "@md": {
+    gap: "$sm",
+  },
+});
+
 export default function RoomsList({
   updateState,
 }: {
@@ -116,49 +159,6 @@ export default function RoomsList({
       );
     }
   }
-
-  const HeadingBox = styled("div", {
-    width: "auto",
-    maxWidth: "600px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "$lg",
-    position: "relative",
-    "> .refresh-icon-container": {
-      position: "absolute",
-      left: "calc( 100% + 20px )",
-    },
-  });
-
-  const EmptyState = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    minWidth: "500px",
-    width: "100%",
-    maxWidth: "600px",
-    marginTop: "$lg",
-    gap: "$sm",
-  });
-
-  const List = styled("ul", {
-    display: "flex",
-    flexDirection: "column",
-    minWidth: "500px",
-    width: "100%",
-    maxWidth: "600px",
-    paddingLeft: "0",
-    listStyle: "none",
-
-    "@base": {
-      gap: "$xs",
-    },
-    "@md": {
-      gap: "$sm",
-    },
-  });
 
   return (
     <div className="content-scroll">

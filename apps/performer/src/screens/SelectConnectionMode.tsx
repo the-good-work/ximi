@@ -8,36 +8,36 @@ import Text from "ui/Texts/Text";
 import { ScreenContainer } from "ui/Composites/ScreenContainer";
 import { UpdateStateActions } from "../../../../types/performerStates";
 
+const ButtonGroup = styled("div", {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  flexDirection: "row",
+  gap: "$3xl",
+  width: "100%",
+
+  ".button-and-text": {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    flexDirection: "column",
+    gap: "$lg",
+    width: "100%",
+  },
+});
+
+const HeadingGroup = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
 export default function SelectConnectionMode({
   updateState,
 }: {
   updateState: Dispatch<UpdateStateActions>;
 }) {
-  const ButtonGroup = styled("div", {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: "$3xl",
-    width: "100%",
-
-    ".button-and-text": {
-      display: "flex",
-      justifyContent: "flex-start",
-      alignItems: "flex-start",
-      flexDirection: "column",
-      gap: "$lg",
-      width: "100%",
-    },
-  });
-
-  const HeadingGroup = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  });
-
   return (
     <div className="content noscroll">
       <ScreenContainer>

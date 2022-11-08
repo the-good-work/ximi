@@ -1,4 +1,9 @@
-import React, { ChangeEventHandler, EventHandler, KeyboardEvent } from "react";
+import React, {
+  ChangeEventHandler,
+  EventHandler,
+  FocusEventHandler,
+  KeyboardEvent,
+} from "react";
 import { styled } from "../theme/theme";
 
 const StyledInput = styled("input", {
@@ -52,10 +57,26 @@ const StyledInput = styled("input", {
       },
     },
   },
+
+  variants: {
+    variant: {
+      default: {},
+      presets: {
+        border: "none",
+        fontSize: "$xs",
+        textTransform: "uppercase",
+      },
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
 });
 
 export default function Input({
   onChange,
+  variant = "default",
+  onBlur,
   css,
   as,
   inputMode,
@@ -65,11 +86,15 @@ export default function Input({
   type = "text",
   pattern,
   value,
+  placeholder,
   maxLength,
   ...props
 }: {
   css?: any;
+  variant?: "default" | "presets";
+  placeholder?: string;
   onChange?: ChangeEventHandler;
+  onBlur?: FocusEventHandler;
   as?: any;
   props?: any;
   pattern?: string;
@@ -83,6 +108,9 @@ export default function Input({
 }) {
   return (
     <StyledInput
+      variant={variant}
+      placeholder={placeholder}
+      onBlur={onBlur}
       maxLength={maxLength}
       readOnly={readOnly}
       autoFocus={autoFocus}

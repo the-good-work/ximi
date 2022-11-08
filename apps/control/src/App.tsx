@@ -43,7 +43,6 @@ function App() {
         screen: "stage-screen",
         room: action.room,
         token: action.token,
-        name: action.name,
       };
       return __state;
     }
@@ -62,7 +61,6 @@ function App() {
         screen: "stage-screen",
         room: _state.room,
         token: action.token,
-        name: action.name,
       };
       return __state;
     } else return initialState;

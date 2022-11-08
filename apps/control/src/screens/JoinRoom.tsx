@@ -12,6 +12,23 @@ import Button from "ui/Buttons/Button";
 import { styled } from "ui/theme/theme";
 import { useToast } from "ui/Feedback/Toast";
 
+const Group = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "$lg",
+
+  ".button-group": {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    gap: "$lg",
+    flexDirection: "row",
+  },
+});
+
 export default function JoinRoom({
   updateState,
   state,
@@ -41,7 +58,7 @@ export default function JoinRoom({
   async function checkPasscode(pass: string) {
     const data = {
       room_name: state.room?.room,
-      participant_name: state.name,
+      participant_name: "temp_control_node",
       participant_type: "CONTROL",
       passcode: pass,
     };
@@ -56,6 +73,7 @@ export default function JoinRoom({
       `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
       options
     );
+
     return response;
   }
 
@@ -64,11 +82,12 @@ export default function JoinRoom({
       .then((res) => {
         if (res.status === 200) {
           res
-            .text()
+            .json()
             .then((r) => {
               updateState({
                 type: "submit-passcode",
-                token: r,
+                token: r.data,
+                name: "asdf",
               });
             })
             .catch(() => {
@@ -127,23 +146,6 @@ export default function JoinRoom({
       setPasscode(`${passcode}${numberKey}`.slice(0, 5));
     } else return;
   };
-
-  const Group = styled("div", {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "$lg",
-
-    ".button-group": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "100%",
-      gap: "$lg",
-      flexDirection: "row",
-    },
-  });
 
   return (
     <div className="content noscroll">

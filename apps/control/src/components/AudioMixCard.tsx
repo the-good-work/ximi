@@ -1,5 +1,10 @@
 import { Participant } from "livekit-client";
-import React from "react";
+import React, {
+  KeyboardEvent,
+  KeyboardEventHandler,
+  MouseEventHandler,
+  useState,
+} from "react";
 import {
   HourglassOutline,
   LinkOutline,
@@ -109,6 +114,17 @@ const StyledDiv = styled("div", {
         gap: "$xs",
         height: "100%",
 
+        ".delay-display": {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 $sm",
+          minWidth: "50px",
+          background: "$text",
+          color: "$background",
+          fontWeight: "$bold",
+        },
+
         ".input-group": {
           display: "flex",
           gap: 0,
@@ -181,7 +197,10 @@ const StyledDiv = styled("div", {
   },
 });
 
-const StyledSubcard = styled("div", {
+const StyledSubcard = styled("button", {
+  appearance: "none",
+  outline: "none",
+  background: "$background",
   border: "1px solid $accent",
   borderRadius: "$xs",
   padding: "$xs $sm",
@@ -192,6 +211,10 @@ const StyledSubcard = styled("div", {
   justifyContent: "start",
   span: {
     lineHeight: 0,
+  },
+  "&:hover": {
+    background: "$brand",
+    cursor: "pointer",
   },
   variants: {
     active: {
@@ -211,9 +234,15 @@ const StyledSubcard = styled("div", {
   },
 });
 
-function ParticipantSubcard({ participant }: { participant: Participant }) {
+function ParticipantSubcard({
+  participant,
+  onClick,
+}: {
+  participant: Participant;
+  onClick?: MouseEventHandler;
+}) {
   return (
-    <StyledSubcard active={participant.audioTracks.size > 0}>
+    <StyledSubcard active={participant.audioTracks.size > 0} onClick={onClick}>
       {participant.audioTracks.size > 0 ? (
         <VolumeHighSharp color="inherit" width="14px" />
       ) : (
@@ -233,6 +262,16 @@ export default function AudioMixCard({
   participants: Participant[];
   type?: "performer" | "control";
 }) {
+  const [delay, setDelay] = useState<number>(0);
+
+  function checkNumber(event: KeyboardEvent) {
+    var aCode = event.which ? event.which : event.keyCode;
+
+    if (aCode > 31 && (aCode < 48 || aCode > 57)) return false;
+
+    return true;
+  }
+
   return (
     <StyledDiv type={type}>
       <div>
@@ -266,7 +305,15 @@ export default function AudioMixCard({
           {participants
             .filter((p: any) => JSON.parse(p.metadata).type === "PERFORMER")
             .map((p) => {
-              return <ParticipantSubcard key={p.identity} participant={p} />;
+              return (
+                <ParticipantSubcard
+                  onClick={() => {
+                    console.log("Update audio setting");
+                  }}
+                  key={p.identity}
+                  participant={p}
+                />
+              );
             })}
         </div>
       </div>
@@ -279,6 +326,9 @@ export default function AudioMixCard({
             </div>
             <div className="buttons">
               <Button
+                onClick={() => {
+                  console.log("Copy video link");
+                }}
                 size="sm"
                 variant="outline"
                 css={{
@@ -296,6 +346,9 @@ export default function AudioMixCard({
                 <VideocamSharp color="inherit" width="20px" />
               </Button>
               <Button
+                onClick={() => {
+                  console.log("Copy video and audio link");
+                }}
                 size="sm"
                 variant="outline"
                 css={{
@@ -328,23 +381,11 @@ export default function AudioMixCard({
               <Text size="2xs">Output Audio Delay</Text>
             </div>
             <div className="inputs">
-              <Input
-                value={30}
-                css={{
-                  fontSize: "$sm",
-                  backgroundColor: "$text",
-                  color: "$background",
-                  fontWeight: "$bold",
-                  border: 0,
-                  borderRadius: 0,
-                  "&:hover": {
-                    color: "$text",
-                    backgroundColor: "$brand",
-                  },
-                }}
-              />
+              <div className="delay-display">{delay}</div>
               <div className="input-group">
                 <Input
+                  id={`desired_delay_${participant.sid}`}
+                  type="text"
                   css={{
                     fontSize: "$sm",
                     border: "1px solid $text",
@@ -361,12 +402,24 @@ export default function AudioMixCard({
                 <Button
                   size="sm"
                   css={{
+                    maxWidth: "60px",
                     padding: "0",
                     alignItems: "center",
                     justifyContent: "center",
                     textTransform: "uppercase",
                     border: "1px solid $text",
                     borderRadius: 0,
+                  }}
+                  onClick={() => {
+                    let delayInput: any = document.getElementById(
+                      `desired_delay_${participant.sid}`
+                    );
+                    let _delay: number = parseInt(delayInput.value);
+                    if (isNaN(_delay)) {
+                      setDelay(0);
+                    } else setDelay(_delay);
+
+                    delayInput.value = null;
                   }}
                 >
                   Set

@@ -79,6 +79,8 @@ export default function Input({
   onBlur,
   css,
   as,
+  id,
+  isDisabled,
   inputMode,
   onKeyDown,
   autoFocus,
@@ -92,6 +94,8 @@ export default function Input({
   min,
   ...props
 }: {
+  id?: string;
+  isDisabled?: boolean;
   min?: number;
   max?: number;
   css?: any;
@@ -112,6 +116,7 @@ export default function Input({
 }) {
   return (
     <StyledInput
+      id={id}
       variant={variant}
       placeholder={placeholder}
       onBlur={onBlur}
@@ -128,6 +133,7 @@ export default function Input({
       inputMode={inputMode}
       max={max}
       min={min}
+      disabled={isDisabled}
     ></StyledInput>
   );
 }

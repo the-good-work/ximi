@@ -6,10 +6,10 @@ import { styled } from "ui/theme/theme";
 const StyledPanelButton = styled(Button, {
   textTransform: "uppercase",
 
-  borderRadius: 0,
   variants: {
     active: {
       true: {
+        borderRadius: 0,
         alignItems: "center",
         justifyContent: "center",
         span: {
@@ -53,16 +53,19 @@ export default function PanelButton({
   onClick,
   icon,
   css,
+  size = "sm",
 }: {
   children: ReactNode;
   active: boolean;
   onClick?: MouseEventHandler;
   icon?: ReactNode;
   css?: any;
+  size?: "sm" | "md" | "lg";
 }) {
   return (
     <StyledPanelButton
       css={css}
+      size={size}
       icon={icon}
       onClick={onClick}
       children={children}

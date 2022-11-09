@@ -28,45 +28,88 @@ const StyledButton = styled("button", {
     },
   },
 
-  "@base": {
-    ".icon": {
-      width: "$md",
-      span: {
-        svg: {
-          width: "20px",
-          height: "auto",
-        },
-      },
-    },
-  },
-  "@md": {
-    ".icon": {
-      width: "$lg",
-      span: {
-        svg: {
-          width: "40px",
-          height: "auto",
-        },
-      },
-    },
-  },
-
   variants: {
     size: {
       lg: {
         padding: "$sm $md",
-        "@base": { fontSize: "$md" },
-        "@md": { fontSize: "$xl" },
+        "@base": {
+          fontSize: "$md",
+          ".icon": {
+            width: "$md",
+            span: {
+              svg: {
+                width: "20px",
+                height: "auto",
+              },
+            },
+          },
+        },
+        "@md": {
+          fontSize: "$xl",
+          ".icon": {
+            width: "$lg",
+            span: {
+              svg: {
+                width: "40px",
+                height: "auto",
+              },
+            },
+          },
+        },
       },
       md: {
         padding: "$sm $md",
-        "@base": { fontSize: "$sm" },
-        "@md": { fontSize: "$md" },
+        "@base": {
+          fontSize: "$sm",
+          ".icon": {
+            width: "$md",
+            span: {
+              svg: {
+                width: "20px",
+                height: "auto",
+              },
+            },
+          },
+        },
+        "@md": {
+          fontSize: "$md",
+          ".icon": {
+            width: "$lg",
+            span: {
+              svg: {
+                width: "40px",
+                height: "auto",
+              },
+            },
+          },
+        },
       },
       sm: {
         padding: "$2xs",
-        "@base": { fontSize: "$xs" },
-        "@md": { fontSize: "$sm" },
+        "@base": {
+          fontSize: "$2xs",
+          ".icon": {
+            width: "$sm",
+            span: {
+              svg: {
+                width: "14px",
+                height: "auto",
+              },
+            },
+          },
+        },
+        "@md": {
+          fontSize: "$xs",
+          ".icon": {
+            width: "$md",
+            span: {
+              svg: {
+                width: "24px",
+                height: "auto",
+              },
+            },
+          },
+        },
       },
     },
     type: {

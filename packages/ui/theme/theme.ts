@@ -9,9 +9,12 @@ export const { styled, css } = createStitches({
       accent: "#7976FF",
       "accent-translucent": "rgba(82, 55, 243, 0.5)",
       text: "#E8E8F4",
+      grey: "#3C3C40",
       negative: "#D73C37",
       disabled: "#99999F",
       background: "#111113",
+      videoBackgroundGradient:
+        "linear-gradient(160.68deg, rgba(82, 55, 243, 0.28) 2.04%, rgba(0, 0, 0, 0) 87.02%), #111113",
       backgroundGradient:
         "linear-gradient(163.02deg, #111113 58.37%, rgba(82, 55, 243, 0.17) 97.01%)",
       headingGradient:

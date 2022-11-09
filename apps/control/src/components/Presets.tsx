@@ -5,21 +5,32 @@ import { SaveSharp, Play } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
 import { Preset, PresetAction } from "../../../../types/stageStates";
 import Input from "ui/Form/Input";
+import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
+
+const StyledRoot = styled(Root, {
+  height: "100%",
+  width: "100%",
+  overflow: "hidden",
+});
+
+const StyledViewport = styled(Viewport, {
+  height: "100%",
+  width: "100%",
+});
 
 const StyledPresets = styled("div", {
   border: "2px solid $brand",
   width: "100%",
-  height: "300px",
+  height: "calc(100vh - 190px - 9.75rem)",
   background: "$background",
   overflow: "hidden",
   boxSizing: "border-box",
-  padding: "$sm",
+  padding: "$xs $sm",
   display: "flex",
   flexDirection: "column",
   gap: "$2xs",
   ".presetsList": {
-    overflowX: "hidden",
-    overflowY: "scroll",
+    height: "100%",
     display: "flex",
     flexDirection: "column",
     gap: "$2xs",
@@ -71,7 +82,7 @@ function PresetSingle({
               });
             }
           }}
-          css={{ color: preset.saved ? "$accent" : "$text" }}
+          css={{ fontSize: "$2xs", color: preset.saved ? "$accent" : "$text" }}
         />
       </div>
       <div className="save">
@@ -115,24 +126,29 @@ export default function Presets({
 }) {
   return (
     <StyledPresets>
-      <Text size="md" css={{ textTransform: "uppercase" }}>
+      <Text size="xs" css={{ textTransform: "uppercase" }}>
         Presets
       </Text>
-      <div className="presetsList">
-        {presets.length > 0 ? (
-          presets.map((_a, i) => {
-            return (
-              <PresetSingle
-                preset={presets[i]}
-                setPresets={setPresets}
-                key={i}
-              />
-            );
-          })
-        ) : (
-          <Text>No presets found</Text>
-        )}
-      </div>
+      <StyledRoot>
+        <StyledViewport>
+          <div className="presetsList">
+            {presets.length > 0 ? (
+              presets.map((_a, i) => {
+                return (
+                  <PresetSingle
+                    preset={presets[i]}
+                    setPresets={setPresets}
+                    key={i}
+                  />
+                );
+              })
+            ) : (
+              <Text size="xs">No presets found</Text>
+            )}
+          </div>
+        </StyledViewport>
+        <Scrollbar orientation="vertical" />
+      </StyledRoot>
     </StyledPresets>
   );
 }

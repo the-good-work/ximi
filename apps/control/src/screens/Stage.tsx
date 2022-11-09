@@ -80,11 +80,7 @@ export default function Stage({
   return (
     <div className="content noscroll">
       <StyledStage>
-        <StagePanel
-          activePanel={activePanel}
-          setActivePanel={setActivePanel}
-          participants={participants}
-        />
+        <StagePanel activePanel={activePanel} participants={participants} />
         <StageSidebar
           presets={presets}
           setPresets={setPresets}

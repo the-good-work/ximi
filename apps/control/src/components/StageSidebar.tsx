@@ -14,19 +14,18 @@ import { PanelStates, PresetAction } from "../../../../types/stageStates";
 
 const StyledSidebar = styled("div", {
   display: "flex",
-  width: "300px",
+  width: "250px",
   flexDirection: "column",
   boxSizing: "border-box",
   alignItems: "start",
   justifyContent: "start",
   height: "100%",
-
-  color: "white",
+  color: "$text",
 
   ".topSpacer": {
     borderLeft: "2px solid $brand",
     boxSizing: "border-box",
-    padding: "$xs",
+    padding: "0",
   },
 
   ".controls": {
@@ -100,8 +99,11 @@ export default function StageSidebar({
       <div className="controls">
         <div>
           <Button
+            size="sm"
             icon={<ChatboxSharp />}
             css={{
+              alignItems: "center",
+              justifyContent: "center",
               textTransform: "uppercase",
               ".icon": {
                 span: {
@@ -115,7 +117,10 @@ export default function StageSidebar({
           <Presets presets={presets} setPresets={setPresets} />
         </div>
         <Button
+          size="sm"
           css={{
+            alignItems: "center",
+            justifyContent: "center",
             textTransform: "uppercase",
           }}
           icon={<ExitSharp />}

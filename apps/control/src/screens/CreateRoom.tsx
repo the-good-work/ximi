@@ -117,62 +117,20 @@ export default function CreateRoom({
     return response;
   }
 
-  async function joinRoom() {
-    const data = {
-      room_name: room.name,
-      participant_name: "",
-      participant_type: "CONTROL",
-      passcode: room.passcode,
-    };
-    const options = {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const response = await fetch(
-      `${process.env.REACT_APP_SERVER_HOST}/rooms/validate-passcode`,
-      options
-    );
-    return response;
-  }
-
   async function onCreate() {
     createRoom()
       .then((res) => {
         if (res.status === 200) {
-          joinRoom()
-            .then((_res) => {
-              if (_res.status === 200) {
-                _res.json().then((r) => {
-                  updateState({
-                    type: "confirm-create-room",
-                    room: {
-                      room: room.name,
-                      participants: 1,
-                    },
-                    token: r.data,
-                  });
-                });
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-              toast({
-                title: "Error joining created room",
-                description: "Please try again later",
-                tone: "warning",
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              toast({
-                title: "Error joining created room",
-                description: "Please try again later",
-                tone: "warning",
-              });
+          res.json().then((r) => {
+            updateState({
+              type: "confirm-create-room",
+              room: {
+                room: room.name,
+                participants: 1,
+              },
+              token: r.data.token,
             });
+          });
         } else {
           toast({
             title: "Error creating room",

@@ -5,6 +5,18 @@ import { SaveSharp, Play } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
 import { Preset, PresetAction } from "../../../../types/stageStates";
 import Input from "ui/Form/Input";
+import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
+
+const StyledRoot = styled(Root, {
+  height: "100%",
+  width: "100%",
+  overflow: "hidden",
+});
+
+const StyledViewport = styled(Viewport, {
+  height: "100%",
+  width: "100%",
+});
 
 const StyledPresets = styled("div", {
   border: "2px solid $brand",
@@ -18,8 +30,7 @@ const StyledPresets = styled("div", {
   flexDirection: "column",
   gap: "$2xs",
   ".presetsList": {
-    overflowX: "hidden",
-    overflowY: "scroll",
+    height: "100%",
     display: "flex",
     flexDirection: "column",
     gap: "$2xs",
@@ -118,21 +129,26 @@ export default function Presets({
       <Text size="xs" css={{ textTransform: "uppercase" }}>
         Presets
       </Text>
-      <div className="presetsList">
-        {presets.length > 0 ? (
-          presets.map((_a, i) => {
-            return (
-              <PresetSingle
-                preset={presets[i]}
-                setPresets={setPresets}
-                key={i}
-              />
-            );
-          })
-        ) : (
-          <Text size="xs">No presets found</Text>
-        )}
-      </div>
+      <StyledRoot>
+        <StyledViewport>
+          <div className="presetsList">
+            {presets.length > 0 ? (
+              presets.map((_a, i) => {
+                return (
+                  <PresetSingle
+                    preset={presets[i]}
+                    setPresets={setPresets}
+                    key={i}
+                  />
+                );
+              })
+            ) : (
+              <Text size="xs">No presets found</Text>
+            )}
+          </div>
+        </StyledViewport>
+        <Scrollbar orientation="vertical" />
+      </StyledRoot>
     </StyledPresets>
   );
 }

@@ -76,7 +76,13 @@ const StyledPanel = styled("div", {
       video: {
         display: "flex",
         flexDirection: "column",
-        ".participants": { display: "flex", width: "100%" },
+        ".participants": {
+          display: "flex",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "$sm",
+        },
         ".video-box": {
           display: "flex",
           boxSizing: "border-box",
@@ -88,10 +94,10 @@ const StyledPanel = styled("div", {
           padding: "$md $md $xs $md",
           gap: "$sm",
           ".layouts": {
-            gap: "$xs",
+            gap: "$sm",
             boxSizing: "border-box",
             display: "flex",
-            justifyContent: "space-around",
+            justifyContent: "center",
             padding: "0 $lg",
             alignItems: "center",
             ".item": {
@@ -122,26 +128,37 @@ const StyledPanel = styled("div", {
 
 const VideoGrid = styled("div", {
   display: "grid",
+  gridTemplateColumns: "repeat(12, 1fr)",
+  gridTemplateRows: "repeat(12, 1fr)",
+  minHeight: "400px",
   width: "100%",
-  height: "100%",
+  height: "calc(100vh - 9.75rem - 157px)",
   border: "2px solid $brand",
   variants: {
     layout: {
-      1: {
-        // gridTemplateColumns:
+      A: {},
+      B: {},
+      C: {},
+      D: {},
+      E: {},
+      F: {
+        ".participant-video": {
+          background: "$videoBackgroundGradient",
+          width: "100%",
+          height: "100%",
+          gridArea: "1 / 1 / 13 / 13",
+        },
       },
-      2: {},
-      3: {},
-      4: {},
-      5: {},
-      6: {},
-      7: {},
-      8: {},
-      9: {},
-      10: {},
-      11: {},
-      12: {},
+      G: {},
+      H: {},
+      I: {},
+      J: {},
+      K: {},
+      L: {},
     },
+  },
+  defaultVariants: {
+    layout: "F",
   },
 });
 
@@ -173,7 +190,11 @@ const StyledViewport = styled(Viewport, {
   width: "100%",
 });
 
-const ParticipantLayout = styled("div", {
+const ParticipantLayout = styled("button", {
+  appearance: "none",
+  outline: "none",
+  border: "none",
+  background: "$background",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -181,6 +202,7 @@ const ParticipantLayout = styled("div", {
   boxSizing: "border-box",
   width: "50px",
   gap: "$2xs",
+  fontWeight: "$normal",
   "> div": {
     display: "flex",
     alignItems: "center",
@@ -194,15 +216,20 @@ const ParticipantLayout = styled("div", {
       objectFit: "contain",
     },
   },
+  "&:hover": {
+    cursor: "pointer",
+    fontWeight: "$bold",
+    "> div": {
+      background: "$brand",
+    },
+  },
 });
 
 export default function StagePanel({
   activePanel,
-  setActivePanel,
   participants,
 }: {
   activePanel: PanelStates;
-  setActivePanel: Dispatch<SetStateAction<PanelStates>>;
   participants: Participant[];
 }) {
   if (activePanel === "audio") {
@@ -236,36 +263,43 @@ export default function StagePanel({
       );
   } else
     return (
-      <StyledPanel variant="video">
-        <div className="video-box">
-          <VideoGrid layout={1}></VideoGrid>
-          <div className="layouts">
-            {videoLayouts.map((l) => {
-              return (
-                <button key={l.name} className={`item layout-${l.name}`}>
-                  <img src={l.image} alt={`Layout ${l.name}`} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className="participants">
-          {participants.map((p: any) => {
-            if (JSON.parse(p.metadata).type !== "CONTROL") {
-              return (
-                <ParticipantLayout>
-                  <div>
-                    <img
-                      src={videoLayouts[0].image}
-                      alt={videoLayouts[0].name}
-                    />
-                  </div>
-                  <Text size="xs">{p.identity}</Text>
-                </ParticipantLayout>
-              );
-            }
-          })}
-        </div>
-      </StyledPanel>
+      <StyledRoot>
+        <StyledViewport>
+          <StyledPanel variant="video">
+            <div className="video-box">
+              <VideoGrid layout={"F"}>
+                <div className="participant-video"></div>
+              </VideoGrid>
+              <div className="layouts">
+                {videoLayouts.map((l) => {
+                  return (
+                    <button key={l.name} className={`item layout-${l.name}`}>
+                      <img src={l.image} alt={`Layout ${l.name}`} />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="participants">
+              {participants.map((p: any) => {
+                if (JSON.parse(p.metadata).type !== "CONTROL") {
+                  return (
+                    <ParticipantLayout>
+                      <div>
+                        <img
+                          src={videoLayouts[0].image}
+                          alt={videoLayouts[0].name}
+                        />
+                      </div>
+                      <Text size="xs">{p.identity}</Text>
+                    </ParticipantLayout>
+                  );
+                }
+              })}
+            </div>
+          </StyledPanel>
+        </StyledViewport>
+        <Scrollbar orientation="vertical" />
+      </StyledRoot>
     );
 }

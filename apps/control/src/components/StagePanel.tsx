@@ -7,6 +7,8 @@ import { styled } from "ui/theme/theme";
 import { PanelStates } from "../../../../types/stageStates";
 import AudioMixCard from "./AudioMixCard";
 
+import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
+
 const StyledPanel = styled("div", {
   height: "100%",
   width: "100%",
@@ -16,8 +18,6 @@ const StyledPanel = styled("div", {
   gridGap: "$md",
   boxSizing: "border-box",
   paddingRight: "$lg",
-  overflowY: "scroll",
-  overflowX: "hidden",
 });
 
 const StyledEmptyState = styled("div", {
@@ -35,6 +35,17 @@ const StyledEmptyState = styled("div", {
       fill: "$text",
     },
   },
+});
+
+const StyledRoot = styled(Root, {
+  height: "100%",
+  width: "100%",
+  overflow: "hidden",
+});
+
+const StyledViewport = styled(Viewport, {
+  height: "100%",
+  width: "100%",
 });
 
 export default function StagePanel({
@@ -58,17 +69,22 @@ export default function StagePanel({
       );
     } else
       return (
-        <StyledPanel>
-          {participants.map((p: any) => {
-            return (
-              <AudioMixCard
-                type={JSON.parse(p.metadata).type.toLowerCase()}
-                participant={p}
-                participants={participants}
-              />
-            );
-          })}
-        </StyledPanel>
+        <StyledRoot>
+          <StyledViewport>
+            <StyledPanel>
+              {participants.map((p: any) => {
+                return (
+                  <AudioMixCard
+                    type={JSON.parse(p.metadata).type.toLowerCase()}
+                    participant={p}
+                    participants={participants}
+                  />
+                );
+              })}
+            </StyledPanel>
+          </StyledViewport>
+          <Scrollbar orientation="vertical" />
+        </StyledRoot>
       );
   } else
     return (

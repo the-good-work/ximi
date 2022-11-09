@@ -84,7 +84,6 @@ export default function JoinRoom({
           res
             .json()
             .then((r) => {
-              console.log(r);
               updateState({
                 type: "submit-passcode",
                 token: r.data,

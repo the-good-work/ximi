@@ -1,5 +1,5 @@
 import { Participant } from "livekit-client";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Sad } from "react-ionicons";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
@@ -12,50 +12,82 @@ const videoLayouts = [
   {
     image: "images/video-layouts/layout-a.png",
     name: "A",
+    layout: [
+      "1 / 1 / 5 / 5",
+      "1 / 5 / 5 / 9",
+      "1 / 9 / 5 / 13",
+      "5 / 1 / 9 / 5",
+      "5 / 5 / 9 / 9",
+      "5 / 9 / 9 / 13",
+      "9 / 1 / 13 / 5",
+      "9 / 5 / 13 / 9",
+      "9 / 9 / 13 / 13",
+    ],
   },
   {
     image: "images/video-layouts/layout-b.png",
     name: "B",
+    layout: [
+      "1 / 1 / 7 / 7",
+      "1 / 7 / 7 / 13",
+      "7 / 1 / 13 / 7",
+      "7 / 7 / 13 / 13",
+    ],
   },
   {
     image: "images/video-layouts/layout-c.png",
     name: "C",
+    layout: ["4 / 1 / 10 / 7", "4 / 7 / 10 / 13"],
   },
   {
     image: "images/video-layouts/layout-d.png",
     name: "D",
+    layout: ["1 / 4 / 7 / 10", "7 / 4 / 13 / 10"],
   },
   {
     image: "images/video-layouts/layout-e.png",
     name: "E",
+    layout: ["1 / 1 / 7 / 7", "1 / 7 / 7 / 13", "7 / 4 / 13 / 10"],
   },
   {
     image: "images/video-layouts/layout-f.png",
     name: "F",
+    layout: ["1 / 1 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-g.png",
     name: "G",
+    layout: ["1 / 4 / 7 / 10", "7 / 1 / 13 / 7", "7 / 7 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-h.png",
     name: "H",
+    layout: ["1 / 1 / 13 / 7", "1 / 7 / 7 / 13", "7 / 7 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-i.png",
     name: "I",
+    layout: ["1 / 1 / 7 / 7", "7 / 1 / 13 / 7", "1 / 7 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-j.png",
     name: "J",
+    layout: ["5 / 1 / 9 / 5", "5 / 5 / 9 / 9", "5 / 9 / 9 / 13"],
   },
   {
     image: "images/video-layouts/layout-k.png",
     name: "K",
+    layout: ["1 / 1 / 13 / 5", "1 / 5 / 13 / 9", "1 / 9 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-l.png",
     name: "L",
+    layout: [
+      "1 / 1 / 13 / 4",
+      "1 / 4 / 13 / 7",
+      "1 / 7 / 13 / 10",
+      "1 / 10 / 13 / 13",
+    ],
   },
 ];
 
@@ -119,6 +151,9 @@ const StyledPanel = styled("div", {
                 background: "$brand",
               },
             },
+            ".active": {
+              background: "$brand",
+            },
           },
         },
       },
@@ -134,31 +169,20 @@ const VideoGrid = styled("div", {
   width: "100%",
   height: "calc(100vh - 9.75rem - 157px)",
   border: "2px solid $brand",
-  variants: {
-    layout: {
-      A: {},
-      B: {},
-      C: {},
-      D: {},
-      E: {},
-      F: {
-        ".participant-video": {
-          background: "$videoBackgroundGradient",
-          width: "100%",
-          height: "100%",
-          gridArea: "1 / 1 / 13 / 13",
-        },
-      },
-      G: {},
-      H: {},
-      I: {},
-      J: {},
-      K: {},
-      L: {},
-    },
-  },
-  defaultVariants: {
-    layout: "F",
+});
+
+const ParticipantVideo = styled("div", {
+  background: "$videoBackgroundGradient",
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  position: "relative",
+  padding: "$md",
+  boxSizing: "border-box",
+  video: {
+    position: "absolute",
+    top: "0",
+    left: "0",
   },
 });
 
@@ -232,6 +256,7 @@ export default function StagePanel({
   activePanel: PanelStates;
   participants: Participant[];
 }) {
+  const [currentLayout, setCurrentLayout] = useState<string>("C");
   if (activePanel === "audio") {
     if (participants.length <= 0) {
       return (
@@ -267,13 +292,29 @@ export default function StagePanel({
         <StyledViewport>
           <StyledPanel variant="video">
             <div className="video-box">
-              <VideoGrid layout={"F"}>
-                <div className="participant-video"></div>
+              <VideoGrid>
+                {videoLayouts
+                  .find((l) => l.name === currentLayout)
+                  ?.layout?.map((l, i) => {
+                    return (
+                      <ParticipantVideo key={i} css={{ gridArea: l }}>
+                        <Text size="xs">NAME</Text>
+                      </ParticipantVideo>
+                    );
+                  })}
               </VideoGrid>
               <div className="layouts">
                 {videoLayouts.map((l) => {
                   return (
-                    <button key={l.name} className={`item layout-${l.name}`}>
+                    <button
+                      key={l.name}
+                      onClick={() => {
+                        setCurrentLayout(l.name);
+                      }}
+                      className={`item layout-${l.name} ${
+                        l.name === currentLayout ? "active" : ""
+                      }`}
+                    >
                       <img src={l.image} alt={`Layout ${l.name}`} />
                     </button>
                   );

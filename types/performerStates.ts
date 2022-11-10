@@ -43,7 +43,9 @@ export type UpdateStateActions =
       properties: {
         token: string;
       };
-    };
+    }
+  | { type: "mute-audio" }
+  | { type: "unmute-audio" };
 
 export type RoomStateInit = {
   screen: "room-list-screen";

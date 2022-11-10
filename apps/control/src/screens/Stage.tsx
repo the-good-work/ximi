@@ -1,4 +1,10 @@
-import React, { Dispatch, useEffect, useState, useReducer } from "react";
+import React, {
+  Dispatch,
+  useEffect,
+  useState,
+  useReducer,
+  SetStateAction,
+} from "react";
 import StageSidebar from "../components/StageSidebar";
 import {
   RoomStateStage,
@@ -12,6 +18,10 @@ import {
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
 import StagePanel from "../components/StagePanel";
+import { UpdateStatePayload } from "@thegoodwork/ximi-types";
+import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
+
+const decoder = new TextDecoder();
 
 const StyledStage = styled("div", {
   display: "flex",
@@ -25,9 +35,11 @@ const StyledStage = styled("div", {
 export default function Stage({
   state,
   updateState,
+  setControllerName,
 }: {
   updateState: Dispatch<UpdateStateActions>;
   state: RoomStateStage;
+  setControllerName: Dispatch<SetStateAction<string>>;
 }) {
   const initialState = Array.apply(null, Array(12)).map((_a, i) => {
     return {
@@ -37,6 +49,7 @@ export default function Stage({
     };
   });
   const { connect, room, error, participants } = useRoom();
+
   const [presets, setPresets] = useReducer(reducer, initialState);
   const [activePanel, setActivePanel] = useState<PanelStates>("audio");
 
@@ -53,25 +66,94 @@ export default function Stage({
     } else return initialState;
   }
 
-  async function connectRoom() {
-    await connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token);
-  }
+  useEffect(() => {
+    // loop thru participants and subscribe/unsubscribe to audio track accordingly
+    // state will indiciate which are the ones on mute (i.e. to unsub)
+    //
+    //
+    // every time audioMixMute changes (from Zahid's send data)
+
+    participants.forEach((participant) => {
+      if (participant) {
+        console.log(participant.audioTracks);
+        if (participant.isLocal) {
+          return;
+        }
+        if (participant.metadata) {
+          try {
+            const metadata = JSON.parse(participant.metadata);
+            if (metadata.type === "PERFORMER") {
+              (participant as RemoteParticipant).audioTracks.forEach(
+                (publication) => {
+                  const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
+                  if (publication.isSubscribed !== true && shouldSubscribe) {
+                    publication.setSubscribed(true);
+                    console.log(publication.subscriptionStatus);
+                  } else if (
+                    publication.isSubscribed === true &&
+                    !shouldSubscribe
+                  ) {
+                    publication.setSubscribed(false);
+                  }
+                }
+              );
+            }
+          } catch (err) {
+            return;
+          }
+        }
+      }
+    });
+  }, [participants, state]);
 
   useEffect(() => {
-    connectRoom().catch((err) => {
-      console.log(err);
-    });
+    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token)
+      .then((rm) => {
+        if (rm) {
+          setControllerName(rm?.localParticipant.identity || "");
+          rm.on(
+            RoomEvent.DataReceived,
+            (
+              payload: Uint8Array,
+              participant?: RemoteParticipant,
+              kind?: DataPacket_Kind
+            ) => {
+              const string = decoder.decode(payload);
+              try {
+                const json: UpdateStatePayload = JSON.parse(
+                  string
+                ) as UpdateStatePayload;
+                console.log(json);
+                // updateState({
+                //   type: "update-from-server",
+                //   payload: room,
+                // });
+              } catch (err) {
+                console.log(err);
+                return;
+              }
+              /*
+               * const obj = JSON.parse(strData);
+               * if (obj.type === "___") {
+               * ___
+               * }
+               */
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
-  useEffect(() => {
-    if (room) {
-      if (room.localParticipant) {
-        console.log(room, participants);
-
-        // set name of current control node as room.localParticipant.identity
-      }
-    }
-  }, [room]);
+  // useEffect(() => {
+  //   if (room) {
+  //     if (room.localParticipant) {
+  //       // console.log(room, participants, room.localParticipant);
+  //     }
+  //   }
+  // }, [room]);
 
   if (error) {
     console.log(error);
@@ -80,7 +162,11 @@ export default function Stage({
   return (
     <div className="content noscroll">
       <StyledStage>
-        <StagePanel activePanel={activePanel} participants={participants} />
+        <StagePanel
+          roomName={room?.name || ""}
+          activePanel={activePanel}
+          participants={participants}
+        />
         <StageSidebar
           presets={presets}
           setPresets={setPresets}

@@ -92,9 +92,11 @@ export default function Input({
   maxLength,
   max,
   min,
+  defaultValue,
   ...props
 }: {
   id?: string;
+  defaultValue?: string;
   isDisabled?: boolean;
   min?: number;
   max?: number;

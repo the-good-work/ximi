@@ -182,6 +182,7 @@ export default function JoinRoom({
             </Text>
           </div>
           <Input
+            defaultValue={""}
             onKeyDown={(e) => {
               const target = e.code;
               handlePasscode(target, passcode);

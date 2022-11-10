@@ -1,3 +1,4 @@
+import { useParticipant } from "@livekit/react-core";
 import { Participant } from "livekit-client";
 import React, {
   KeyboardEvent,
@@ -34,7 +35,8 @@ const StyledDiv = styled("div", {
   display: "flex",
   height: "100%",
   width: "100%",
-  maxHeight: "240px",
+  minHeight: "240px",
+  maxHeight: "370px",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "space-between",
@@ -95,6 +97,11 @@ const StyledDiv = styled("div", {
         gap: "$xs",
         width: "100%",
         height: "100%",
+
+        "input.hidden": {
+          position: "absolute",
+          top: "-100000px",
+        },
       },
     },
     ".audio-delay": {
@@ -234,6 +241,25 @@ const StyledSubcard = styled("button", {
   },
 });
 
+async function unmute(roomName: string, participant: string, target: string) {
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        type: "UNMUTE_AUDIO",
+        room_name: roomName,
+        participant: participant,
+        target: target,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response;
+}
+
 function ParticipantSubcard({
   participant,
   onClick,
@@ -255,22 +281,18 @@ function ParticipantSubcard({
 
 export default function AudioMixCard({
   participant,
+  roomName,
   participants,
   type = "performer",
 }: {
   participant: Participant | any;
   participants: Participant[];
+  roomName: string;
   type?: "performer" | "control";
 }) {
   const [delay, setDelay] = useState<number>(0);
-
-  function checkNumber(event: KeyboardEvent) {
-    var aCode = event.which ? event.which : event.keyCode;
-
-    if (aCode > 31 && (aCode < 48 || aCode > 57)) return false;
-
-    return true;
-  }
+  // const part = useParticipant(participant);
+  // console.log(part);
 
   return (
     <StyledDiv type={type}>
@@ -308,7 +330,18 @@ export default function AudioMixCard({
               return (
                 <ParticipantSubcard
                   onClick={() => {
-                    console.log("Update audio setting");
+                    // for now, force unmute
+                    unmute(roomName, participant.identity, p.identity)
+                      .then((e) => {
+                        // console.log(participant);
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
+
+                    // if participant is muted ()...
+
+                    //else if participant is not muted
                   }}
                   key={p.identity}
                   participant={p}
@@ -327,7 +360,11 @@ export default function AudioMixCard({
             <div className="buttons">
               <Button
                 onClick={() => {
-                  console.log("Copy video link");
+                  let input = document.querySelector(
+                    `#${`stream_url_${participant.sid}`}`
+                  );
+                  // input?.select();
+                  // document.execCommand("copy");
                 }}
                 size="sm"
                 variant="outline"
@@ -372,6 +409,21 @@ export default function AudioMixCard({
                 <VideocamSharp color="inherit" width="20px" /> +{" "}
                 <VolumeHighSharp color="inherit" width="20px" />
               </Button>
+              <input
+                type="text"
+                className="hidden"
+                id={`stream_url_${participant.sid}`}
+                // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}`}
+                readOnly
+              />
+
+              <input
+                type="text"
+                className="hidden"
+                id={`stream_url_a_${participant.sid}`}
+                // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}&audio=1`}
+                readOnly
+              />
             </div>
           </div>
           <div className="spacer" />

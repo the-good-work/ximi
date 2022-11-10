@@ -17,9 +17,18 @@ import {
 } from "../../../../types/stageStates";
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
-import StagePanel from "../components/StagePanel";
 import { UpdateStatePayload } from "@thegoodwork/ximi-types";
-import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
+import {
+  DataPacket_Kind,
+  Participant,
+  RemoteParticipant,
+  RoomEvent,
+} from "livekit-client";
+import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
+import AudioMixCard from "../components/AudioMixCard";
+import Text from "ui/Texts/Text";
+import { Sad } from "react-ionicons";
+import VideoPanel from "../components/VideoPanel";
 
 const decoder = new TextDecoder();
 
@@ -31,6 +40,101 @@ const StyledStage = styled("div", {
   alignItems: "center",
   flexDirection: "row",
 });
+
+const StyledAudioPanel = styled("div", {
+  height: "100%",
+  width: "100%",
+  color: "white",
+  gridGap: "$md",
+  boxSizing: "border-box",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+});
+
+const StyledEmptyState = styled("div", {
+  height: "100%",
+  width: "100%",
+  color: "white",
+  display: "flex",
+  opacity: "0.8",
+  gap: "$sm",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+  ".icon": {
+    path: {
+      fill: "$text",
+    },
+  },
+});
+
+const StyledRoot = styled(Root, {
+  height: "100%",
+  width: "100%",
+  overflow: "hidden",
+});
+
+const StyledViewport = styled(Viewport, {
+  height: "100%",
+  width: "100%",
+  paddingRight: "$lg",
+  boxSizing: "border-box",
+});
+
+function StagePanel({
+  activePanel,
+  participants,
+  roomName,
+}: {
+  activePanel: PanelStates;
+  participants: Participant[];
+  roomName: string;
+}) {
+  if (activePanel === "audio") {
+    if (participants.length <= 0) {
+      return (
+        <StyledEmptyState>
+          <div className="icon" aria-hidden="true">
+            <Sad width="32px" height="32px" />
+          </div>
+          <Text>There is no one in this room</Text>
+        </StyledEmptyState>
+      );
+    } else
+      return (
+        <StyledRoot>
+          <StyledViewport>
+            <StyledAudioPanel>
+              {participants.map((p: any) => {
+                return (
+                  <AudioMixCard
+                    roomName={roomName}
+                    type={JSON.parse(p.metadata).type.toLowerCase()}
+                    participant={p}
+                    participants={participants}
+                  />
+                );
+              })}
+            </StyledAudioPanel>
+          </StyledViewport>
+          <Scrollbar orientation="vertical" />
+        </StyledRoot>
+      );
+  } else
+    return (
+      <StyledRoot>
+        <StyledViewport>
+          <VideoPanel
+            participants={participants}
+            currentParticipant={
+              participants.length >= 2 ? participants[1] : participants[0]
+            }
+          />
+        </StyledViewport>
+        <Scrollbar orientation="vertical" />
+      </StyledRoot>
+    );
+}
 
 export default function Stage({
   state,

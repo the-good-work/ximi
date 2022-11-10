@@ -157,6 +157,7 @@ const StyledVideoPanel = styled("div", {
   backgroundColor: "$background",
   padding: "$md $md $xs $md",
   gap: "$sm",
+
   ".layouts": {
     gap: "$sm",
     boxSizing: "border-box",
@@ -205,39 +206,38 @@ export default function VideoPanel({
 }) {
   const [currentLayout, setCurrentLayout] = useState<string>("F");
   const participantData = useParticipant(currentParticipant);
-  // console.log(participantData);
+
   return (
     <StyledVideoPanel>
-      <div className="video-box">
-        <VideoGrid>
-          {videoLayouts
-            .find((l) => l.name === currentLayout)
-            ?.layout?.map((l, i) => {
-              return (
-                <ParticipantVideo key={i} css={{ gridArea: l }}>
-                  <Text size="xs">NAME</Text>
-                </ParticipantVideo>
-              );
-            })}
-        </VideoGrid>
-        <div className="layouts">
-          {videoLayouts.map((l) => {
+      <VideoGrid>
+        {videoLayouts
+          .find((l) => l.name === currentLayout)
+          ?.layout?.map((l, i) => {
             return (
-              <button
-                key={l.name}
-                onClick={() => {
-                  setCurrentLayout(l.name);
-                }}
-                className={`item layout-${l.name} ${
-                  l.name === currentLayout ? "active" : ""
-                }`}
-              >
-                <img src={l.image} alt={`Layout ${l.name}`} />
-              </button>
+              <ParticipantVideo key={i} css={{ gridArea: l }}>
+                <Text size="xs">NAME</Text>
+              </ParticipantVideo>
             );
           })}
-        </div>
+      </VideoGrid>
+      <div className="layouts">
+        {videoLayouts.map((l) => {
+          return (
+            <button
+              key={l.name}
+              onClick={() => {
+                setCurrentLayout(l.name);
+              }}
+              className={`item layout-${l.name} ${
+                l.name === currentLayout ? "active" : ""
+              }`}
+            >
+              <img src={l.image} alt={`Layout ${l.name}`} />
+            </button>
+          );
+        })}
       </div>
+
       <div className="participants">
         {participants.map((p: any) => {
           if (JSON.parse(p.metadata).type !== "CONTROL") {

@@ -94,7 +94,7 @@ export default function ListButton({
             fontWeight: "$medium",
           }}
         >
-          {noOfParticipants}
+          {noOfParticipants < 9 ? noOfParticipants : "Full"}
         </Text>
       </div>
     </StyledButton>

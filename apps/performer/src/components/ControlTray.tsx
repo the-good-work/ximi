@@ -8,27 +8,140 @@ import {
   Videocam,
   VolumeHigh,
   VolumeMute,
+  VolumeMuteOutline,
 } from "react-ionicons";
-import { Room } from "livekit-client";
-import { UpdateStateActions } from "../../../../types/performerStates";
+import {
+  RoomStateStage,
+  UpdateStateActions,
+} from "../../../../types/performerStates";
+import {
+  createLocalAudioTrack,
+  createLocalVideoTrack,
+  Room,
+  Track,
+  VideoPresets,
+} from "livekit-client";
 
 export default function ControlTray({
   room,
+  state,
   updateState,
 }: {
   room?: Room;
+  state: RoomStateStage;
   updateState: Dispatch<UpdateStateActions>;
 }) {
   const [open, setOpen] = useState<boolean>(false);
+  const [muted, setMuted] = useState<boolean>(false);
+
+  const localParticipant = room && room.localParticipant;
+
+  if (!room || !localParticipant) {
+    return <></>;
+  }
+
   return (
     <>
       <ButtonTray open={open ? "open" : "closed"}>
-        <ToggleIconButton size={open ? "lg" : "md"} icon={<VolumeHigh />} />
-        <ToggleIconButton size={open ? "lg" : "md"} icon={<VolumeMute />} />
         <ToggleIconButton
-          active={true}
+          size={open ? "lg" : "md"}
+          icon={<VolumeHigh />}
+          active={localParticipant.audioTracks.size > 0}
+          onClick={async () => {
+            const currentlyActive = localParticipant.audioTracks.size > 0;
+
+            if (currentlyActive) {
+              localParticipant.audioTracks.forEach((track) => {
+                if (track.audioTrack) {
+                  localParticipant.unpublishTrack(track.audioTrack);
+                }
+              });
+              setMuted(false);
+            } else {
+              const localAudioTrack = await createLocalAudioTrack({
+                noiseSuppression:
+                  state.properties.inputType === "voice" ? true : false,
+                echoCancellation:
+                  state.properties.inputType === "voice" ? true : false,
+                channelCount: 2,
+                sampleRate: 48000,
+                autoGainControl: false,
+              });
+              await localParticipant.publishTrack(localAudioTrack);
+            }
+          }}
+        />
+        <ToggleIconButton
+          size={open ? "lg" : "md"}
+          icon={muted ? <VolumeMute /> : <VolumeMuteOutline />}
+          css={{
+            svg: { opacity: localParticipant.audioTracks.size > 0 ? 1 : 0.3 },
+          }}
+          active={muted}
+          onClick={async () => {
+            const tracks = Array.from(localParticipant.audioTracks.values());
+            if (tracks.length < 1) {
+              return;
+            }
+
+            if (muted) {
+              await Promise.all(
+                tracks.map((track) => {
+                  return track.unmute();
+                })
+              );
+              setMuted(false);
+            } else {
+              await Promise.all(
+                tracks.map((track) => {
+                  return track.mute();
+                })
+              );
+
+              setMuted(true);
+            }
+          }}
+        />
+        <ToggleIconButton
+          active={
+            Array.from(localParticipant.tracks.values()).filter(
+              (publication) => publication.kind === Track.Kind.Video
+            ).length > 0
+          }
           size={open ? "lg" : "md"}
           icon={<Videocam />}
+          onClick={async () => {
+            let publishingVideo = false;
+            const videoTracks = Array.from(
+              localParticipant.tracks.values()
+            ).filter((publication) => publication.kind === Track.Kind.Video);
+
+            localParticipant.tracks.forEach((track) => {
+              if (publishingVideo) {
+                return;
+              }
+              if (track.kind === Track.Kind.Video) {
+                publishingVideo = true;
+              }
+            });
+
+            if (publishingVideo) {
+              await Promise.all(
+                videoTracks.map((track) => {
+                  if (track.track) {
+                    return localParticipant.unpublishTrack(track.track);
+                  } else {
+                    return null;
+                  }
+                })
+              );
+            } else {
+              const videoTrack = await createLocalVideoTrack({
+                resolution: VideoPresets.h720,
+              });
+              await localParticipant.publishTrack(videoTrack);
+            }
+          }}
         />
         <ToggleIconButton size={open ? "lg" : "md"} icon={<Chatbox />} />
         <ToggleIconButton
@@ -97,7 +210,7 @@ const ButtonTray = styled("div", {
   variants: {
     open: {
       open: {
-        bottom: "$3xl",
+        bottom: "$md",
       },
       closed: {
         bottom: "$sm",

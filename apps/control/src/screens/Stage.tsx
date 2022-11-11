@@ -159,16 +159,23 @@ function StagePanel({
           <StyledRoot>
             <StyledViewport>
               <StyledAudioPanel>
-                {participantsSettings.map((p: ParticipantPerformer) => {
+                {participants.map((p: Participant) => {
+                  const participantSettings = participantsSettings.find(
+                    (_p: ParticipantPerformer | ParticipantControl) =>
+                      _p.name === p.identity
+                  );
+
+                  const meta = JSON.parse(p.metadata || "{}");
+
                   return (
                     <AudioMixCard
                       key={p.sid}
+                      thisParticipant={p}
                       participants={participants}
                       roomName={roomName}
-                      participantSettings={p}
-                      type={p.type}
-                      audioMixMute={p.audioMixMute}
-                      audioDelay={p.audioOutDelay}
+                      type={meta.type}
+                      audioMixMute={participantSettings?.audioMixMute || []}
+                      audioDelay={participantSettings?.audioOutDelay || 0}
                     />
                   );
                 })}
@@ -301,9 +308,9 @@ export default function Stage({
   state: RoomStateStage;
   setControllerName: Dispatch<SetStateAction<string>>;
 }) {
-  const [stage, setStage] = useState<undefined | UpdateStatePayload | any>(
-    undefined
-  );
+  const [stageSettings, setStageSettings] = useState<
+    undefined | UpdateStatePayload | any
+  >(undefined);
   const [lastUpdatedParticipant, setLastUpdatedParticipant] = useState<
     undefined | UpdateStatePayload | any
   >(undefined);
@@ -388,7 +395,8 @@ export default function Stage({
                 if (json.sid) {
                   setLastUpdatedParticipant(json);
                 } else {
-                  setStage(json);
+                  console.log(json);
+                  setStageSettings(() => json);
                 }
               } catch (err) {
                 console.log(err);
@@ -422,7 +430,7 @@ export default function Stage({
     console.log(error);
   }
 
-  // console.log(stage);
+  // console.log(lastUpdatedParticipant);
   // console.log(lastUpdatedParticipant);
 
   return (
@@ -433,7 +441,7 @@ export default function Stage({
           roomName={room?.name || ""}
           participants={participants}
           activePanel={activePanel}
-          participantsSettings={stage?.participants || []}
+          participantsSettings={stageSettings?.participants || []}
         />
         <StageSidebar
           presets={presets}

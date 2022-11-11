@@ -230,7 +230,7 @@ const StyledDiv = styled("div", {
 const StyledSubcard = styled("button", {
   appearance: "none",
   outline: "none",
-  background: "$background",
+  // background: "$background",
   border: "1px solid $accent",
   borderRadius: "$xs",
   padding: "$xs $sm",
@@ -249,12 +249,14 @@ const StyledSubcard = styled("button", {
   variants: {
     active: {
       true: {
+        background: "red",
         path: {
           stroke: "$accent",
           fill: "$accent",
         },
       },
       false: {
+        background: "$background",
         path: {
           stroke: "$text",
           fill: "$text",
@@ -290,23 +292,19 @@ async function applyAudioSetting(
 
 function ParticipantSubcard({
   target,
+  muted,
   onClick,
-  participantSettings,
-  participant,
 }: {
   target: any;
+  muted: boolean;
   onClick?: MouseEventHandler;
-  participantSettings: ParticipantPerformer;
-  participant: Participant;
 }) {
   return (
-    <StyledSubcard active={false} onClick={onClick}>
-      {participantSettings.audioMixMute.findIndex(
-        (p: any) => p === target.identity
-      ) < 0 ? (
-        <VolumeHighSharp color="inherit" width="14px" />
-      ) : (
+    <StyledSubcard active={muted} onClick={onClick}>
+      {muted ? (
         <VolumeMuteSharp color="inherit" width="14px" />
+      ) : (
+        <VolumeHighSharp color="inherit" width="14px" />
       )}
       <Text size="2xs">{target.identity}</Text>
     </StyledSubcard>
@@ -316,23 +314,19 @@ function ParticipantSubcard({
 export default function AudioMixCard({
   audioMixMute,
   audioDelay,
-  participantSettings,
   participants,
+  thisParticipant,
   roomName,
   type,
 }: {
   audioMixMute: string[];
   audioDelay?: number;
+  thisParticipant: any;
   participants: Participant[];
   roomName: string;
-  participantSettings: ParticipantPerformer;
   type: "PERFORMER" | "CONTROL";
 }) {
   const [delay, setDelay] = useState<number>(0);
-
-  const thisParticipant: any = participants.find(
-    (p) => p.identity === participantSettings.name
-  );
 
   const performerParticipants = participants.filter((p) => {
     try {
@@ -389,12 +383,10 @@ export default function AudioMixCard({
                       applyAudioSetting(
                         "MUTE_AUDIO",
                         roomName,
-                        participantSettings.name,
+                        thisParticipant.identity,
                         p.identity
                       )
-                        .then((e) => {
-                          // console.log(participant);
-                        })
+                        .then(() => {})
                         .catch((err) => {
                           console.log(err);
                         });
@@ -402,7 +394,7 @@ export default function AudioMixCard({
                       applyAudioSetting(
                         "UNMUTE_AUDIO",
                         roomName,
-                        participantSettings.name,
+                        thisParticipant.identity,
                         p.identity
                       )
                         .then((e) => {
@@ -413,16 +405,19 @@ export default function AudioMixCard({
                         });
                     }
                   }}
-                  key={p.identity}
-                  participantSettings={participantSettings}
-                  participant={thisParticipant}
+                  key={`${p.identity}_${
+                    audioMixMute.findIndex((_p) => _p === p.identity) < 0
+                      ? "mute"
+                      : "unmute"
+                  }`}
+                  muted={audioMixMute.findIndex((_p) => _p === p.identity) > -1}
                   target={p}
                 />
               );
             })}
         </div>
       </div>
-      {participantSettings.type === "PERFORMER" && (
+      {type === "PERFORMER" && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
@@ -433,7 +428,7 @@ export default function AudioMixCard({
               <Button
                 onClick={() => {
                   let input = document.querySelector(
-                    `#${`stream_url_${participantSettings.sid}`}`
+                    `#${`stream_url_${thisParticipant.sid}`}`
                   );
                   // input?.select();
                   // document.execCommand("copy");
@@ -484,7 +479,7 @@ export default function AudioMixCard({
               <input
                 type="text"
                 className="hidden"
-                id={`stream_url_${participantSettings.sid}`}
+                id={`stream_url_${thisParticipant.sid}`}
                 // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}`}
                 readOnly
               />
@@ -492,7 +487,7 @@ export default function AudioMixCard({
               <input
                 type="text"
                 className="hidden"
-                id={`stream_url_a_${participantSettings.sid}`}
+                id={`stream_url_a_${thisParticipant.sid}`}
                 // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}&audio=1`}
                 readOnly
               />
@@ -508,7 +503,7 @@ export default function AudioMixCard({
               <div className="delay-display">{delay}</div>
               <div className="input-group">
                 <Input
-                  id={`desired_delay_${participantSettings.sid}`}
+                  id={`desired_delay_${thisParticipant.sid}`}
                   type="text"
                   css={{
                     fontSize: "$sm",
@@ -536,7 +531,7 @@ export default function AudioMixCard({
                   }}
                   onClick={() => {
                     let delayInput: any = document.getElementById(
-                      `desired_delay_${participantSettings.sid}`
+                      `desired_delay_${thisParticipant.sid}`
                     );
                     let _delay: number = parseInt(delayInput.value);
                     if (isNaN(_delay)) {

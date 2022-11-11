@@ -235,16 +235,21 @@ const StyledSubcard = styled("button", {
   },
 });
 
-async function unmute(roomName: string, participant: string, target: string) {
+async function applyAudioSetting(
+  type: string,
+  room_name: string,
+  participant: string,
+  target: string
+) {
   const response = await fetch(
     `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
     {
       method: "PATCH",
       body: JSON.stringify({
-        type: "UNMUTE_AUDIO",
-        room_name: roomName,
-        participant: participant,
-        target: target,
+        type,
+        room_name,
+        participant,
+        target,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -262,12 +267,12 @@ function ParticipantSubcard({
   onClick?: MouseEventHandler;
 }) {
   return (
-    <StyledSubcard active={participant.audioTracks.size > 0} onClick={onClick}>
-      {participant.audioTracks.size > 0 ? (
+    <StyledSubcard active={false} onClick={onClick}>
+      {/* {participant.audioTracks.size > 0 ? (
         <VolumeHighSharp color="inherit" width="14px" />
       ) : (
         <VolumeMuteSharp color="inherit" width="14px" />
-      )}
+      )} */}
       <Text size="2xs">{participant.identity}</Text>
     </StyledSubcard>
   );
@@ -304,7 +309,7 @@ export default function AudioMixCard({
               </Text>
             </div>
           </div>
-          <div className="icons">
+          {/* <div className="icons">
             {participant.audioTracks.size > 0 ? (
               <MicSharp width="20px" />
             ) : (
@@ -315,17 +320,22 @@ export default function AudioMixCard({
             ) : (
               <VideocamOffSharp width="20px" />
             )}
-          </div>
+          </div> */}
         </div>
         <div className="body">
           {participants
-            .filter((p: any) => JSON.parse(p.metadata).type === "PERFORMER")
+            .filter((p: any) => p.type === "PERFORMER")
             .map((p) => {
               return (
                 <ParticipantSubcard
                   onClick={() => {
-                    // for now, force unmute
-                    unmute(roomName, participant.identity, p.identity)
+                    //if state of target for this participant is unmuted
+                    applyAudioSetting(
+                      "MUTE_AUDIO",
+                      roomName,
+                      participant.identity,
+                      p.identity
+                    )
                       .then((e) => {
                         // console.log(participant);
                       })
@@ -333,9 +343,14 @@ export default function AudioMixCard({
                         console.log(err);
                       });
 
-                    // if participant is muted ()...
-
-                    //else if participant is not muted
+                    //else if state of target for this participant is muted
+                    // applyAudioSetting("UNMUTE_AUDIO", roomName, participant.identity, p.identity)
+                    // .then((e) => {
+                    //   // console.log(participant);
+                    // })
+                    // .catch((err) => {
+                    //   console.log(err);
+                    // });
                   }}
                   key={p.identity}
                   participant={p}
@@ -344,7 +359,7 @@ export default function AudioMixCard({
             })}
         </div>
       </div>
-      {JSON.parse(participant.metadata).type === "PERFORMER" && (
+      {participant.type === "PERFORMER" && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">

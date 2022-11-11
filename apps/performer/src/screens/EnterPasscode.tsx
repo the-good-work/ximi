@@ -139,7 +139,7 @@ export default function EnterPasscode({
                 });
               } else {
                 toast({
-                  title: r.message,
+                  title: r.error,
                   tone: "warning",
                   jumbo: false,
                 });

@@ -201,11 +201,11 @@ export default function VideoPanel({
   currentParticipant,
   participants,
 }: {
-  currentParticipant: Participant;
-  participants: Participant[];
+  currentParticipant: Participant | undefined;
+  participants: Participant[] | undefined;
 }) {
   const [currentLayout, setCurrentLayout] = useState<string>("F");
-  const participantData = useParticipant(currentParticipant);
+  // const participantData = useParticipant(currentParticipant);
 
   return (
     <StyledVideoPanel>
@@ -239,7 +239,7 @@ export default function VideoPanel({
       </div>
 
       <div className="participants">
-        {participants.map((p: any) => {
+        {participants?.map((p: any) => {
           if (JSON.parse(p.metadata).type !== "CONTROL") {
             const currentVideoLayout = videoLayouts.find(
               (l) => l.name === currentLayout

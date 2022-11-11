@@ -155,7 +155,7 @@ function StagePanel({
                 return (
                   <AudioMixCard
                     roomName={roomName}
-                    type={JSON.parse(p.metadata).type.toLowerCase()}
+                    type={p?.type.toLowerCase() || "performer"}
                     participant={p}
                     participants={participants}
                   />
@@ -173,7 +173,11 @@ function StagePanel({
           <VideoPanel
             participants={participants}
             currentParticipant={
-              participants.length >= 2 ? participants[1] : participants[0]
+              participants
+                ? participants.length >= 2
+                  ? participants[1]
+                  : participants[0]
+                : undefined
             }
           />
         </StyledViewport>
@@ -195,6 +199,7 @@ function StageSidebar({
   presets: any[];
   setPresets: Dispatch<PresetAction>;
 }) {
+  const { room } = useRoom();
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -257,7 +262,12 @@ function StageSidebar({
           }}
           icon={<ExitSharp />}
           type="negative"
-          onClick={() => {
+          onClick={async () => {
+            if (room) {
+              await room.disconnect();
+              console.log("disconnected");
+            }
+
             updateState({
               type: "back-to-list",
             });
@@ -279,6 +289,12 @@ export default function Stage({
   state: RoomStateStage;
   setControllerName: Dispatch<SetStateAction<string>>;
 }) {
+  const [stage, setStage] = useState<undefined | UpdateStatePayload | any>(
+    undefined
+  );
+  const [lastUpdatedParticipant, setLastUpdatedParticipant] = useState<
+    undefined | UpdateStatePayload | any
+  >(undefined);
   const initialState = Array.apply(null, Array(12)).map((_a, i) => {
     return {
       name: `SLOT${i < 9 ? `0${i + 1}` : i + 1}`,
@@ -313,11 +329,10 @@ export default function Stage({
 
     participants.forEach((participant) => {
       if (participant) {
-        console.log(participant.audioTracks);
+        // console.log(participant.audioTracks);
         if (participant.isLocal) {
           return;
-        }
-        if (participant.metadata) {
+        } else if (participant.metadata) {
           try {
             const metadata = JSON.parse(participant.metadata);
             if (metadata.type === "PERFORMER") {
@@ -326,7 +341,7 @@ export default function Stage({
                   const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
                   if (publication.isSubscribed !== true && shouldSubscribe) {
                     publication.setSubscribed(true);
-                    console.log(publication.subscriptionStatus);
+                    // console.log(publication.subscriptionStatus);
                   } else if (
                     publication.isSubscribed === true &&
                     !shouldSubscribe
@@ -358,18 +373,18 @@ export default function Stage({
             ) => {
               const string = decoder.decode(payload);
               try {
-                const json: UpdateStatePayload = JSON.parse(
-                  string
-                ) as UpdateStatePayload;
-                console.log(json);
-                // updateState({
-                //   type: "update-from-server",
-                //   payload: room,
-                // });
+                const json = JSON.parse(string);
+                // console.log(json);
+                if (json.sid) {
+                  setLastUpdatedParticipant(json);
+                } else {
+                  setStage(json);
+                }
               } catch (err) {
                 console.log(err);
                 return;
               }
+
               /*
                * const obj = JSON.parse(strData);
                * if (obj.type === "___") {
@@ -397,13 +412,16 @@ export default function Stage({
     console.log(error);
   }
 
+  console.log(stage);
+  console.log(lastUpdatedParticipant);
+
   return (
     <div className="content noscroll">
       <StyledStage>
         <StagePanel
           roomName={room?.name || ""}
           activePanel={activePanel}
-          participants={participants}
+          participants={stage?.participants || []}
         />
         <StageSidebar
           presets={presets}

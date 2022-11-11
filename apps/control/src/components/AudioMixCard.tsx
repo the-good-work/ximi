@@ -1,18 +1,11 @@
-import { useRoom } from "@livekit/react-core";
-import {
-  ParticipantPerformer,
-  UpdateStatePayload,
-} from "@thegoodwork/ximi-types";
 import { Participant } from "livekit-client";
 import React, { MouseEventHandler, useState } from "react";
 import {
   HourglassOutline,
   LinkOutline,
-  MicOffSharp,
   MicSharp,
   PersonCircle,
   SwapHorizontal,
-  VideocamOffSharp,
   VideocamSharp,
   VolumeHighSharp,
   VolumeMuteSharp,
@@ -290,6 +283,29 @@ async function applyAudioSetting(
   return response;
 }
 
+async function applyDelay(
+  room_name: string,
+  participant: string,
+  delay: string
+) {
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        type: "UPDATE_DELAY",
+        room_name,
+        participant,
+        delay,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response;
+}
+
 function ParticipantSubcard({
   target,
   muted,
@@ -397,9 +413,7 @@ export default function AudioMixCard({
                         thisParticipant.identity,
                         p.identity
                       )
-                        .then((e) => {
-                          // console.log(participant);
-                        })
+                        .then(() => {})
                         .catch((err) => {
                           console.log(err);
                         });
@@ -500,7 +514,7 @@ export default function AudioMixCard({
               <Text size="2xs">Output Audio Delay</Text>
             </div>
             <div className="inputs">
-              <div className="delay-display">{delay}</div>
+              <div className="delay-display">{audioDelay}</div>
               <div className="input-group">
                 <Input
                   id={`desired_delay_${thisParticipant.sid}`}
@@ -534,10 +548,13 @@ export default function AudioMixCard({
                       `desired_delay_${thisParticipant.sid}`
                     );
                     let _delay: number = parseInt(delayInput.value);
-                    if (isNaN(_delay)) {
-                      setDelay(0);
-                    } else setDelay(_delay);
-
+                    if (!isNaN(_delay)) {
+                      applyDelay(
+                        roomName,
+                        thisParticipant.identity,
+                        _delay.toString()
+                      );
+                    }
                     delayInput.value = null;
                   }}
                 >

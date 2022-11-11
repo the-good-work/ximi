@@ -14,7 +14,13 @@ import {
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/performerStates";
-import { createLocalAudioTrack, Room } from "livekit-client";
+import {
+  createLocalAudioTrack,
+  createLocalVideoTrack,
+  Room,
+  Track,
+  VideoPresets,
+} from "livekit-client";
 
 export default function ControlTray({
   room,
@@ -50,6 +56,7 @@ export default function ControlTray({
                   localParticipant.unpublishTrack(track.audioTrack);
                 }
               });
+              setMuted(false);
             } else {
               const localAudioTrack = await createLocalAudioTrack({
                 noiseSuppression:
@@ -96,9 +103,45 @@ export default function ControlTray({
           }}
         />
         <ToggleIconButton
-          active={true}
+          active={
+            Array.from(localParticipant.tracks.values()).filter(
+              (publication) => publication.kind === Track.Kind.Video
+            ).length > 0
+          }
           size={open ? "lg" : "md"}
           icon={<Videocam />}
+          onClick={async () => {
+            let publishingVideo = false;
+            const videoTracks = Array.from(
+              localParticipant.tracks.values()
+            ).filter((publication) => publication.kind === Track.Kind.Video);
+
+            localParticipant.tracks.forEach((track) => {
+              if (publishingVideo) {
+                return;
+              }
+              if (track.kind === Track.Kind.Video) {
+                publishingVideo = true;
+              }
+            });
+
+            if (publishingVideo) {
+              await Promise.all(
+                videoTracks.map((track) => {
+                  if (track.track) {
+                    return localParticipant.unpublishTrack(track.track);
+                  } else {
+                    return null;
+                  }
+                })
+              );
+            } else {
+              const videoTrack = await createLocalVideoTrack({
+                resolution: VideoPresets.h720,
+              });
+              await localParticipant.publishTrack(videoTrack);
+            }
+          }}
         />
         <ToggleIconButton size={open ? "lg" : "md"} icon={<Chatbox />} />
         <ToggleIconButton
@@ -167,7 +210,7 @@ const ButtonTray = styled("div", {
   variants: {
     open: {
       open: {
-        bottom: "15%",
+        bottom: "$md",
       },
       closed: {
         bottom: "$sm",

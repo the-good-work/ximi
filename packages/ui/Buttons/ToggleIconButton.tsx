@@ -84,8 +84,8 @@ const StyledToggleIconButton = styled("button", {
       },
 
       lg: {
-        width: "$4xl",
-        height: "$4xl",
+        width: "60px",
+        height: "60px",
       },
     },
 

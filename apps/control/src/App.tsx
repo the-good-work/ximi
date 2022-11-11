@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import "./App.css";
 import {
   ReducerStates,
@@ -18,6 +18,8 @@ function App() {
   const initialState: RoomStateInit = {
     screen: "room-list-screen",
   };
+
+  const [controllerName, setControllerName] = useState<string>("");
 
   function reducer(_state: ReducerStates, action: UpdateStateActions) {
     if (
@@ -76,13 +78,20 @@ function App() {
     } else if (state.screen === "create-room-screen") {
       return <CreateRoom updateState={updateState} />;
     } else if (state.screen === "stage-screen") {
-      return <Stage state={state} updateState={updateState} />;
+      return (
+        <Stage
+          state={state}
+          updateState={updateState}
+          setControllerName={setControllerName}
+        />
+      );
     } else return <></>;
   }
 
   return (
     <div className="App">
       <Container
+        participantName={state.screen === "stage-screen" ? controllerName : "-"}
         variant="control"
         room={
           state.screen !== "room-list-screen" &&

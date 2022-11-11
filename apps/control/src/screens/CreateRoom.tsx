@@ -149,15 +149,11 @@ export default function CreateRoom({
       });
   }
 
-  async function checkRoom() {
-    return;
-  }
-
   const handlePasscode = (key: string) => {
     const numberKey = key.slice(-1);
 
     if (key === "Enter" || key === "ent") {
-      checkRoom();
+      onCreate();
     } else if (key === "Backspace" || key === "bsp") {
       setRoom({ ...room, passcode: room.passcode.slice(0, -1) });
     } else if (key === "clr") {
@@ -174,7 +170,7 @@ export default function CreateRoom({
     const textKey = key.slice(-1);
 
     if (key === "Enter" || key === "ent") {
-      checkRoom();
+      onCreate();
     } else if (key === "Backspace" || key === "bsp") {
       setRoom({ ...room, name: room.name.slice(0, -1) });
     } else if (key === "clr") {

@@ -1,18 +1,11 @@
 import { Participant } from "livekit-client";
-import React, {
-  KeyboardEvent,
-  KeyboardEventHandler,
-  MouseEventHandler,
-  useState,
-} from "react";
+import React, { MouseEventHandler, useState } from "react";
 import {
   HourglassOutline,
   LinkOutline,
-  MicOffSharp,
   MicSharp,
   PersonCircle,
   SwapHorizontal,
-  VideocamOffSharp,
   VideocamSharp,
   VolumeHighSharp,
   VolumeMuteSharp,
@@ -25,8 +18,8 @@ import { styled } from "ui/theme/theme";
 const StyledDiv = styled("div", {
   variants: {
     type: {
-      control: { border: "3px solid $accent" },
-      performer: {
+      CONTROL: { border: "3px solid $accent" },
+      PERFORMER: {
         border: "1px solid $brand",
       },
     },
@@ -34,7 +27,8 @@ const StyledDiv = styled("div", {
   display: "flex",
   height: "100%",
   width: "100%",
-  maxHeight: "240px",
+  minHeight: "240px",
+  maxHeight: "370px",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "space-between",
@@ -95,6 +89,11 @@ const StyledDiv = styled("div", {
         gap: "$xs",
         width: "100%",
         height: "100%",
+
+        "input.hidden": {
+          position: "absolute",
+          top: "-100000px",
+        },
       },
     },
     ".audio-delay": {
@@ -189,9 +188,33 @@ const StyledDiv = styled("div", {
       span: {
         lineHeight: 0,
       },
-      path: {
-        stroke: "$text",
-        fill: "$text",
+      ".active": {
+        path: {
+          stroke: "$text",
+          fill: "$text",
+        },
+      },
+      ".inactive": {
+        path: {
+          stroke: "$grey",
+          fill: "$grey",
+        },
+      },
+      ".audio.inactive": {
+        path: {
+          fill: "none",
+          "&:last-child": {
+            fill: "$grey",
+          },
+        },
+      },
+      ".audio.active": {
+        path: {
+          fill: "none",
+          "&:last-child": {
+            fill: "$text",
+          },
+        },
       },
     },
   },
@@ -200,7 +223,7 @@ const StyledDiv = styled("div", {
 const StyledSubcard = styled("button", {
   appearance: "none",
   outline: "none",
-  background: "$background",
+  // background: "$background",
   border: "1px solid $accent",
   borderRadius: "$xs",
   padding: "$xs $sm",
@@ -219,12 +242,14 @@ const StyledSubcard = styled("button", {
   variants: {
     active: {
       true: {
+        background: "red",
         path: {
           stroke: "$accent",
           fill: "$accent",
         },
       },
       false: {
+        background: "$background",
         path: {
           stroke: "$text",
           fill: "$text",
@@ -234,43 +259,105 @@ const StyledSubcard = styled("button", {
   },
 });
 
+async function applyAudioSetting(
+  type: string,
+  room_name: string,
+  participant: string,
+  target: string
+) {
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        type,
+        room_name,
+        participant,
+        target,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response;
+}
+
+async function applyDelay(
+  room_name: string,
+  participant: string,
+  delay: string
+) {
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        type: "UPDATE_DELAY",
+        room_name,
+        participant,
+        delay,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response;
+}
+
 function ParticipantSubcard({
-  participant,
+  target,
+  muted,
   onClick,
 }: {
-  participant: Participant;
+  target: any;
+  muted: boolean;
   onClick?: MouseEventHandler;
 }) {
   return (
-    <StyledSubcard active={participant.audioTracks.size > 0} onClick={onClick}>
-      {participant.audioTracks.size > 0 ? (
-        <VolumeHighSharp color="inherit" width="14px" />
-      ) : (
+    <StyledSubcard active={muted} onClick={onClick}>
+      {muted ? (
         <VolumeMuteSharp color="inherit" width="14px" />
+      ) : (
+        <VolumeHighSharp color="inherit" width="14px" />
       )}
-      <Text size="2xs">{participant.identity}</Text>
+      <Text size="2xs">{target.identity}</Text>
     </StyledSubcard>
   );
 }
 
 export default function AudioMixCard({
-  participant,
+  audioMixMute,
+  audioDelay,
   participants,
-  type = "performer",
+  thisParticipant,
+  roomName,
+  type,
 }: {
-  participant: Participant | any;
+  audioMixMute: string[];
+  audioDelay?: number;
+  thisParticipant: any;
   participants: Participant[];
-  type?: "performer" | "control";
+  roomName: string;
+  type: "PERFORMER" | "CONTROL";
 }) {
   const [delay, setDelay] = useState<number>(0);
 
-  function checkNumber(event: KeyboardEvent) {
-    var aCode = event.which ? event.which : event.keyCode;
+  const performerParticipants = participants.filter((p) => {
+    try {
+      const meta = JSON.parse(p.metadata || "{}");
+      return meta.type === "PERFORMER";
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  });
 
-    if (aCode > 31 && (aCode < 48 || aCode > 57)) return false;
-
-    return true;
-  }
+  const isPublishingAudio =
+    thisParticipant && thisParticipant.audioTracks.size > 0;
+  const isPublishingVideo =
+    thisParticipant && thisParticipant.videoTracks.size > 0;
 
   return (
     <StyledDiv type={type}>
@@ -279,45 +366,78 @@ export default function AudioMixCard({
           <div>
             <div className="identity">
               <PersonCircle color="inherit" width="20px" height="20px" />
-              <Text size="xs">{participant.identity}</Text>
+              <Text size="xs">{thisParticipant?.identity}</Text>
             </div>
             <div className="latency">
               <SwapHorizontal color="inherit" width="20px" height="20px" />
               <Text size="xs">
-                {participant?.signalClient?.pingInterval || 0}
+                {thisParticipant?.signalClient?.pingInterval || 0}
               </Text>
             </div>
           </div>
           <div className="icons">
-            {participant.audioTracks.size > 0 ? (
-              <MicSharp width="20px" />
-            ) : (
-              <MicOffSharp width="20px" />
-            )}
-            {participant.videoTracks.size > 0 ? (
-              <VideocamSharp width="20px" />
-            ) : (
-              <VideocamOffSharp width="20px" />
-            )}
+            <div
+              className={isPublishingAudio ? "audio active" : "audio inactive"}
+            >
+              <MicSharp width="20px" color={"inherit"} />
+            </div>
+            <div
+              className={isPublishingVideo ? "video active" : "video inactive"}
+            >
+              <VideocamSharp width="20px" color="inherit" />
+            </div>
           </div>
         </div>
         <div className="body">
-          {participants
-            .filter((p: any) => JSON.parse(p.metadata).type === "PERFORMER")
+          {performerParticipants
+            .filter((p) => p.identity !== thisParticipant?.identity)
             .map((p) => {
-              return (
-                <ParticipantSubcard
-                  onClick={() => {
-                    console.log("Update audio setting");
-                  }}
-                  key={p.identity}
-                  participant={p}
-                />
-              );
+              if (p.audioTracks.size > 0) {
+                return (
+                  <ParticipantSubcard
+                    onClick={() => {
+                      if (
+                        audioMixMute.findIndex((_p) => _p === p.identity) < 0
+                      ) {
+                        applyAudioSetting(
+                          "MUTE_AUDIO",
+                          roomName,
+                          thisParticipant.identity,
+                          p.identity
+                        )
+                          .then(() => {})
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      } else {
+                        applyAudioSetting(
+                          "UNMUTE_AUDIO",
+                          roomName,
+                          thisParticipant.identity,
+                          p.identity
+                        )
+                          .then(() => {})
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      }
+                    }}
+                    key={`${p.identity}_${
+                      audioMixMute.findIndex((_p) => _p === p.identity) < 0
+                        ? "mute"
+                        : "unmute"
+                    }`}
+                    muted={
+                      audioMixMute.findIndex((_p) => _p === p.identity) > -1
+                    }
+                    target={p}
+                  />
+                );
+              }
             })}
         </div>
       </div>
-      {JSON.parse(participant.metadata).type === "PERFORMER" && (
+      {type === "PERFORMER" && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
@@ -327,7 +447,11 @@ export default function AudioMixCard({
             <div className="buttons">
               <Button
                 onClick={() => {
-                  console.log("Copy video link");
+                  let input = document.querySelector(
+                    `#${`stream_url_${thisParticipant.sid}`}`
+                  );
+                  // input?.select();
+                  // document.execCommand("copy");
                 }}
                 size="sm"
                 variant="outline"
@@ -372,6 +496,21 @@ export default function AudioMixCard({
                 <VideocamSharp color="inherit" width="20px" /> +{" "}
                 <VolumeHighSharp color="inherit" width="20px" />
               </Button>
+              <input
+                type="text"
+                className="hidden"
+                id={`stream_url_${thisParticipant.sid}`}
+                // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}`}
+                readOnly
+              />
+
+              <input
+                type="text"
+                className="hidden"
+                id={`stream_url_a_${thisParticipant.sid}`}
+                // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}&audio=1`}
+                readOnly
+              />
             </div>
           </div>
           <div className="spacer" />
@@ -381,10 +520,10 @@ export default function AudioMixCard({
               <Text size="2xs">Output Audio Delay</Text>
             </div>
             <div className="inputs">
-              <div className="delay-display">{delay}</div>
+              <div className="delay-display">{audioDelay}</div>
               <div className="input-group">
                 <Input
-                  id={`desired_delay_${participant.sid}`}
+                  id={`desired_delay_${thisParticipant.sid}`}
                   type="text"
                   css={{
                     fontSize: "$sm",
@@ -412,13 +551,16 @@ export default function AudioMixCard({
                   }}
                   onClick={() => {
                     let delayInput: any = document.getElementById(
-                      `desired_delay_${participant.sid}`
+                      `desired_delay_${thisParticipant.sid}`
                     );
                     let _delay: number = parseInt(delayInput.value);
-                    if (isNaN(_delay)) {
-                      setDelay(0);
-                    } else setDelay(_delay);
-
+                    if (!isNaN(_delay)) {
+                      applyDelay(
+                        roomName,
+                        thisParticipant.identity,
+                        _delay.toString()
+                      );
+                    }
                     delayInput.value = null;
                   }}
                 >

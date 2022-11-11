@@ -16,7 +16,11 @@ import {
 } from "../../../../types/stageStates";
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
-import { UpdateStatePayload } from "@thegoodwork/ximi-types";
+import {
+  ParticipantControl,
+  ParticipantPerformer,
+  UpdateStatePayload,
+} from "@thegoodwork/ximi-types";
 import {
   DataPacket_Kind,
   Participant,
@@ -129,61 +133,69 @@ const StyledSidebar = styled("div", {
 
 function StagePanel({
   activePanel,
-  participants,
+  participantsSettings,
   roomName,
+  participants,
 }: {
   activePanel: PanelStates;
-  participants: Participant[];
+  participantsSettings: UpdateStatePayload | any;
   roomName: string;
+  participants: Participant[];
 }) {
-  if (activePanel === "audio") {
-    if (participants.length <= 0) {
-      return (
-        <StyledEmptyState>
-          <div className="icon" aria-hidden="true">
-            <Sad width="32px" height="32px" />
-          </div>
-          <Text>There is no one in this room</Text>
-        </StyledEmptyState>
-      );
+  if (participantsSettings) {
+    if (activePanel === "audio") {
+      if (participantsSettings.length <= 0) {
+        return (
+          <StyledEmptyState>
+            {/* <div className="icon" aria-hidden="true">
+              <Sad width="32px" height="32px" />
+            </div>
+            <Text>There is no one in this room</Text> */}
+            <Text>Loading...</Text>
+          </StyledEmptyState>
+        );
+      } else
+        return (
+          <StyledRoot>
+            <StyledViewport>
+              <StyledAudioPanel>
+                {participantsSettings.map((p: ParticipantPerformer) => {
+                  return (
+                    <AudioMixCard
+                      key={p.sid}
+                      participants={participants}
+                      roomName={roomName}
+                      participantSettings={p}
+                      type={p.type}
+                      audioMixMute={p.audioMixMute}
+                      audioDelay={p.audioOutDelay}
+                    />
+                  );
+                })}
+              </StyledAudioPanel>
+            </StyledViewport>
+            <Scrollbar orientation="vertical" />
+          </StyledRoot>
+        );
     } else
       return (
         <StyledRoot>
           <StyledViewport>
-            <StyledAudioPanel>
-              {participants.map((p: any) => {
-                return (
-                  <AudioMixCard
-                    roomName={roomName}
-                    type={p?.type.toLowerCase() || "performer"}
-                    participant={p}
-                    participants={participants}
-                  />
-                );
-              })}
-            </StyledAudioPanel>
+            {/* <VideoPanel
+              participants={participants}
+              currentParticipant={
+                participants
+                  ? participants.length >= 2
+                    ? participants[1]
+                    : participants[0]
+                  : undefined
+              }
+            /> */}
           </StyledViewport>
           <Scrollbar orientation="vertical" />
         </StyledRoot>
       );
-  } else
-    return (
-      <StyledRoot>
-        <StyledViewport>
-          <VideoPanel
-            participants={participants}
-            currentParticipant={
-              participants
-                ? participants.length >= 2
-                  ? participants[1]
-                  : participants[0]
-                : undefined
-            }
-          />
-        </StyledViewport>
-        <Scrollbar orientation="vertical" />
-      </StyledRoot>
-    );
+  } else return <></>;
 }
 
 function StageSidebar({
@@ -329,7 +341,6 @@ export default function Stage({
 
     participants.forEach((participant) => {
       if (participant) {
-        // console.log(participant.audioTracks);
         if (participant.isLocal) {
           return;
         } else if (participant.metadata) {
@@ -374,7 +385,6 @@ export default function Stage({
               const string = decoder.decode(payload);
               try {
                 const json = JSON.parse(string);
-                // console.log(json);
                 if (json.sid) {
                   setLastUpdatedParticipant(json);
                 } else {
@@ -412,16 +422,18 @@ export default function Stage({
     console.log(error);
   }
 
-  console.log(stage);
-  console.log(lastUpdatedParticipant);
+  // console.log(stage);
+  // console.log(lastUpdatedParticipant);
 
   return (
     <div className="content noscroll">
       <StyledStage>
+        {activePanel === "audio" ? <></> : <></>}
         <StagePanel
           roomName={room?.name || ""}
+          participants={participants}
           activePanel={activePanel}
-          participants={stage?.participants || []}
+          participantsSettings={stage?.participants || []}
         />
         <StageSidebar
           presets={presets}

@@ -1,3 +1,8 @@
+import { useRoom } from "@livekit/react-core";
+import {
+  ParticipantPerformer,
+  UpdateStatePayload,
+} from "@thegoodwork/ximi-types";
 import { Participant } from "livekit-client";
 import React, { MouseEventHandler, useState } from "react";
 import {
@@ -20,8 +25,8 @@ import { styled } from "ui/theme/theme";
 const StyledDiv = styled("div", {
   variants: {
     type: {
-      control: { border: "3px solid $accent" },
-      performer: {
+      CONTROL: { border: "3px solid $accent" },
+      PERFORMER: {
         border: "1px solid $brand",
       },
     },
@@ -190,9 +195,33 @@ const StyledDiv = styled("div", {
       span: {
         lineHeight: 0,
       },
-      path: {
-        stroke: "$text",
-        fill: "$text",
+      ".active": {
+        path: {
+          stroke: "$text",
+          fill: "$text",
+        },
+      },
+      ".inactive": {
+        path: {
+          stroke: "$grey",
+          fill: "$grey",
+        },
+      },
+      ".audio.inactive": {
+        path: {
+          fill: "none",
+          "&:last-child": {
+            fill: "$grey",
+          },
+        },
+      },
+      ".audio.active": {
+        path: {
+          fill: "none",
+          "&:last-child": {
+            fill: "$text",
+          },
+        },
       },
     },
   },
@@ -260,38 +289,65 @@ async function applyAudioSetting(
 }
 
 function ParticipantSubcard({
-  participant,
+  target,
   onClick,
+  participantSettings,
+  participant,
 }: {
-  participant: Participant;
+  target: any;
   onClick?: MouseEventHandler;
+  participantSettings: ParticipantPerformer;
+  participant: Participant;
 }) {
   return (
     <StyledSubcard active={false} onClick={onClick}>
-      {/* {participant.audioTracks.size > 0 ? (
+      {participantSettings.audioMixMute.findIndex(
+        (p: any) => p === target.identity
+      ) < 0 ? (
         <VolumeHighSharp color="inherit" width="14px" />
       ) : (
         <VolumeMuteSharp color="inherit" width="14px" />
-      )} */}
-      <Text size="2xs">{participant.identity}</Text>
+      )}
+      <Text size="2xs">{target.identity}</Text>
     </StyledSubcard>
   );
 }
 
 export default function AudioMixCard({
-  participant,
-  roomName,
+  audioMixMute,
+  audioDelay,
+  participantSettings,
   participants,
-  type = "performer",
+  roomName,
+  type,
 }: {
-  participant: Participant | any;
+  audioMixMute: string[];
+  audioDelay?: number;
   participants: Participant[];
   roomName: string;
-  type?: "performer" | "control";
+  participantSettings: ParticipantPerformer;
+  type: "PERFORMER" | "CONTROL";
 }) {
   const [delay, setDelay] = useState<number>(0);
-  // const part = useParticipant(participant);
-  // console.log(part);
+
+  const thisParticipant: any = participants.find(
+    (p) => p.identity === participantSettings.name
+  );
+
+  const performerParticipants = participants.filter((p) => {
+    try {
+      const meta = JSON.parse(p.metadata || "{}");
+      return meta.type === "PERFORMER";
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  });
+
+  const isPublishingAudio =
+    thisParticipant && thisParticipant.audioTracks.size > 0;
+  const isPublishingVideo =
+    thisParticipant && thisParticipant.videoTracks.size > 0;
 
   return (
     <StyledDiv type={type}>
@@ -300,66 +356,73 @@ export default function AudioMixCard({
           <div>
             <div className="identity">
               <PersonCircle color="inherit" width="20px" height="20px" />
-              <Text size="xs">{participant.identity}</Text>
+              <Text size="xs">{thisParticipant?.identity}</Text>
             </div>
             <div className="latency">
               <SwapHorizontal color="inherit" width="20px" height="20px" />
               <Text size="xs">
-                {participant?.signalClient?.pingInterval || 0}
+                {thisParticipant?.signalClient?.pingInterval || 0}
               </Text>
             </div>
           </div>
-          {/* <div className="icons">
-            {participant.audioTracks.size > 0 ? (
-              <MicSharp width="20px" />
-            ) : (
-              <MicOffSharp width="20px" />
-            )}
-            {participant.videoTracks.size > 0 ? (
-              <VideocamSharp width="20px" />
-            ) : (
-              <VideocamOffSharp width="20px" />
-            )}
-          </div> */}
+          <div className="icons">
+            <div
+              className={isPublishingAudio ? "audio active" : "audio inactive"}
+            >
+              <MicSharp width="20px" color={"inherit"} />
+            </div>
+            <div
+              className={isPublishingVideo ? "video active" : "video inactive"}
+            >
+              <VideocamSharp width="20px" color="inherit" />
+            </div>
+          </div>
         </div>
         <div className="body">
-          {participants
-            .filter((p: any) => p.type === "PERFORMER")
+          {performerParticipants
+            .filter((p) => p.identity !== thisParticipant?.identity)
             .map((p) => {
               return (
                 <ParticipantSubcard
                   onClick={() => {
-                    //if state of target for this participant is unmuted
-                    applyAudioSetting(
-                      "MUTE_AUDIO",
-                      roomName,
-                      participant.identity,
-                      p.identity
-                    )
-                      .then((e) => {
-                        // console.log(participant);
-                      })
-                      .catch((err) => {
-                        console.log(err);
-                      });
-
-                    //else if state of target for this participant is muted
-                    // applyAudioSetting("UNMUTE_AUDIO", roomName, participant.identity, p.identity)
-                    // .then((e) => {
-                    //   // console.log(participant);
-                    // })
-                    // .catch((err) => {
-                    //   console.log(err);
-                    // });
+                    if (audioMixMute.findIndex((_p) => _p === p.identity) < 0) {
+                      applyAudioSetting(
+                        "MUTE_AUDIO",
+                        roomName,
+                        participantSettings.name,
+                        p.identity
+                      )
+                        .then((e) => {
+                          // console.log(participant);
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                        });
+                    } else {
+                      applyAudioSetting(
+                        "UNMUTE_AUDIO",
+                        roomName,
+                        participantSettings.name,
+                        p.identity
+                      )
+                        .then((e) => {
+                          // console.log(participant);
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                        });
+                    }
                   }}
                   key={p.identity}
-                  participant={p}
+                  participantSettings={participantSettings}
+                  participant={thisParticipant}
+                  target={p}
                 />
               );
             })}
         </div>
       </div>
-      {participant.type === "PERFORMER" && (
+      {participantSettings.type === "PERFORMER" && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
@@ -370,7 +433,7 @@ export default function AudioMixCard({
               <Button
                 onClick={() => {
                   let input = document.querySelector(
-                    `#${`stream_url_${participant.sid}`}`
+                    `#${`stream_url_${participantSettings.sid}`}`
                   );
                   // input?.select();
                   // document.execCommand("copy");
@@ -421,7 +484,7 @@ export default function AudioMixCard({
               <input
                 type="text"
                 className="hidden"
-                id={`stream_url_${participant.sid}`}
+                id={`stream_url_${participantSettings.sid}`}
                 // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}`}
                 readOnly
               />
@@ -429,7 +492,7 @@ export default function AudioMixCard({
               <input
                 type="text"
                 className="hidden"
-                id={`stream_url_a_${participant.sid}`}
+                id={`stream_url_a_${participantSettings.sid}`}
                 // value={`${process.env.REACT_APP_VIEWER_BASE_URL}?room=${context.room.name}&passcode=${context.passcode}&target=${nickname}&audio=1`}
                 readOnly
               />
@@ -445,7 +508,7 @@ export default function AudioMixCard({
               <div className="delay-display">{delay}</div>
               <div className="input-group">
                 <Input
-                  id={`desired_delay_${participant.sid}`}
+                  id={`desired_delay_${participantSettings.sid}`}
                   type="text"
                   css={{
                     fontSize: "$sm",
@@ -473,7 +536,7 @@ export default function AudioMixCard({
                   }}
                   onClick={() => {
                     let delayInput: any = document.getElementById(
-                      `desired_delay_${participant.sid}`
+                      `desired_delay_${participantSettings.sid}`
                     );
                     let _delay: number = parseInt(delayInput.value);
                     if (isNaN(_delay)) {

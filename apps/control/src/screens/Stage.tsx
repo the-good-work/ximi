@@ -16,11 +16,11 @@ import {
 } from "../../../../types/stageStates";
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
+
 import {
-  ParticipantControl,
-  ParticipantPerformer,
-  UpdateStatePayload,
-} from "@thegoodwork/ximi-types";
+  RoomUpdatePayload,
+  ServerUpdate,
+} from "@thegoodwork/ximi-types/src/room";
 import {
   DataPacket_Kind,
   Participant,
@@ -33,7 +33,6 @@ import Text from "ui/Texts/Text";
 import {
   ChatboxSharp,
   ExitSharp,
-  Sad,
   VideocamSharp,
   VolumeHighSharp,
 } from "react-ionicons";
@@ -138,7 +137,7 @@ function StagePanel({
   participants,
 }: {
   activePanel: PanelStates;
-  participantsSettings: UpdateStatePayload | any;
+  participantsSettings: RoomUpdatePayload["update"]["participants"];
   roomName: string;
   participants: Participant[];
 }) {
@@ -161,9 +160,12 @@ function StagePanel({
               <StyledAudioPanel>
                 {participants.map((p: Participant) => {
                   const participantSettings = participantsSettings.find(
-                    (_p: ParticipantPerformer | ParticipantControl) =>
-                      _p.name === p.identity
+                    (_p) => _p.name === p.identity
                   );
+
+                  if (participantSettings?.type === "OUTPUT") {
+                    return false;
+                  }
 
                   const meta = JSON.parse(p.metadata || "{}");
 
@@ -175,7 +177,11 @@ function StagePanel({
                       roomName={roomName}
                       type={meta.type}
                       audioMixMute={participantSettings?.audioMixMute || []}
-                      audioDelay={participantSettings?.audioOutDelay || 0}
+                      audioDelay={
+                        participantSettings?.type === "PERFORMER"
+                          ? participantSettings?.audioOutDelay
+                          : 0
+                      }
                     />
                   );
                 })}
@@ -308,12 +314,9 @@ export default function Stage({
   state: RoomStateStage;
   setControllerName: Dispatch<SetStateAction<string>>;
 }) {
-  const [stageSettings, setStageSettings] = useState<
-    undefined | UpdateStatePayload | any
-  >(undefined);
-  const [lastUpdatedParticipant, setLastUpdatedParticipant] = useState<
-    undefined | UpdateStatePayload | any
-  >(undefined);
+  const [stageSettings, setStageSettings] =
+    useState<(ServerUpdate & { type: "room-update" })["update"]>();
+
   const initialState = Array.apply(null, Array(12)).map((_a, i) => {
     return {
       name: `SLOT${i < 9 ? `0${i + 1}` : i + 1}`,
@@ -391,12 +394,10 @@ export default function Stage({
             ) => {
               const string = decoder.decode(payload);
               try {
-                const json = JSON.parse(string);
-                if (json.sid) {
-                  setLastUpdatedParticipant(json);
-                } else {
-                  console.log(json);
-                  setStageSettings(() => json);
+                const json = JSON.parse(string) as ServerUpdate;
+
+                if (json.type === "room-update") {
+                  setStageSettings(() => json.update);
                 }
               } catch (err) {
                 console.log(err);

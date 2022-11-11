@@ -392,42 +392,48 @@ export default function AudioMixCard({
           {performerParticipants
             .filter((p) => p.identity !== thisParticipant?.identity)
             .map((p) => {
-              return (
-                <ParticipantSubcard
-                  onClick={() => {
-                    if (audioMixMute.findIndex((_p) => _p === p.identity) < 0) {
-                      applyAudioSetting(
-                        "MUTE_AUDIO",
-                        roomName,
-                        thisParticipant.identity,
-                        p.identity
-                      )
-                        .then(() => {})
-                        .catch((err) => {
-                          console.log(err);
-                        });
-                    } else {
-                      applyAudioSetting(
-                        "UNMUTE_AUDIO",
-                        roomName,
-                        thisParticipant.identity,
-                        p.identity
-                      )
-                        .then(() => {})
-                        .catch((err) => {
-                          console.log(err);
-                        });
+              if (p.audioTracks.size > 0) {
+                return (
+                  <ParticipantSubcard
+                    onClick={() => {
+                      if (
+                        audioMixMute.findIndex((_p) => _p === p.identity) < 0
+                      ) {
+                        applyAudioSetting(
+                          "MUTE_AUDIO",
+                          roomName,
+                          thisParticipant.identity,
+                          p.identity
+                        )
+                          .then(() => {})
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      } else {
+                        applyAudioSetting(
+                          "UNMUTE_AUDIO",
+                          roomName,
+                          thisParticipant.identity,
+                          p.identity
+                        )
+                          .then(() => {})
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      }
+                    }}
+                    key={`${p.identity}_${
+                      audioMixMute.findIndex((_p) => _p === p.identity) < 0
+                        ? "mute"
+                        : "unmute"
+                    }`}
+                    muted={
+                      audioMixMute.findIndex((_p) => _p === p.identity) > -1
                     }
-                  }}
-                  key={`${p.identity}_${
-                    audioMixMute.findIndex((_p) => _p === p.identity) < 0
-                      ? "mute"
-                      : "unmute"
-                  }`}
-                  muted={audioMixMute.findIndex((_p) => _p === p.identity) > -1}
-                  target={p}
-                />
-              );
+                    target={p}
+                  />
+                );
+              }
             })}
         </div>
       </div>

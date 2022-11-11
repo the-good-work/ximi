@@ -1,11 +1,5 @@
-import { useParticipant } from "@livekit/react-core";
 import { Participant } from "livekit-client";
-import React, {
-  KeyboardEvent,
-  KeyboardEventHandler,
-  MouseEventHandler,
-  useState,
-} from "react";
+import React, { MouseEventHandler, useState } from "react";
 import {
   HourglassOutline,
   LinkOutline,

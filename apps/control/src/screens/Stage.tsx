@@ -5,7 +5,6 @@ import React, {
   useReducer,
   SetStateAction,
 } from "react";
-import StageSidebar from "../components/StageSidebar";
 import {
   RoomStateStage,
   UpdateStateActions,
@@ -27,8 +26,17 @@ import {
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
 import AudioMixCard from "../components/AudioMixCard";
 import Text from "ui/Texts/Text";
-import { Sad } from "react-ionicons";
+import {
+  ChatboxSharp,
+  ExitSharp,
+  Sad,
+  VideocamSharp,
+  VolumeHighSharp,
+} from "react-ionicons";
 import VideoPanel from "../components/VideoPanel";
+import PanelButton from "../components/PanelButton";
+import Button from "ui/Buttons/Button";
+import Presets from "../components/Presets";
 
 const decoder = new TextDecoder();
 
@@ -79,6 +87,44 @@ const StyledViewport = styled(Viewport, {
   width: "100%",
   paddingRight: "$lg",
   boxSizing: "border-box",
+});
+
+const StyledSidebar = styled("div", {
+  display: "flex",
+  width: "250px",
+  flexDirection: "column",
+  boxSizing: "border-box",
+  alignItems: "start",
+  justifyContent: "start",
+  height: "100%",
+  color: "$text",
+
+  ".topSpacer": {
+    borderLeft: "2px solid $brand",
+    boxSizing: "border-box",
+    padding: "0",
+  },
+
+  ".controls": {
+    borderLeft: "2px solid $brand",
+    height: "100%",
+    width: "100%",
+    padding: "$sm",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    boxSizing: "border-box",
+    gap: "$sm",
+
+    "> div": {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "$sm",
+    },
+  },
 });
 
 function StagePanel({
@@ -134,6 +180,94 @@ function StagePanel({
         <Scrollbar orientation="vertical" />
       </StyledRoot>
     );
+}
+
+function StageSidebar({
+  activePanel,
+  setActivePanel,
+  updateState,
+  presets,
+  setPresets,
+}: {
+  activePanel: PanelStates;
+  setActivePanel: Dispatch<SetStateAction<PanelStates>>;
+  updateState: Dispatch<UpdateStateActions>;
+  presets: any[];
+  setPresets: Dispatch<PresetAction>;
+}) {
+  return (
+    <StyledSidebar>
+      <div className="topSpacer" />
+      <PanelButton
+        onClick={() => {
+          setActivePanel("audio");
+        }}
+        active={activePanel === "audio"}
+        icon={<VolumeHighSharp />}
+        css={{
+          ".icon": {
+            span: {
+              svg: {
+                color: activePanel === "audio" ? "$accent" : "$text",
+              },
+              "path:not(:last-child)": {
+                fill: "none",
+              },
+            },
+          },
+        }}
+      >
+        Audio
+      </PanelButton>
+      <PanelButton
+        onClick={() => {
+          setActivePanel("video");
+        }}
+        active={activePanel === "video"}
+        icon={<VideocamSharp />}
+      >
+        Video
+      </PanelButton>
+      <div className="controls">
+        <div>
+          <Button
+            size="sm"
+            icon={<ChatboxSharp />}
+            css={{
+              alignItems: "center",
+              justifyContent: "center",
+              textTransform: "uppercase",
+              ".icon": {
+                span: {
+                  path: { fill: "$text" },
+                },
+              },
+            }}
+          >
+            Message
+          </Button>
+          <Presets presets={presets} setPresets={setPresets} />
+        </div>
+        <Button
+          size="sm"
+          css={{
+            alignItems: "center",
+            justifyContent: "center",
+            textTransform: "uppercase",
+          }}
+          icon={<ExitSharp />}
+          type="negative"
+          onClick={() => {
+            updateState({
+              type: "back-to-list",
+            });
+          }}
+        >
+          Exit
+        </Button>
+      </div>
+    </StyledSidebar>
+  );
 }
 
 export default function Stage({

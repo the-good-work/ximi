@@ -38,16 +38,20 @@ const StyledPresets = styled("div", {
 });
 const StyledPresetSingle = styled("div", {
   display: "flex",
-  alignItems: "center",
+  alignItems: "stretch",
   justifyContent: "center",
   flexDirection: "row",
   color: "$text",
   border: "1px solid $text",
   borderRadius: "$xs",
+
   ".name": {
+    display: "block",
+    padding: 0,
     width: "100%",
     textTransform: "uppercase",
-    padding: "$2xs $xs $2xs $2xs",
+
+    // padding: "$2xs $xs $2xs $2xs",
   },
   ".save": {
     borderLeft: "1px solid $text",
@@ -82,7 +86,19 @@ function PresetSingle({
               });
             }
           }}
-          css={{ fontSize: "$2xs", color: preset.saved ? "$accent" : "$text" }}
+          css={{
+            fontSize: "$2xs",
+            borderRadius: "$xs 0 0 $xs",
+            appearance: "none",
+            width: "100%",
+            height: "100%",
+            boxSizing: "border-box",
+            color: preset.saved ? "$accent" : "$text",
+            border: "none",
+            outline: "none",
+            position: "relative",
+            display: "block",
+          }}
         />
       </div>
       <div className="save">

@@ -14,7 +14,7 @@ export const { styled, css } = createStitches({
       disabled: "#99999F",
       background: "#111113",
       videoBackgroundGradient:
-        "linear-gradient(160.68deg, rgba(82, 55, 243, 0.28) 2.04%, rgba(0, 0, 0, 0) 87.02%), #111113",
+        "linear-gradient(160.68deg, rgba(82, 55, 243, 0.28) 2.04%, rgba(0, 0, 0, 0) 87.02%), rgba(0,0,2,.4)",
       backgroundGradient:
         "linear-gradient(163.02deg, #111113 58.37%, rgba(82, 55, 243, 0.17) 97.01%)",
       headingGradient:

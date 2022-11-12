@@ -4,6 +4,7 @@ import {
   RemoteTrackPublication,
   Room,
   Track,
+  VideoQuality,
 } from "livekit-client";
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import { styled } from "@stitches/react";
@@ -105,6 +106,9 @@ const VideoSlot = ({
         if (!participant.isLocal && !videoTrack.isSubscribed) {
           console.log(`subscribing ${videoTrack.trackSid}`);
           (videoTrack as RemoteTrackPublication).setSubscribed(true);
+          (videoTrack as RemoteTrackPublication).setVideoQuality(
+            VideoQuality.MEDIUM
+          );
         }
         if (!participant.isLocal && !videoTrack.isEnabled) {
           console.log(`enabling ${videoTrack.trackSid}`);
@@ -116,6 +120,13 @@ const VideoSlot = ({
         }
       }
     }
+    return () => {
+      console.log("disable");
+      if (!participant.isLocal && videoTrack) {
+        (videoTrack as RemoteTrackPublication).setSubscribed(false);
+        (videoTrack as RemoteTrackPublication).setEnabled(false);
+      }
+    };
   }, [
     videoTrackSid,
     participant.isLocal,
@@ -191,6 +202,7 @@ const VideoContainer = styled("div", {
     width: "100%",
     height: "100%",
     objectFit: "cover",
+    background: "$videoBackgroundGradient",
     zIndex: 1,
   },
 

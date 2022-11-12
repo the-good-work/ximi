@@ -78,6 +78,10 @@ const StyledContainer = styled("main", {
     width: "calc(100% + 30px)",
   },
 
+  ".content.nopadding": {
+    padding: 0,
+  },
+
   ".noscroll": {
     justifyContent: "center",
     overflow: "hidden",

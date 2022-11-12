@@ -24,10 +24,13 @@ export default function Stage({
   state: RoomStateStage;
 }) {
   const { connect, room, error, participants } = useRoom();
+  const [trayOpen, setTrayOpen] = useState<boolean>(false);
+  const [showDebug, setShowDebug] = useState<boolean>(false);
 
   const [audioMixMute, setAudioMixMute] = useState<
     PerformerUpdatePayload["update"]["audioMixMute"]
   >([]);
+
   const [video, setVideo] = useState<PerformerUpdatePayload["update"]["video"]>(
     { layout: "Default", slots: [] }
   );
@@ -65,7 +68,9 @@ export default function Stage({
   }, [participants, state]);
 
   useEffect(() => {
-    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token)
+    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token, {
+      autoSubscribe: false,
+    })
       .then((room) => {
         if (room) {
           room.on(
@@ -106,9 +111,23 @@ export default function Stage({
 
   return (
     <div className="content noscroll nopadding">
-      <VideoLayout room={room} participants={participants} videoState={video} />
+      <VideoLayout
+        room={room}
+        participants={participants}
+        videoState={video}
+        showDebug={showDebug}
+      />
 
-      <ControlTray state={state} room={room} updateState={updateState} />
+      <ControlTray
+        state={state}
+        room={room}
+        updateState={updateState}
+        audioMixMute={audioMixMute}
+        open={trayOpen}
+        setOpen={setTrayOpen}
+        showDebug={showDebug}
+        setShowDebug={setShowDebug}
+      />
     </div>
   );
 }

@@ -175,7 +175,12 @@ export default function Container({
                     document.exitFullscreen();
                   }
                 }}
-                css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+                css={{
+                  position: "fixed",
+                  bottom: "$sm",
+                  right: "$sm",
+                  zIndex: 30,
+                }}
                 iconSize="md"
                 variant="outline"
                 aria-label={`Toggle fullscreen. Fullscreen mode is currently ${

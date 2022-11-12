@@ -17,21 +17,35 @@ import {
 import {
   createLocalAudioTrack,
   createLocalVideoTrack,
+  Participant,
   Room,
   Track,
   VideoPresets,
 } from "livekit-client";
+import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 
 export default function ControlTray({
   room,
+  open,
+  setOpen,
   state,
   updateState,
+  audioMixMute,
+  showDebug,
+  setShowDebug,
 }: {
   room?: Room;
   state: RoomStateStage;
+
+  open: boolean;
+  setOpen: Dispatch<boolean>;
+
+  audioMixMute: PerformerUpdatePayload["update"]["audioMixMute"];
   updateState: Dispatch<UpdateStateActions>;
+
+  showDebug: boolean;
+  setShowDebug: Dispatch<boolean>;
 }) {
-  const [open, setOpen] = useState<boolean>(false);
   const [muted, setMuted] = useState<boolean>(false);
 
   const localParticipant = room && room.localParticipant;
@@ -145,7 +159,8 @@ export default function ControlTray({
         />
         <ToggleIconButton size={open ? "lg" : "md"} icon={<Chatbox />} />
         <ToggleIconButton
-          active={true}
+          active={showDebug}
+          onClick={() => setShowDebug(!showDebug)}
           size={open ? "lg" : "md"}
           icon={<Bug />}
         />
@@ -167,6 +182,23 @@ export default function ControlTray({
           }}
         />
       </ButtonTray>
+      <AudioStateBar open={open}>
+        <VolumeHigh color="white" width={"16px"} height={"14px"} />
+        {room?.participants &&
+          Array.from(room.participants.values())
+            .filter(onlyPerformers)
+            .map((p) => {
+              const isMuted = audioMixMute.indexOf(p.identity) > -1;
+              return (
+                <span
+                  style={{ textDecoration: isMuted ? "line-through" : "none" }}
+                  key={`${p.identity}${isMuted ? "_muted" : ""}`}
+                >
+                  {p.identity}
+                </span>
+              );
+            })}
+      </AudioStateBar>
       {open && (
         <ModalOverlay
           onClick={() => {
@@ -210,7 +242,7 @@ const ButtonTray = styled("div", {
   variants: {
     open: {
       open: {
-        bottom: "$md",
+        bottom: "$3xl",
       },
       closed: {
         bottom: "$sm",
@@ -228,3 +260,40 @@ const ModalOverlay = styled("div", {
   zIndex: 4000,
   background: "transparent",
 });
+
+const AudioStateBar = styled("div", {
+  position: "fixed",
+  display: "flex",
+  maxWidth: "80%",
+  alignItems: "center",
+  gap: "$xs",
+  left: "50%",
+  transform: "translateX(-50%)",
+  color: "$text",
+  fontSize: "$xs",
+
+  "> span": {
+    display: "flex",
+    alignItems: "center",
+  },
+
+  variants: {
+    open: {
+      true: {
+        bottom: "$md",
+      },
+      false: {
+        bottom: "-200px",
+      },
+    },
+  },
+});
+
+const onlyPerformers = (p: Participant) => {
+  try {
+    const meta = JSON.parse(p.metadata || "");
+    return meta?.type === "PERFORMER";
+  } catch (err) {
+    return false;
+  }
+};

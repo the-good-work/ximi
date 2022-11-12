@@ -1,16 +1,17 @@
-import React, { Dispatch, useEffect } from "react";
-import IconButton from "ui/Buttons/IconButton";
-import ToggleIconButton from "ui/Buttons/ToggleIconButton";
+import React, { Dispatch, useEffect, useState } from "react";
 import Heading from "ui/Texts/Heading";
-import { ReturnDownBack } from "react-ionicons";
 import {
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/performerStates";
-import { UpdateStatePayload } from "@thegoodwork/ximi-types";
+import {
+  PerformerUpdatePayload,
+  ServerUpdate,
+} from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
 import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
+import VideoLayout from "../components/VideoLayout";
 
 // const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -23,6 +24,16 @@ export default function Stage({
   state: RoomStateStage;
 }) {
   const { connect, room, error, participants } = useRoom();
+  const [trayOpen, setTrayOpen] = useState<boolean>(false);
+  const [showDebug, setShowDebug] = useState<boolean>(false);
+
+  const [audioMixMute, setAudioMixMute] = useState<
+    PerformerUpdatePayload["update"]["audioMixMute"]
+  >([]);
+
+  const [video, setVideo] = useState<PerformerUpdatePayload["update"]["video"]>(
+    { layout: "Default", slots: [] }
+  );
 
   // every time audioMixMute changes (from Zahid's send data)
   /*
@@ -57,9 +68,10 @@ export default function Stage({
   }, [participants, state]);
 
   useEffect(() => {
-    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token)
+    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token, {
+      autoSubscribe: false,
+    })
       .then((room) => {
-        console.log("connected");
         if (room) {
           room.on(
             RoomEvent.DataReceived,
@@ -69,30 +81,17 @@ export default function Stage({
               kind?: DataPacket_Kind
             ) => {
               const string = decoder.decode(payload);
+
               try {
-                const json: UpdateStatePayload = JSON.parse(
-                  string
-                ) as UpdateStatePayload;
+                const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
-                /*
-                json.participants.map((p) => p.id);
-
-                updateState({
-                  type: "update-from-server",
-                  payload: room,
-                });
-								*/
+                if (update.type === "performer-update") {
+                  setAudioMixMute(update.update.audioMixMute);
+                  setVideo(update.update.video);
+                }
               } catch (err) {
                 console.log(err);
-                return;
               }
-
-              /*
-               * const obj = JSON.parse(strData);
-               * if (obj.type === "___") {
-               * ___
-               * }
-               */
             }
           );
         }
@@ -111,20 +110,24 @@ export default function Stage({
   }
 
   return (
-    <div className="content noscroll">
-      <Heading
-        color="gradient"
-        css={{
-          textAlign: "center",
-          textTransform: "uppercase",
-          marginTop: "$sm",
-          marginBottom: "$sm",
-        }}
-      >
-        Stage
-      </Heading>
+    <div className="content noscroll nopadding">
+      <VideoLayout
+        room={room}
+        participants={participants}
+        videoState={video}
+        showDebug={showDebug}
+      />
 
-      <ControlTray state={state} room={room} updateState={updateState} />
+      <ControlTray
+        state={state}
+        room={room}
+        updateState={updateState}
+        audioMixMute={audioMixMute}
+        open={trayOpen}
+        setOpen={setTrayOpen}
+        showDebug={showDebug}
+        setShowDebug={setShowDebug}
+      />
     </div>
   );
 }

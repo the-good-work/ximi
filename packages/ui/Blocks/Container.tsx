@@ -78,6 +78,10 @@ const StyledContainer = styled("main", {
     width: "calc(100% + 30px)",
   },
 
+  ".content.nopadding": {
+    padding: 0,
+  },
+
   ".noscroll": {
     justifyContent: "center",
     overflow: "hidden",
@@ -171,7 +175,12 @@ export default function Container({
                     document.exitFullscreen();
                   }
                 }}
-                css={{ position: "fixed", bottom: "$sm", right: "$sm" }}
+                css={{
+                  position: "fixed",
+                  bottom: "$sm",
+                  right: "$sm",
+                  zIndex: 30,
+                }}
                 iconSize="md"
                 variant="outline"
                 aria-label={`Toggle fullscreen. Fullscreen mode is currently ${

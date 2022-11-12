@@ -81,57 +81,6 @@ export default function RoomsList({
     mutate();
   }
 
-  function ListOfRooms({ rooms, ...props }: { rooms: Room[]; props?: any }) {
-    if (isRefreshing) {
-      return (
-        <EmptyState>
-          <Text size="md">Refreshing...</Text>
-        </EmptyState>
-      );
-    } else if (!data || data.length <= 0) {
-      return (
-        <EmptyState css={{ fill: "$text" }}>
-          <Icon size="lg" icon={<SadOutline color="inherit" />} />
-          <Text size="md">There are currently no available rooms</Text>
-        </EmptyState>
-      );
-    } else if (error) {
-      return (
-        <EmptyState css={{ fill: "$text" }}>
-          <Icon size="lg" icon={<SadOutline color="inherit" />} />
-          <Text size="md">An error has occurred. Please try again later.</Text>
-        </EmptyState>
-      );
-    } else {
-      return (
-        <List {...props}>
-          {rooms.length &&
-            rooms.map((r) => {
-              if (r) {
-                return (
-                  <ListButton
-                    onClick={() => {
-                      updateState({
-                        type: "select-room",
-                        properties: { room: r },
-                      });
-                    }}
-                    key={r.room}
-                    as="button"
-                    aria-label={`Room: ${r.room}, participants: ${r.participants}`}
-                    noOfParticipants={r.participants}
-                  >
-                    {r.room}
-                  </ListButton>
-                );
-              }
-              return null;
-            })}
-        </List>
-      );
-    }
-  }
-
   return (
     <div className="content-scroll">
       <div className="scroll">
@@ -159,7 +108,50 @@ export default function RoomsList({
             />
           </div>
         </HeadingBox>
-        <ListOfRooms rooms={rooms} />
+
+        {error ? (
+          <EmptyState css={{ fill: "$text" }}>
+            <Icon size="lg" icon={<SadOutline color="inherit" />} />
+            <Text size="md">
+              An error has occurred. Please try again later.
+            </Text>
+          </EmptyState>
+        ) : isRefreshing ? (
+          <EmptyState>
+            <Text size="md">Refreshing...</Text>
+          </EmptyState>
+        ) : rooms.length < 1 ? (
+          <EmptyState css={{ fill: "$text" }}>
+            <Icon size="lg" icon={<SadOutline color="inherit" />} />
+            <Text size="md">There are currently no available rooms</Text>
+          </EmptyState>
+        ) : (
+          <List>
+            {rooms.length > 0
+              ? rooms.map((r) => {
+                  if (r) {
+                    return (
+                      <ListButton
+                        onClick={() => {
+                          updateState({
+                            type: "select-room",
+                            properties: { room: r },
+                          });
+                        }}
+                        key={r.room}
+                        as="button"
+                        aria-label={`Room: ${r.room}, participants: ${r.participants}`}
+                        noOfParticipants={r.participants}
+                      >
+                        {r.room}
+                      </ListButton>
+                    );
+                  }
+                  return null;
+                })
+              : null}
+          </List>
+        )}
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { useRoom } from "@livekit/react-core";
 import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
 import VideoLayout from "../components/VideoLayout";
+import AudioLayout from "../components/AudioLayout";
 
 // const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -34,38 +35,6 @@ export default function Stage({
   const [video, setVideo] = useState<PerformerUpdatePayload["update"]["video"]>(
     { layout: "Default", slots: [] }
   );
-
-  // every time audioMixMute changes (from Zahid's send data)
-  /*
-  participants.forEach((participant) => {
-    if (participant.isLocal) {
-      return;
-    }
-    try {
-      const metadata = JSON.parse(participant.metadata);
-      if (metadata.type === "PERFORMER") {
-        (participant as RemoteParticipant).audioTracks.forEach(
-          (publication) => {
-            const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
-            if (publication.isSubscribed !== true && shouldSubscribe) {
-							publication.setSubscribed(true);
-						} else if (publication.isSubscribed === true && !shouldSubscribe) {
-							publication.setSubscribed(false);
-						}
-          }
-        );
-      }
-    } catch (err) {
-      return;
-    }
-  });
-	*/
-
-  useEffect(() => {
-    // loop thru participants and subscribe/unsubscribe to audio track accordingly
-    // state will indiciate which are the ones on mute (i.e. to unsub)
-    //
-  }, [participants, state]);
 
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token, {
@@ -107,6 +76,41 @@ export default function Stage({
     };
   }, []);
 
+  useEffect(() => {
+    // TODO: work on audioMixMute next
+    // every time audioMixMute changes (from Zahid's send data)
+
+    participants.forEach((participant) => {
+      if (participant.isLocal) {
+        return;
+      }
+      try {
+        const metadata = JSON.parse(participant.metadata || "");
+        if (metadata.type === "PERFORMER") {
+          (participant as RemoteParticipant).audioTracks.forEach(
+            (publication) => {
+              const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
+              if (!publication.isSubscribed) {
+                publication.setSubscribed(true);
+              } else if (
+                publication.isSubscribed === true &&
+                !shouldSubscribe
+              ) {
+                publication.setSubscribed(false);
+              }
+            }
+          );
+        }
+      } catch (err) {
+        return;
+      }
+    });
+
+    // loop thru participants and subscribe/unsubscribe to audio track accordingly
+    // state will indiciate which are the ones on mute (i.e. to unsub)
+    //
+  }, [participants, state]);
+
   if (error) {
     console.log(error);
   }
@@ -114,11 +118,12 @@ export default function Stage({
   return (
     <div className="content noscroll nopadding">
       <VideoLayout
-        room={room}
         participants={participants}
         videoState={video}
         showDebug={showDebug}
       />
+
+      <AudioLayout participants={participants} audioMixMute={audioMixMute} />
 
       <ControlTray
         state={state}

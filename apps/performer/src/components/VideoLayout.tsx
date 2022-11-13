@@ -2,7 +2,6 @@ import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import {
   Participant,
   RemoteTrackPublication,
-  Room,
   Track,
   VideoQuality,
 } from "livekit-client";
@@ -20,12 +19,10 @@ const onlyPerformers = (p: Participant) => {
 };
 
 export default function VideoLayout({
-  room,
   showDebug,
   participants,
   videoState,
 }: {
-  room?: Room;
   participants: Participant[];
   showDebug: boolean;
   videoState: PerformerUpdatePayload["update"]["video"];

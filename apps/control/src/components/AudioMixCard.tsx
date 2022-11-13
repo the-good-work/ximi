@@ -9,6 +9,8 @@ import {
   VideocamSharp,
   VolumeHighSharp,
   VolumeMuteSharp,
+  GitCommitOutline,
+  ArrowForward,
 } from "react-ionicons";
 import Button from "ui/Buttons/Button";
 import Input from "ui/Form/Input";
@@ -117,14 +119,17 @@ const StyledDiv = styled("div", {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0 $sm",
-          minWidth: "50px",
-          background: "$text",
-          color: "$background",
-          fontWeight: "$bold",
+          gap: "$2xs",
+          padding: "0 $2xs",
+          width: "40%",
+          color: "$text",
+          fontWeight: "$normal",
+          fontSize: "$2xs",
+          border: "1px solid $brand",
         },
 
         ".input-group": {
+          width: "100%",
           display: "flex",
           gap: 0,
           flexDirection: "row",
@@ -224,7 +229,6 @@ const StyledSubcard = styled("button", {
   appearance: "none",
   outline: "none",
   // background: "$background",
-  border: "1px solid $accent",
   borderRadius: "$xs",
   padding: "$xs $sm",
   display: "flex",
@@ -232,7 +236,12 @@ const StyledSubcard = styled("button", {
   gap: "$xs",
   alignItems: "center",
   justifyContent: "start",
+  path: {
+    stroke: "$text",
+  },
   span: {
+    color: "$text",
+    fontWeight: "$semibold",
     lineHeight: 0,
   },
   "&:hover": {
@@ -242,18 +251,12 @@ const StyledSubcard = styled("button", {
   variants: {
     active: {
       true: {
-        background: "red",
-        path: {
-          stroke: "$accent",
-          fill: "$accent",
-        },
+        background: "$negative",
+        border: "1px solid $text",
       },
       false: {
-        background: "$background",
-        path: {
-          stroke: "$text",
-          fill: "$text",
-        },
+        background: "$backgroundGradient",
+        border: "1px solid $text",
       },
     },
   },
@@ -318,9 +321,9 @@ function ParticipantSubcard({
   return (
     <StyledSubcard active={muted} onClick={onClick}>
       {muted ? (
-        <VolumeMuteSharp color="inherit" width="14px" />
+        <VolumeMuteSharp color="#fff" width="18px" />
       ) : (
-        <VolumeHighSharp color="inherit" width="14px" />
+        <VolumeHighSharp color="#fff" width="18px" />
       )}
       <Text size="2xs">{target.identity}</Text>
     </StyledSubcard>
@@ -518,34 +521,45 @@ export default function AudioMixCard({
               <Text size="2xs">Output Audio Delay</Text>
             </div>
             <div className="inputs">
-              <div className="delay-display">{audioDelay}</div>
               <div className="input-group">
                 <Input
                   id={`desired_delay_${thisParticipant.sid}`}
                   type="text"
                   css={{
-                    fontSize: "$sm",
+                    fontSize: "$xs",
                     border: "1px solid $text",
-                    backgroundColor: "$grey",
+                    backgroundColor: "$videoBackgroundGradient",
                     color: "$text",
                     borderRadius: 0,
-                    "&:hover": {
-                      color: "$background",
-                      backgroundColor: "$text",
-                    },
                   }}
-                  maxLength="4"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      let delayInput: any = document.getElementById(
+                        `desired_delay_${thisParticipant.sid}`
+                      );
+                      let _delay: number = parseInt(delayInput.value);
+                      if (!isNaN(_delay)) {
+                        applyDelay(
+                          roomName,
+                          thisParticipant.identity,
+                          _delay.toString()
+                        );
+                      }
+                      delayInput.value = null;
+                    }
+                  }}
                 />
                 <Button
                   size="sm"
                   css={{
-                    maxWidth: "60px",
+                    display: "flex",
                     padding: "0",
                     alignItems: "center",
                     justifyContent: "center",
                     textTransform: "uppercase",
                     border: "1px solid $text",
                     borderRadius: 0,
+                    width: "60px",
                   }}
                   onClick={() => {
                     let delayInput: any = document.getElementById(
@@ -562,8 +576,16 @@ export default function AudioMixCard({
                     delayInput.value = null;
                   }}
                 >
-                  Set
+                  <ArrowForward color="white" style={{ display: "block" }} />
                 </Button>
+                <div className="delay-display">
+                  <GitCommitOutline
+                    style={{ display: "block" }}
+                    width={10}
+                    color={"white"}
+                  />{" "}
+                  {audioDelay}ms
+                </div>
               </div>
             </div>
           </div>

@@ -342,8 +342,6 @@ export default function AudioMixCard({
   roomName: string;
   type: "PERFORMER" | "CONTROL";
 }) {
-  const [delay, setDelay] = useState<number>(0);
-
   const performerParticipants = participants.filter((p) => {
     try {
       const meta = JSON.parse(p.metadata || "{}");

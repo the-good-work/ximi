@@ -183,15 +183,19 @@ export default function ControlTray({
         />
       </ButtonTray>
       <AudioStateBar open={open}>
-        <VolumeHigh color="white" width={"16px"} height={"14px"} />
+        {<VolumeHigh color="white" width={"16px"} height={"14px"} />}
         {room?.participants &&
           Array.from(room.participants.values())
             .filter(onlyPerformers)
+            .filter((performer) => performer.audioTracks.size > 0)
             .map((p) => {
               const isMuted = audioMixMute.indexOf(p.identity) > -1;
               return (
                 <span
-                  style={{ textDecoration: isMuted ? "line-through" : "none" }}
+                  style={{
+                    textDecoration: isMuted ? "line-through" : "none",
+                    color: isMuted ? "rgba(255,255,255,.3)" : "#fff",
+                  }}
                   key={`${p.identity}${isMuted ? "_muted" : ""}`}
                 >
                   {p.identity}
@@ -271,6 +275,9 @@ const AudioStateBar = styled("div", {
   transform: "translateX(-50%)",
   color: "$text",
   fontSize: "$xs",
+  zIndex: 20,
+  background: "rgba(0,0,0,.5)",
+  padding: "$2xs $xs",
 
   "> span": {
     display: "flex",

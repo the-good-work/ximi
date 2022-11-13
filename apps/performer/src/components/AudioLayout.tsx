@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import {
   Participant,
@@ -26,28 +26,62 @@ export default function AudioLayout({
     .filter(onlyPerformers)
     .filter((p) => !p.isLocal) as RemoteParticipant[];
 
-  const [activeTracks, setActiveTracks] = useState<RemoteTrackPublication[]>(
-    []
+  return (
+    <>
+      {performers.map((p) => (
+        <AudioTrack
+          key={p.identity}
+          performer={p}
+          muted={audioMixMute.indexOf(p.identity) > -1}
+        />
+      ))}
+    </>
   );
+}
+
+const AudioTrack = ({
+  performer,
+  muted,
+}: {
+  performer: RemoteParticipant;
+  muted: boolean;
+}) => {
+  const audioElem = useRef<HTMLAudioElement>();
+
+  //currently only supports one audio track per performer
+  const audioTrackPublication = Array.from(performer.audioTracks.values())?.[0];
+  const audioTrack = audioTrackPublication?.track;
 
   useEffect(() => {
-    const _activeTracks: RemoteTrackPublication[] = [];
-    performers.forEach((performer) => {
-      const audioTracks = Array.from(performer.audioTracks.values());
-      if (audioMixMute.indexOf(performer.identity) > -1) {
-        audioTracks.forEach((track) => {
-          track.setSubscribed(false);
-          track.setEnabled(false);
-        });
-      } else {
-        audioTracks.forEach((track) => {
-          track.setSubscribed(true);
-          track.setEnabled(true);
-          _activeTracks.push(track);
-        });
-      }
-    });
-    setActiveTracks(_activeTracks);
-  }, [performers, audioMixMute]);
-  return <></>;
-}
+    if (!audioTrack) {
+      return;
+    }
+
+    if (!audioElem.current) {
+      return;
+    }
+
+    if (!audioTrackPublication.isSubscribed) {
+      audioTrackPublication.setSubscribed(true);
+    }
+
+    audioTrack.attach(audioElem.current);
+
+    audioTrackPublication.setEnabled(!muted);
+  }, [
+    muted,
+    performer,
+    audioTrackPublication,
+    audioTrackPublication?.isSubscribed,
+    audioTrack,
+  ]);
+
+  return (
+    <div
+      className={`audioTrack`}
+      data-participant-identity={performer.identity}
+    >
+      <audio ref={audioElem as LegacyRef<HTMLAudioElement>} />
+    </div>
+  );
+};

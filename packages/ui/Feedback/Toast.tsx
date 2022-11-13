@@ -48,6 +48,7 @@ const Root = styled(RadixToast.Root, {
   borderRadius: "$xs",
   width: "100%",
   boxSizing: "border-box",
+  zIndex: 5000,
 
   "&[data-state=open]": {
     animation: `${animToastIn} .5s ease-in`,
@@ -112,6 +113,7 @@ const Viewport = styled(RadixToast.Viewport, {
   position: "fixed",
   bottom: "20px",
   transform: "translate(-50%, 0)",
+  zIndex: 5000,
 });
 
 const Description = styled(RadixToast.Description, {

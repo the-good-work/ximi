@@ -14,60 +14,66 @@ import Container from "ui/Blocks/Container";
 import Stage from "./screens/Stage";
 import CreateRoom from "./screens/CreateRoom";
 
-function App() {
-  const initialState: RoomStateInit = {
-    screen: "room-list-screen",
-  };
+const initialState: RoomStateInit = {
+  screen: "room-list-screen",
+};
 
-  const [controllerName, setControllerName] = useState<string>("");
-
-  function reducer(_state: ReducerStates, action: UpdateStateActions) {
-    if (
-      action.type === "back-to-list" &&
-      _state.screen !== "room-list-screen"
-    ) {
-      const __state: RoomStateInit = {
-        screen: "room-list-screen",
-      };
-      return __state;
-    }
-    if (action.type === "create-room" && _state.screen === "room-list-screen") {
-      const __state: RoomStateCreate = {
-        screen: "create-room-screen",
-      };
-      return __state;
-    }
-    if (
-      action.type === "confirm-create-room" &&
-      _state.screen === "create-room-screen"
-    ) {
-      const __state: RoomStateStage = {
-        screen: "stage-screen",
-        room: action.room,
-        token: action.token,
-      };
-      return __state;
-    }
-    if (action.type === "select-room" && _state.screen === "room-list-screen") {
-      const __state: RoomStateJoin = {
-        screen: "join-room-screen",
-        room: action.room,
-      };
-      return __state;
-    }
-    if (
-      action.type === "submit-passcode" &&
-      _state.screen === "join-room-screen"
-    ) {
-      const __state: RoomStateStage = {
-        screen: "stage-screen",
-        room: _state.room,
-        token: action.token,
-      };
-      return __state;
-    } else return initialState;
+function reducer(_state: ReducerStates, action: UpdateStateActions) {
+  if (action.type === "back-to-list" && _state.screen !== "room-list-screen") {
+    const __state: RoomStateInit = {
+      screen: "room-list-screen",
+    };
+    return __state;
   }
+  if (action.type === "create-room" && _state.screen === "room-list-screen") {
+    const __state: RoomStateCreate = {
+      screen: "create-room-screen",
+    };
+    return __state;
+  }
+  if (
+    action.type === "confirm-create-room" &&
+    _state.screen === "create-room-screen"
+  ) {
+    const __state: RoomStateStage = {
+      screen: "stage-screen",
+      room: action.room,
+      token: action.token,
+    };
+    return __state;
+  }
+  if (action.type === "select-room" && _state.screen === "room-list-screen") {
+    const __state: RoomStateJoin = {
+      screen: "join-room-screen",
+      room: action.room,
+    };
+    return __state;
+  }
+  if (
+    action.type === "submit-passcode" &&
+    _state.screen === "join-room-screen"
+  ) {
+    const __state: RoomStateStage = {
+      screen: "stage-screen",
+      room: _state.room,
+      token: action.token,
+    };
+    return __state;
+  } else if (
+    action.type === "set-control-name" &&
+    _state.screen === "stage-screen"
+  ) {
+    if (_state.controlName === action.name) {
+      return _state;
+    }
+    const __state: RoomStateStage = { ..._state, controlName: action.name };
+    return __state;
+  } else {
+    return initialState;
+  }
+}
 
+function App() {
   const [state, updateState] = useReducer(reducer, initialState);
 
   function RenderScreen({ state }: { state: ReducerStates }) {
@@ -78,20 +84,16 @@ function App() {
     } else if (state.screen === "create-room-screen") {
       return <CreateRoom updateState={updateState} />;
     } else if (state.screen === "stage-screen") {
-      return (
-        <Stage
-          state={state}
-          updateState={updateState}
-          setControllerName={setControllerName}
-        />
-      );
+      return <Stage state={state} updateState={updateState} />;
     } else return <></>;
   }
 
   return (
     <div className="App">
       <Container
-        participantName={state.screen === "stage-screen" ? controllerName : "-"}
+        participantName={
+          state.screen === "stage-screen" ? state.controlName : "-"
+        }
         variant="control"
         room={
           state.screen !== "room-list-screen" &&

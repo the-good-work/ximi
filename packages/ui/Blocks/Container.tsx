@@ -79,7 +79,7 @@ const StyledContainer = styled("main", {
   },
 
   ".content.smallpadding": {
-    padding: "$xs",
+    padding: "$md",
   },
 
   ".content.nopadding": {

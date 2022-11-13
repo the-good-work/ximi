@@ -13,6 +13,10 @@ export type Screens =
 
 export type UpdateStateActions =
   | {
+      type: "set-control-name";
+      name: string;
+    }
+  | {
       type: "back-to-list";
     }
   | {
@@ -48,6 +52,7 @@ export type RoomStateStage = {
   screen: "stage-screen";
   room: Room;
   token: string;
+  controlName?: string;
 };
 
 export type ReducerStates =

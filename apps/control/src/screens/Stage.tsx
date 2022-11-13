@@ -311,11 +311,9 @@ function StageSidebar({
 export default function Stage({
   state,
   updateState,
-  setControllerName,
 }: {
   updateState: Dispatch<UpdateStateActions>;
   state: RoomStateStage;
-  setControllerName: Dispatch<SetStateAction<string>>;
 }) {
   const [stageSettings, setStageSettings] =
     useState<(ServerUpdate & { type: "room-update" })["update"]>();
@@ -390,41 +388,37 @@ export default function Stage({
       .then((rm) => {
         console.log("connected");
         if (rm) {
-          setControllerName(rm?.localParticipant.identity || "");
-          rm.on(
-            RoomEvent.DataReceived,
-            (
-              payload: Uint8Array,
-              participant?: RemoteParticipant,
-              kind?: DataPacket_Kind
-            ) => {
-              const string = decoder.decode(payload);
-              try {
-                const json = JSON.parse(string) as ServerUpdate;
+          updateState({
+            type: "set-control-name",
+            name: rm.localParticipant.identity,
+          });
+          rm.on(RoomEvent.DataReceived, (payload: Uint8Array) => {
+            const string = decoder.decode(payload);
+            try {
+              const json = JSON.parse(string) as ServerUpdate;
 
-                if (json.type === "room-update") {
-                  setStageSettings(() => json.update);
-                }
-              } catch (err) {
-                console.log(err);
-                return;
+              if (json.type === "room-update") {
+                setStageSettings(() => json.update);
               }
-
-              /*
-               * const obj = JSON.parse(strData);
-               * if (obj.type === "___") {
-               * ___
-               * }
-               */
+            } catch (err) {
+              console.log(err);
+              return;
             }
-          );
 
-          rm.on(RoomEvent.TrackPublished, (publication, participant) => {
+            /*
+             * const obj = JSON.parse(strData);
+             * if (obj.type === "___") {
+             * ___
+             * }
+             */
+          });
+
+          rm.on(RoomEvent.TrackPublished, (publication) => {
             publication.setSubscribed(true);
             publication.setEnabled(false);
           });
 
-          rm.on(RoomEvent.TrackUnpublished, (publication, participant) => {
+          rm.on(RoomEvent.TrackUnpublished, (publication) => {
             publication.setSubscribed(false);
           });
         }

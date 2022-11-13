@@ -86,8 +86,10 @@ export default function Stage({
                 const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
                 if (update.type === "performer-update") {
-                  setAudioMixMute(update.update.audioMixMute);
-                  setVideo(update.update.video);
+                  if (update.update.name === state.properties.name) {
+                    setAudioMixMute(update.update.audioMixMute);
+                    setVideo(update.update.video);
+                  }
                 }
               } catch (err) {
                 console.log(err);

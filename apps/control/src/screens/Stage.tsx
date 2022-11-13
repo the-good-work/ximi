@@ -25,6 +25,7 @@ import {
   DataPacket_Kind,
   Participant,
   RemoteParticipant,
+  Room,
   RoomEvent,
 } from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
@@ -217,14 +218,15 @@ function StageSidebar({
   updateState,
   presets,
   setPresets,
+  room,
 }: {
   activePanel: PanelStates;
   setActivePanel: Dispatch<SetStateAction<PanelStates>>;
   updateState: Dispatch<UpdateStateActions>;
   presets: any[];
   setPresets: Dispatch<PresetAction>;
+  room?: Room;
 }) {
-  const { room } = useRoom();
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -290,12 +292,13 @@ function StageSidebar({
           onClick={async () => {
             if (room) {
               await room.disconnect();
-              console.log("disconnected");
-            }
 
-            updateState({
-              type: "back-to-list",
-            });
+              window.setTimeout(() => {
+                updateState({
+                  type: "back-to-list",
+                });
+              }, 200);
+            }
           }}
         >
           Exit
@@ -381,8 +384,11 @@ export default function Stage({
   }, [participants, state]);
 
   useEffect(() => {
-    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token)
+    connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token, {
+      autoSubscribe: false,
+    })
       .then((rm) => {
+        console.log("connect attempted");
         if (rm) {
           setControllerName(rm?.localParticipant.identity || "");
           rm.on(
@@ -415,6 +421,7 @@ export default function Stage({
         }
       })
       .catch((err) => {
+        console.log("connect error");
         console.log(err);
       });
   }, []);
@@ -450,6 +457,7 @@ export default function Stage({
           updateState={updateState}
           activePanel={activePanel}
           setActivePanel={setActivePanel}
+          room={room}
         />
       </StyledStage>
     </div>

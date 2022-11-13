@@ -78,6 +78,10 @@ const StyledContainer = styled("main", {
     width: "calc(100% + 30px)",
   },
 
+  ".content.smallpadding": {
+    padding: "$xs",
+  },
+
   ".content.nopadding": {
     padding: 0,
   },

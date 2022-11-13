@@ -195,7 +195,7 @@ function StagePanel({
       return (
         <StyledRoot>
           <StyledViewport>
-            {/* <VideoPanel
+            <VideoPanel
               participants={participants}
               currentParticipant={
                 participants
@@ -204,7 +204,7 @@ function StagePanel({
                     : participants[0]
                   : undefined
               }
-            /> */}
+            />
           </StyledViewport>
           <Scrollbar orientation="vertical" />
         </StyledRoot>
@@ -385,10 +385,10 @@ export default function Stage({
 
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token, {
-      autoSubscribe: false,
+      autoSubscribe: true,
     })
       .then((rm) => {
-        console.log("connect attempted");
+        console.log("connected");
         if (rm) {
           setControllerName(rm?.localParticipant.identity || "");
           rm.on(
@@ -418,6 +418,15 @@ export default function Stage({
                */
             }
           );
+
+          rm.on(RoomEvent.TrackPublished, (publication, participant) => {
+            publication.setSubscribed(true);
+            publication.setEnabled(false);
+          });
+
+          rm.on(RoomEvent.TrackUnpublished, (publication, participant) => {
+            publication.setSubscribed(false);
+          });
         }
       })
       .catch((err) => {
@@ -442,7 +451,7 @@ export default function Stage({
   // console.log(lastUpdatedParticipant);
 
   return (
-    <div className="content noscroll">
+    <div className="content noscroll smallpadding">
       <StyledStage>
         {activePanel === "audio" ? <></> : <></>}
         <StagePanel

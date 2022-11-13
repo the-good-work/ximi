@@ -80,6 +80,7 @@ const AudioTrack = ({
     <div
       className={`audioTrack`}
       data-participant-identity={performer.identity}
+      data-muted={muted}
     >
       <audio ref={audioElem as LegacyRef<HTMLAudioElement>} />
     </div>

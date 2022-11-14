@@ -152,33 +152,51 @@ function StagePanel({
           <StyledRoot>
             <StyledViewport>
               <StyledAudioPanel>
-                {participants.map((p: Participant) => {
-                  const participantSettings = participantsSettings.find(
-                    (_p) => _p.name === p.identity
-                  );
+                {participants
 
-                  if (participantSettings?.type === "OUTPUT") {
-                    return false;
-                  }
-
-                  const meta = JSON.parse(p.metadata || "{}");
-
-                  return (
-                    <AudioMixCard
-                      key={p.sid}
-                      thisParticipant={p}
-                      participants={participants}
-                      roomName={roomName}
-                      type={meta.type}
-                      audioMixMute={participantSettings?.audioMixMute || []}
-                      audioDelay={
-                        participantSettings?.type === "PERFORMER"
-                          ? participantSettings?.audioOutDelay
-                          : 0
+                  .sort((a, b) => (a.identity > b.identity ? 1 : -1))
+                  .sort((a, b) => {
+                    try {
+                      const typeA = JSON.parse(a.metadata || "")?.type;
+                      const typeB = JSON.parse(b.metadata || "")?.type;
+                      if (typeA === "PERFORMER" && typeB === "CONTROL") {
+                        return -1;
+                      } else if (typeA === "CONTROL" && typeB === "PERFORMER") {
+                        return 1;
+                      } else {
+                        return 0;
                       }
-                    />
-                  );
-                })}
+                    } catch (_err) {
+                      return 0;
+                    }
+                  })
+                  .map((p: Participant) => {
+                    const participantSettings = participantsSettings.find(
+                      (_p) => _p.name === p.identity
+                    );
+
+                    if (participantSettings?.type === "OUTPUT") {
+                      return false;
+                    }
+
+                    const meta = JSON.parse(p.metadata || "{}");
+
+                    return (
+                      <AudioMixCard
+                        key={p.sid}
+                        thisParticipant={p}
+                        participants={participants}
+                        roomName={roomName}
+                        type={meta.type}
+                        audioMixMute={participantSettings?.audioMixMute || []}
+                        audioDelay={
+                          participantSettings?.type === "PERFORMER"
+                            ? participantSettings?.audioOutDelay
+                            : 0
+                        }
+                      />
+                    );
+                  })}
               </StyledAudioPanel>
             </StyledViewport>
             <Scrollbar orientation="vertical" />

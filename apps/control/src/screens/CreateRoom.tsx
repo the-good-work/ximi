@@ -7,6 +7,7 @@ import {
   CloseCircleOutline,
   ReturnDownForward,
 } from "react-ionicons";
+import { ApiPayload } from "@thegoodwork/ximi-types";
 import { UpdateStateActions } from "../../../../types/controlStates";
 import Text from "ui/Texts/Text";
 import Input from "ui/Form/Input";
@@ -118,35 +119,30 @@ export default function CreateRoom({
   }
 
   async function onCreate() {
-    createRoom()
-      .then((res) => {
-        if (res.status === 200) {
-          res.json().then((r) => {
-            updateState({
-              type: "confirm-create-room",
-              room: {
-                room: room.name,
-                participants: 1,
-              },
-              token: r.data.token,
-            });
-          });
-        } else {
-          toast({
-            title: "Error creating room",
-            description: "Please try again later",
-            tone: "warning",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast({
-          title: "Error creating room",
-          description: "Please try again later",
-          tone: "warning",
-        });
+    try {
+      const createRoomResponse = await createRoom();
+      const json: ApiPayload = await createRoomResponse.json();
+
+      if (json.status !== "success") {
+        throw Error(json.error);
+      }
+
+      updateState({
+        type: "confirm-create-room",
+        room: {
+          room: room.name,
+          participants: 1,
+        },
+        token: json.data.token,
       });
+    } catch (err: any) {
+      console.log({ err });
+      toast({
+        title: "Error creating room",
+        description: err.message || "Please try again later",
+        tone: "warning",
+      });
+    }
   }
 
   const handlePasscode = (key: string) => {

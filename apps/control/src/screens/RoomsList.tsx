@@ -1,5 +1,5 @@
 import { Dispatch } from "react";
-import useSWR from "swr";
+import useSWR, { SWRConfiguration } from "swr";
 import Text from "ui/Texts/Text";
 import IconButton from "ui/Buttons/IconButton";
 import ListButton from "ui/Buttons/ListButton";
@@ -12,9 +12,9 @@ import Heading from "ui/Texts/Heading";
 
 const fetcher = (args: any) => fetch(args).then((res) => res.json());
 
-const options = {
-  revalidateOnFocus: false,
-  revalidateIfStale: false,
+const options: SWRConfiguration = {
+  revalidateOnFocus: true,
+  revalidateIfStale: true,
   shouldRetryOnError: false,
 };
 

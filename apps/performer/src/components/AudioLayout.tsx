@@ -1,10 +1,6 @@
-import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import React, { LegacyRef, useEffect, useRef } from "react";
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
-import {
-  Participant,
-  RemoteParticipant,
-  RemoteTrackPublication,
-} from "livekit-client";
+import { Participant, RemoteParticipant } from "livekit-client";
 
 const onlyPerformers = (p: Participant) => {
   try {

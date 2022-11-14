@@ -7,12 +7,12 @@ import { SyncOutline, SadOutline } from "react-ionicons";
 import { Room, UpdateStateActions } from "../../../../types/performerStates";
 import Text from "ui/Texts/Text";
 import Icon from "ui/Texts/Icon";
-import useSWR from "swr";
+import useSWR, { SWRConfiguration } from "swr";
 
 const fetcher = (args: any) => fetch(args).then((res) => res.json());
-const options = {
-  revalidateOnFocus: false,
-  revalidateIfStale: false,
+const options: SWRConfiguration = {
+  revalidateOnFocus: true,
+  revalidateIfStale: true,
   shouldRetryOnError: false,
 };
 

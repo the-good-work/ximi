@@ -1,5 +1,5 @@
 import { Participant } from "livekit-client";
-import React, { MouseEventHandler, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import {
   HourglassOutline,
   LinkOutline,
@@ -340,7 +340,7 @@ export default function AudioMixCard({
 }: {
   audioMixMute: string[];
   audioDelay?: number;
-  thisParticipant: any;
+  thisParticipant: Participant;
   participants: Participant[];
   roomName: string;
   type: "PERFORMER" | "CONTROL";
@@ -360,6 +360,18 @@ export default function AudioMixCard({
   const isPublishingVideo =
     thisParticipant && thisParticipant.videoTracks.size > 0;
 
+  let isControl = false;
+  try {
+    const meta = thisParticipant && JSON.parse(thisParticipant.metadata || "");
+    isControl = meta.type === "CONTROL";
+  } catch (err) {
+    console.log(err);
+  }
+
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {}, []);
+
   return (
     <StyledDiv type={type}>
       <div>
@@ -369,24 +381,34 @@ export default function AudioMixCard({
               <PersonCircle color="inherit" width="20px" height="20px" />
               <Text size="xs">{thisParticipant?.identity}</Text>
             </div>
-            <div className="latency">
-              <SwapHorizontal color="inherit" width="20px" height="20px" />
-              <Text size="xs">
-                {thisParticipant?.signalClient?.pingInterval || 0}
-              </Text>
-            </div>
+            {!thisParticipant.isLocal && (
+              <div className="latency">
+                <SwapHorizontal color="inherit" width="20px" height="20px" />
+                <Text size="xs">
+                  {/*thisParticipant?.signalClient?.pingInterval || 0*/}
+                </Text>
+              </div>
+            )}
           </div>
           <div className="icons">
-            <div
-              className={isPublishingAudio ? "audio active" : "audio inactive"}
-            >
-              <MicSharp width="20px" color={"inherit"} />
-            </div>
-            <div
-              className={isPublishingVideo ? "video active" : "video inactive"}
-            >
-              <VideocamSharp width="20px" color="inherit" />
-            </div>
+            {!isControl && (
+              <>
+                <div
+                  className={
+                    isPublishingAudio ? "audio active" : "audio inactive"
+                  }
+                >
+                  <MicSharp width="20px" color={"inherit"} />
+                </div>
+                <div
+                  className={
+                    isPublishingVideo ? "video active" : "video inactive"
+                  }
+                >
+                  <VideocamSharp width="20px" color="inherit" />
+                </div>
+              </>
+            )}
           </div>
         </div>
         <div className="body">

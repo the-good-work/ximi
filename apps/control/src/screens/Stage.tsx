@@ -363,7 +363,7 @@ export default function Stage({
 
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token, {
-      autoSubscribe: true,
+      autoSubscribe: false,
     })
       .then((rm) => {
         console.log("connected");

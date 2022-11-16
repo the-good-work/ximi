@@ -122,8 +122,11 @@ const VideoGrid = styled("div", {
   gridTemplateRows: "repeat(12, 1fr)",
   minHeight: "400px",
   width: "100%",
-  height: "calc(100vh - 9.75rem - 157px)",
-  border: "2px solid $brand",
+  height: "calc(100vh - 9.75rem - 113px)",
+  border: "1px solid $brand",
+  padding: "2px",
+  boxSizing: "border-box",
+  gap: "2px",
 });
 
 const ParticipantVideo = styled("div", {
@@ -134,11 +137,20 @@ const ParticipantVideo = styled("div", {
   position: "relative",
   padding: "$md",
   boxSizing: "border-box",
+  border: "1px solid $brand",
 
   select: {
     position: "absolute",
     top: "$xs",
     left: "$xs",
+    background: "$background",
+    appearance: "none",
+    border: "1px solid $brand",
+    borderRadius: "5px",
+    color: "$text",
+    padding: "$2xs",
+    cursor: "pointer",
+    textAlign: "center",
   },
 
   video: {
@@ -257,8 +269,6 @@ export default function VideoPanel({
     RoomUpdatePayload["update"]["participants"]
   > & { type: "PERFORMER" })[];
 }) {
-  const [currentLayout, setCurrentLayout] = useState<string>("Default");
-
   const performers =
     participants && participants?.length > 0
       ? participants.filter((p: Participant) => {
@@ -302,6 +312,15 @@ export default function VideoPanel({
 
   return (
     <StyledVideoPanel>
+      <Text
+        color="accent"
+        css={{
+          fontSize: "$sm",
+          textTransform: "uppercase",
+        }}
+      >
+        {thisParticipantSetting?.name} Video Layout
+      </Text>
       <VideoGrid>
         {thisParticipantSetting &&
           thisParticipantSetting.video.layout === "Default" &&
@@ -448,34 +467,36 @@ export default function VideoPanel({
       </div>
 
       <div className="participants">
-        {performers.map((p: Participant) => {
-          const thisPerformerSettings = (
-            participantsSettings as ParticipantPerformer[]
-          ).find((q) => q.name === p.identity);
-          const currentLayout = thisPerformerSettings?.video.layout;
-          const activeVideoLayout = videoLayouts.find(
-            (l) => l.name === currentLayout
-          );
+        {performers
+          .sort((a, b) => (a.identity < b.identity ? -1 : 1))
+          .map((p: Participant) => {
+            const thisPerformerSettings = (
+              participantsSettings as ParticipantPerformer[]
+            ).find((q) => q.name === p.identity);
+            const currentLayout = thisPerformerSettings?.video.layout;
+            const activeVideoLayout = videoLayouts.find(
+              (l) => l.name === currentLayout
+            );
 
-          return (
-            <ParticipantLayout
-              className={
-                activePerformer.identity === p.identity ? "active" : ""
-              }
-              onClick={() => {
-                setActivePerformer(p);
-              }}
-            >
-              <div>
-                <img
-                  src={activeVideoLayout?.image}
-                  alt={activeVideoLayout?.name}
-                />
-              </div>
-              <Text size="xs">{p.identity}</Text>
-            </ParticipantLayout>
-          );
-        })}
+            return (
+              <ParticipantLayout
+                className={
+                  activePerformer.identity === p.identity ? "active" : ""
+                }
+                onClick={() => {
+                  setActivePerformer(p);
+                }}
+              >
+                <div>
+                  <img
+                    src={activeVideoLayout?.image}
+                    alt={activeVideoLayout?.name}
+                  />
+                </div>
+                <Text size="xs">{p.identity}</Text>
+              </ParticipantLayout>
+            );
+          })}
       </div>
     </StyledVideoPanel>
   );

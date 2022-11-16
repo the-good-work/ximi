@@ -384,9 +384,7 @@ export default function AudioMixCard({
             {!thisParticipant.isLocal && (
               <div className="latency">
                 <SwapHorizontal color="inherit" width="20px" height="20px" />
-                <Text size="xs">
-                  {/*thisParticipant?.signalClient?.pingInterval || 0*/}
-                </Text>
+                <Text size="xs">{""}</Text>
               </div>
             )}
           </div>

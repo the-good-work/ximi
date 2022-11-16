@@ -22,6 +22,7 @@ import {
   PerformerUpdatePayload,
   ParticipantControl,
   ServerUpdate,
+  ParticipantPerformer,
 } from "@thegoodwork/ximi-types/src/room";
 import { Participant, Room, RoomEvent } from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
@@ -129,11 +130,13 @@ const StyledSidebar = styled("div", {
 });
 
 function StagePanel({
+  room,
   activePanel,
   participantsSettings,
   roomName,
   participants,
 }: {
+  room?: Room;
   activePanel: PanelStates;
   participantsSettings: RoomUpdatePayload["update"]["participants"];
   roomName: string;
@@ -208,13 +211,12 @@ function StagePanel({
         <StyledRoot>
           <StyledViewport>
             <VideoPanel
+              room={room}
               participants={participants}
-              currentParticipant={
-                participants
-                  ? participants.length >= 2
-                    ? participants[1]
-                    : participants[0]
-                  : undefined
+              participantsSettings={
+                participantsSettings.filter(
+                  (p) => p.type === "PERFORMER"
+                ) as ParticipantPerformer[]
               }
             />
           </StyledViewport>
@@ -386,7 +388,6 @@ export default function Stage({
                 ) as ParticipantControl;
 
                 if (thisParticipantSettings) {
-                  console.log("√", thisParticipantSettings.audioMixMute);
                   setAudioMixMute(thisParticipantSettings.audioMixMute);
                 }
               }
@@ -425,6 +426,7 @@ export default function Stage({
           participants={participants}
           activePanel={activePanel}
           participantsSettings={stageSettings?.participants || []}
+          room={room}
         />
         <StageSidebar
           presets={presets}

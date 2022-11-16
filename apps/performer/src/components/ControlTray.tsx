@@ -28,6 +28,7 @@ export default function ControlTray({
   room,
   open,
   setOpen,
+  setOpenMessage,
   state,
   updateState,
   audioMixMute,
@@ -39,6 +40,7 @@ export default function ControlTray({
 
   open: boolean;
   setOpen: Dispatch<boolean>;
+  setOpenMessage: Dispatch<boolean>;
 
   audioMixMute: PerformerUpdatePayload["update"]["audioMixMute"];
   updateState: Dispatch<UpdateStateActions>;
@@ -157,7 +159,14 @@ export default function ControlTray({
             }
           }}
         />
-        <ToggleIconButton size={open ? "lg" : "md"} icon={<Chatbox />} />
+        <ToggleIconButton
+          onClick={() => {
+            setOpenMessage(true);
+            setOpen(false);
+          }}
+          size={open ? "lg" : "md"}
+          icon={<Chatbox />}
+        />
         <ToggleIconButton
           active={showDebug}
           onClick={() => setShowDebug(!showDebug)}

@@ -1,5 +1,4 @@
 import React, { Dispatch, useEffect, useState } from "react";
-import Heading from "ui/Texts/Heading";
 import {
   RoomStateStage,
   UpdateStateActions,
@@ -9,10 +8,11 @@ import {
   ServerUpdate,
 } from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
-import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
+import { RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
 import VideoLayout from "../components/VideoLayout";
 import AudioLayout from "../components/AudioLayout";
+import MessageModal from "../components/MessageModal";
 
 // const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -26,6 +26,7 @@ export default function Stage({
 }) {
   const { connect, room, error, participants } = useRoom();
   const [trayOpen, setTrayOpen] = useState<boolean>(false);
+  const [messageOpen, setMessageOpen] = useState<boolean>(false);
   const [showDebug, setShowDebug] = useState<boolean>(false);
 
   const [audioMixMute, setAudioMixMute] = useState<
@@ -42,29 +43,22 @@ export default function Stage({
     })
       .then((room) => {
         if (room) {
-          room.on(
-            RoomEvent.DataReceived,
-            (
-              payload: Uint8Array,
-              participant?: RemoteParticipant,
-              kind?: DataPacket_Kind
-            ) => {
-              const string = decoder.decode(payload);
+          room.on(RoomEvent.DataReceived, (payload: Uint8Array) => {
+            const string = decoder.decode(payload);
 
-              try {
-                const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
+            try {
+              const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
-                if (update.type === "performer-update") {
-                  if (update.update.name === state.properties.name) {
-                    setAudioMixMute(update.update.audioMixMute);
-                    setVideo(update.update.video);
-                  }
+              if (update.type === "performer-update") {
+                if (update.update.name === state.properties.name) {
+                  setAudioMixMute(update.update.audioMixMute);
+                  setVideo(update.update.video);
                 }
-              } catch (err) {
-                console.log(err);
               }
+            } catch (err) {
+              console.log(err);
             }
-          );
+          });
         }
       })
       .catch((err) => {
@@ -125,6 +119,8 @@ export default function Stage({
 
       <AudioLayout participants={participants} audioMixMute={audioMixMute} />
 
+      <MessageModal open={messageOpen} setOpen={setMessageOpen} />
+
       <ControlTray
         state={state}
         room={room}
@@ -132,6 +128,7 @@ export default function Stage({
         audioMixMute={audioMixMute}
         open={trayOpen}
         setOpen={setTrayOpen}
+        setOpenMessage={setMessageOpen}
         showDebug={showDebug}
         setShowDebug={setShowDebug}
       />

@@ -1,34 +1,32 @@
-import { useParticipant } from "@livekit/react-core";
-import { Participant } from "livekit-client";
+import {
+  ParticipantPerformer,
+  RoomUpdateAction,
+  RoomUpdatePayload,
+  Slot,
+  VideoLayout,
+} from "@thegoodwork/ximi-types/src/room";
+import { Participant, Room } from "livekit-client";
 import { useState } from "react";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
 
 const videoLayouts = [
   {
+    image: "images/video-layouts/layout-default.png",
+    name: "Default",
+    layout: [],
+  },
+
+  {
     image: "images/video-layouts/layout-a.png",
     name: "A",
-    layout: [
-      "1 / 1 / 5 / 5",
-      "1 / 5 / 5 / 9",
-      "1 / 9 / 5 / 13",
-      "5 / 1 / 9 / 5",
-      "5 / 5 / 9 / 9",
-      "5 / 9 / 9 / 13",
-      "9 / 1 / 13 / 5",
-      "9 / 5 / 13 / 9",
-      "9 / 9 / 13 / 13",
-    ],
+    layout: ["1 / 1 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-b.png",
     name: "B",
-    layout: [
-      "1 / 1 / 7 / 7",
-      "1 / 7 / 7 / 13",
-      "7 / 1 / 13 / 7",
-      "7 / 7 / 13 / 13",
-    ],
+
+    layout: ["1 / 4 / 7 / 10", "7 / 4 / 13 / 10"],
   },
   {
     image: "images/video-layouts/layout-c.png",
@@ -38,18 +36,20 @@ const videoLayouts = [
   {
     image: "images/video-layouts/layout-d.png",
     name: "D",
-    layout: ["1 / 4 / 7 / 10", "7 / 4 / 13 / 10"],
+    layout: ["1 / 4 / 7 / 10", "7 / 1 / 13 / 7", "7 / 7 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-e.png",
     name: "E",
     layout: ["1 / 1 / 7 / 7", "1 / 7 / 7 / 13", "7 / 4 / 13 / 10"],
   },
+
   {
     image: "images/video-layouts/layout-f.png",
     name: "F",
-    layout: ["1 / 1 / 13 / 13"],
+    layout: ["1 / 1 / 13 / 7", "1 / 7 / 7 / 13", "7 / 7 / 13 / 13"],
   },
+
   {
     image: "images/video-layouts/layout-g.png",
     name: "G",
@@ -58,26 +58,27 @@ const videoLayouts = [
   {
     image: "images/video-layouts/layout-h.png",
     name: "H",
-    layout: ["1 / 1 / 13 / 7", "1 / 7 / 7 / 13", "7 / 7 / 13 / 13"],
+
+    layout: ["5 / 1 / 9 / 5", "5 / 5 / 9 / 9", "5 / 9 / 9 / 13"],
   },
   {
     image: "images/video-layouts/layout-i.png",
     name: "I",
-    layout: ["1 / 1 / 7 / 7", "7 / 1 / 13 / 7", "1 / 7 / 13 / 13"],
+    layout: ["1 / 1 / 13 / 5", "1 / 5 / 13 / 9", "1 / 9 / 13 / 13"],
   },
   {
     image: "images/video-layouts/layout-j.png",
     name: "J",
-    layout: ["5 / 1 / 9 / 5", "5 / 5 / 9 / 9", "5 / 9 / 9 / 13"],
+    layout: [
+      "1 / 1 / 7 / 7",
+      "1 / 7 / 7 / 13",
+      "7 / 1 / 13 / 7",
+      "7 / 7 / 13 / 13",
+    ],
   },
   {
     image: "images/video-layouts/layout-k.png",
     name: "K",
-    layout: ["1 / 1 / 13 / 5", "1 / 5 / 13 / 9", "1 / 9 / 13 / 13"],
-  },
-  {
-    image: "images/video-layouts/layout-l.png",
-    name: "L",
     layout: [
       "1 / 1 / 13 / 4",
       "1 / 4 / 13 / 7",
@@ -86,6 +87,34 @@ const videoLayouts = [
     ],
   },
 ];
+
+async function applyVideoSetting(
+  room_name: string,
+  participant: string,
+  layout: VideoLayout,
+  slots: Slot[]
+) {
+  const action: RoomUpdateAction & { type: "UPDATE_LAYOUT" } = {
+    type: "UPDATE_LAYOUT",
+    room_name,
+    participant,
+    layout,
+    slots,
+  };
+
+  const response = await fetch(
+    `${process.env.REACT_APP_SERVER_HOST}/rooms/apply-setting`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(action),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response;
+}
 
 const VideoGrid = styled("div", {
   display: "grid",
@@ -105,6 +134,13 @@ const ParticipantVideo = styled("div", {
   position: "relative",
   padding: "$md",
   boxSizing: "border-box",
+
+  select: {
+    position: "absolute",
+    top: "$xs",
+    left: "$xs",
+  },
+
   video: {
     position: "absolute",
     top: "0",
@@ -115,35 +151,37 @@ const ParticipantVideo = styled("div", {
 const ParticipantLayout = styled("button", {
   appearance: "none",
   outline: "none",
-  border: "none",
+  border: "1px solid $brand",
+  padding: "$2xs",
   background: "$background",
   display: "flex",
-  flexDirection: "column",
+  flexDirection: "row",
   alignItems: "center",
   justifyContent: "center",
   boxSizing: "border-box",
-  width: "50px",
+  width: "100px",
   gap: "$2xs",
   fontWeight: "$normal",
+
   "> div": {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-    border: "1px solid $brand",
-    background: "$background",
-    padding: "$2xs",
+    width: "20px",
     img: {
+      display: "block",
       width: "100%",
-      objectFit: "contain",
     },
   },
+
   "&:hover": {
     cursor: "pointer",
-    fontWeight: "$bold",
-    "> div": {
-      background: "$brand",
-    },
+    background: "$brand",
+  },
+
+  "&.active": {
+    background: "$brand",
   },
 });
 
@@ -155,7 +193,7 @@ const StyledVideoPanel = styled("div", {
   height: "100%",
   border: "2px solid $brand",
   backgroundColor: "$background",
-  padding: "$md $md $xs $md",
+  padding: "$xs",
   gap: "$sm",
 
   ".layouts": {
@@ -165,6 +203,7 @@ const StyledVideoPanel = styled("div", {
     justifyContent: "center",
     padding: "0 $lg",
     alignItems: "center",
+
     ".item": {
       appearance: "none",
       outline: "none",
@@ -194,28 +233,106 @@ const StyledVideoPanel = styled("div", {
     alignItems: "center",
     justifyContent: "center",
     gap: "$sm",
+    borderTop: "1px solid $brand",
+    padding: "$sm 0 0 0",
   },
 });
 
+type Unpacked<T> = T extends (infer U)[]
+  ? U
+  : T extends (...args: any[]) => infer U
+  ? U
+  : T extends Promise<infer U>
+  ? U
+  : T;
+
 export default function VideoPanel({
-  currentParticipant,
+  room,
   participants,
+  participantsSettings,
 }: {
-  currentParticipant: Participant | undefined;
-  participants: Participant[] | undefined;
+  room?: Room;
+  participants?: Participant[];
+  participantsSettings?: (Unpacked<
+    RoomUpdatePayload["update"]["participants"]
+  > & { type: "PERFORMER" })[];
 }) {
-  const [currentLayout, setCurrentLayout] = useState<string>("F");
-  // const participantData = useParticipant(currentParticipant);
+  const [currentLayout, setCurrentLayout] = useState<string>("Default");
+
+  const performers =
+    participants && participants?.length > 0
+      ? participants.filter((p: Participant) => {
+          try {
+            const meta = JSON.parse(p.metadata || "");
+            return meta?.type === "PERFORMER" ? true : false;
+          } catch (err) {
+            return false;
+          }
+        })
+      : [];
+
+  const [activePerformer, setActivePerformer] = useState<Participant>(
+    performers?.[0]
+  );
+
+  if (!room || !participantsSettings || !participants) {
+    return <></>;
+  }
+
+  if (performers.length < 1) {
+    return (
+      <div
+        style={{
+          color: "white",
+          height: "70vh",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Awaiting performers
+      </div>
+    );
+  }
+
+  const thisParticipantSetting = participantsSettings.find(
+    (p) => p.name === activePerformer.identity
+  );
 
   return (
     <StyledVideoPanel>
       <VideoGrid>
-        {videoLayouts
-          .find((l) => l.name === currentLayout)
-          ?.layout?.map((l, i) => {
+        {thisParticipantSetting &&
+          thisParticipantSetting.video.slots.map((slot, i) => {
+            const x1 = slot.position.x * 12 + 1;
+            const x2 = x1 + slot.size.w * 12;
+            const y1 = slot.position.y * 12 + 1;
+            const y2 = y1 + slot.size.h * 12;
+
+            const gridArea = `${y1} / ${x1} / ${y2} / ${x2}`;
             return (
-              <ParticipantVideo key={i} css={{ gridArea: l }}>
-                <Text size="xs">NAME</Text>
+              <ParticipantVideo key={i} css={{ gridArea }}>
+                <select
+                  value={slot.nickname || "empty"}
+                  onChange={(e) => {
+                    const _slots = [...thisParticipantSetting.video.slots];
+                    _slots[i].nickname = e.target.value;
+                    applyVideoSetting(
+                      room.name,
+                      thisParticipantSetting.name,
+                      thisParticipantSetting.video.layout,
+                      _slots
+                    );
+                  }}
+                >
+                  {performers.map((p) => (
+                    <option key={p.identity} value={p.identity}>
+                      {p.identity}
+                    </option>
+                  ))}
+                  <option value={"empty"}>--</option>
+                </select>
               </ParticipantVideo>
             );
           })}
@@ -225,11 +342,73 @@ export default function VideoPanel({
           return (
             <button
               key={l.name}
-              onClick={() => {
-                setCurrentLayout(l.name);
+              onClick={async () => {
+                const thisParticipantSetting = participantsSettings.find(
+                  (p) => p.name === activePerformer.identity
+                );
+                if (!thisParticipantSetting) {
+                  return;
+                }
+                const _slots = [...thisParticipantSetting.video.slots];
+                const newLayout = videoLayouts.find(
+                  (layout) => layout.name === l.name
+                );
+
+                if (!newLayout) {
+                  return;
+                }
+                const newSlots = newLayout.layout.map((l) =>
+                  l.split("/").map((n) => parseInt(n.trim()))
+                );
+                const newSlotLength = newLayout.layout.length;
+
+                if (l.name !== "Default") {
+                  const __slots = new Array(newSlotLength)
+                    .fill({
+                      size: { w: 0, h: 0 },
+                      position: { x: 0, y: 0 },
+                      nickname: "",
+                    } as Slot)
+                    .map((slot, i) => {
+                      const newSlot = newSlots[i];
+                      const w = (newSlot[3] - newSlot[1]) / 12;
+                      const x = (newSlot[1] - 1) / 12;
+
+                      const h = (newSlot[2] - newSlot[0]) / 12;
+                      const y = (newSlot[0] - 1) / 12;
+
+                      return {
+                        ...slot,
+                        size: { w, h },
+                        position: { x, y },
+                        nickname: _slots?.[i]?.nickname,
+                      };
+                    });
+
+                  await applyVideoSetting(
+                    room.name,
+                    activePerformer.identity,
+                    l.name as VideoLayout,
+                    __slots
+                  );
+                } else {
+                  // default video slot
+
+                  await applyVideoSetting(
+                    room.name,
+                    activePerformer.identity,
+                    l.name as VideoLayout,
+                    []
+                  );
+                }
               }}
               className={`item layout-${l.name} ${
-                l.name === currentLayout ? "active" : ""
+                l.name ===
+                (participantsSettings as ParticipantPerformer[])?.find(
+                  (p) => p.name === activePerformer.identity
+                )?.video.layout
+                  ? "active"
+                  : ""
               }`}
             >
               <img src={l.image} alt={`Layout ${l.name}`} />
@@ -239,23 +418,33 @@ export default function VideoPanel({
       </div>
 
       <div className="participants">
-        {participants?.map((p: any) => {
-          if (JSON.parse(p.metadata).type !== "CONTROL") {
-            const currentVideoLayout = videoLayouts.find(
-              (l) => l.name === currentLayout
-            );
-            return (
-              <ParticipantLayout>
-                <div>
-                  <img
-                    src={currentVideoLayout?.image}
-                    alt={currentVideoLayout?.name}
-                  />
-                </div>
-                <Text size="xs">{p.identity}</Text>
-              </ParticipantLayout>
-            );
-          }
+        {performers.map((p: Participant) => {
+          const thisPerformerSettings = (
+            participantsSettings as ParticipantPerformer[]
+          ).find((q) => q.name === p.identity);
+          const currentLayout = thisPerformerSettings?.video.layout;
+          const activeVideoLayout = videoLayouts.find(
+            (l) => l.name === currentLayout
+          );
+
+          return (
+            <ParticipantLayout
+              className={
+                activePerformer.identity === p.identity ? "active" : ""
+              }
+              onClick={() => {
+                setActivePerformer(p);
+              }}
+            >
+              <div>
+                <img
+                  src={activeVideoLayout?.image}
+                  alt={activeVideoLayout?.name}
+                />
+              </div>
+              <Text size="xs">{p.identity}</Text>
+            </ParticipantLayout>
+          );
         })}
       </div>
     </StyledVideoPanel>

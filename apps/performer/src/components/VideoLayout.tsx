@@ -39,7 +39,7 @@ export default function VideoLayout({
               return (
                 <VideoSlot
                   participant={p}
-                  key={p.identity}
+                  key={`${p.identity}_slot${i}_${videoState.layout}`}
                   w={(1 / columns) * 100}
                   h={(1 / rows) * 100}
                   x={((i % columns) / columns) * 100}
@@ -48,17 +48,23 @@ export default function VideoLayout({
                 />
               );
             })
-        : participants.map((p) => (
-            <VideoSlot
-              debug={showDebug}
-              participant={p}
-              w={100}
-              h={100}
-              key={p.identity}
-              x={0}
-              y={0}
-            />
-          ))}
+        : videoState.slots.map((slot, i) => {
+            const p = participants.find((p) => p.identity === slot.nickname);
+            if (!p) {
+              return <></>;
+            }
+            return (
+              <VideoSlot
+                debug={showDebug}
+                participant={p}
+                w={slot.size.w * 100}
+                h={slot.size.h * 100}
+                key={`${p.identity}_slot${i}_${videoState.layout}`}
+                x={slot.position.x * 100}
+                y={slot.position.y * 100}
+              />
+            );
+          })}
     </VideoLayoutContainer>
   );
 }
@@ -81,6 +87,7 @@ const VideoSlot = ({
   const videoRef = useRef<HTMLVideoElement>();
   const [tick, setTick] = useState<number>(0);
   const performer = useParticipant(participant);
+  const [flipped, setFlipped] = useState(false);
   const videoTrack = performer.publications.filter(
     (trackPublication) => trackPublication.kind === Track.Kind.Video
   )?.[0];
@@ -112,15 +119,12 @@ const VideoSlot = ({
           (videoTrack as RemoteTrackPublication).setEnabled(true);
         }
 
-        if ((videoTrack.videoTrack?.attachedElements?.length || 0) < 1) {
-          videoTrack.track?.attach(videoRef.current);
-        }
+        videoTrack.track?.attach(videoRef.current);
       }
     }
     return () => {
       console.log("disable");
       if (!participant.isLocal && videoTrack) {
-        (videoTrack as RemoteTrackPublication).setSubscribed(false);
         (videoTrack as RemoteTrackPublication).setEnabled(false);
       }
     };
@@ -134,9 +138,22 @@ const VideoSlot = ({
   return (
     <VideoContainer
       local={performer.isLocal}
-      css={{ width: `${w}%`, height: `${h}%`, left: `${x}%`, top: `${y}%` }}
+      css={{
+        width: `${w}%`,
+        height: `${h}%`,
+        left: `${x}%`,
+        top: `${y}%`,
+      }}
     >
-      <video ref={videoRef as LegacyRef<HTMLVideoElement>} />
+      <video
+        onClick={() => {
+          setFlipped(!flipped);
+        }}
+        style={{
+          transform: `scaleX(${flipped ? -1 : 1})`,
+        }}
+        ref={videoRef as LegacyRef<HTMLVideoElement>}
+      />
       <span className="name">{participant.identity}</span>
       {debug && (
         <div className="debug" key={tick}>

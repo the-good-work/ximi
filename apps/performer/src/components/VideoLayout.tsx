@@ -108,11 +108,14 @@ const VideoSlot = ({
   useEffect(() => {
     const n = window.setInterval(() => {
       setTick((t) => (t > 10 ? 0 : t + 1));
+      if (videoTrack && videoTrack.track?.attachedElements?.length === 0) {
+        console.log(`video track ${videoTrack.trackSid} not attached`);
+      }
     }, 1000);
     return () => {
       window.clearInterval(n);
     };
-  }, []);
+  }, [videoTrack]);
 
   useEffect(() => {
     if (videoRef.current) {

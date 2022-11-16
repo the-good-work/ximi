@@ -297,13 +297,42 @@ export default function VideoPanel({
   }
 
   const thisParticipantSetting = participantsSettings.find(
-    (p) => p.name === activePerformer.identity
+    (p) => p.name === activePerformer?.identity
   );
 
   return (
     <StyledVideoPanel>
       <VideoGrid>
         {thisParticipantSetting &&
+          thisParticipantSetting.video.layout === "Default" &&
+          performers
+            .sort((a, b) => {
+              return a.identity > b.identity ? -1 : 1;
+            })
+            .map((p, i, a) => {
+              const rows = Math.round(Math.sqrt(a.length));
+              const columns = Math.ceil(a.length / rows);
+
+              const w = 1 / columns;
+              const h = 1 / rows;
+              const x = (i % columns) / columns;
+              const y = (Math.ceil((i + 1) / columns) - 1) / rows;
+
+              const x1 = x * 12 + 1;
+              const x2 = x1 + w * 12;
+              const y1 = y * 12 + 1;
+              const y2 = y1 + h * 12;
+
+              const gridArea = `${y1} / ${x1} / ${y2} / ${x2}`;
+
+              return (
+                <ParticipantVideo key={i} css={{ gridArea }}>
+                  <Text>{p.identity}</Text>
+                </ParticipantVideo>
+              );
+            })}
+        {thisParticipantSetting &&
+          thisParticipantSetting.video.layout !== "Default" &&
           thisParticipantSetting.video.slots.map((slot, i) => {
             const x1 = slot.position.x * 12 + 1;
             const x2 = x1 + slot.size.w * 12;
@@ -311,6 +340,7 @@ export default function VideoPanel({
             const y2 = y1 + slot.size.h * 12;
 
             const gridArea = `${y1} / ${x1} / ${y2} / ${x2}`;
+
             return (
               <ParticipantVideo key={i} css={{ gridArea }}>
                 <select

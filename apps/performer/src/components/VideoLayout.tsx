@@ -8,6 +8,7 @@ import {
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import { styled } from "@stitches/react";
 import { useParticipant } from "@livekit/react-core";
+import { VideoConfiguration } from "livekit-client/dist/src/proto/livekit_models";
 
 const onlyPerformers = (p: Participant) => {
   try {
@@ -32,7 +33,7 @@ export default function VideoLayout({
       {videoState.layout === "Default"
         ? participants
             .filter(onlyPerformers)
-            .sort((a, b) => (a.identity > b.identity ? -1 : 1))
+            .sort((a, b) => (a.identity < b.identity ? -1 : 1))
             .map((p, i, a) => {
               const rows = Math.round(Math.sqrt(a.length));
               const columns = Math.ceil(a.length / rows);
@@ -50,20 +51,30 @@ export default function VideoLayout({
             })
         : videoState.slots.map((slot, i) => {
             const p = participants.find((p) => p.identity === slot.nickname);
-            if (!p) {
-              return <></>;
+
+            if (!p || p === undefined) {
+              return (
+                <VideoEmptySlot
+                  w={slot.size.w * 100}
+                  h={slot.size.h * 100}
+                  key={`empty_slot${i}_${videoState.layout}`}
+                  x={slot.position.x * 100}
+                  y={slot.position.y * 100}
+                />
+              );
+            } else {
+              return (
+                <VideoSlot
+                  debug={showDebug}
+                  participant={p}
+                  w={slot.size.w * 100}
+                  h={slot.size.h * 100}
+                  key={`${p.identity}_slot${i}_${videoState.layout}`}
+                  x={slot.position.x * 100}
+                  y={slot.position.y * 100}
+                />
+              );
             }
-            return (
-              <VideoSlot
-                debug={showDebug}
-                participant={p}
-                w={slot.size.w * 100}
-                h={slot.size.h * 100}
-                key={`${p.identity}_slot${i}_${videoState.layout}`}
-                x={slot.position.x * 100}
-                y={slot.position.y * 100}
-              />
-            );
           })}
     </VideoLayoutContainer>
   );
@@ -86,6 +97,7 @@ const VideoSlot = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>();
   const [tick, setTick] = useState<number>(0);
+
   const performer = useParticipant(participant);
   const [flipped, setFlipped] = useState(false);
   const videoTrack = performer.publications.filter(
@@ -186,6 +198,7 @@ const VideoContainer = styled("div", {
   position: "absolute",
   boxSizing: "border-box",
   color: "$text",
+  background: "$videoBackgroundGradient",
 
   "span.name": {
     position: "absolute",
@@ -231,3 +244,26 @@ const VideoContainer = styled("div", {
     },
   },
 });
+
+const VideoEmptySlot = ({
+  w,
+  h,
+  x,
+  y,
+}: {
+  w: number;
+  h: number;
+  x: number;
+  y: number;
+}) => {
+  return (
+    <VideoContainer
+      css={{
+        width: `${w}%`,
+        height: `${h}%`,
+        left: `${x}%`,
+        top: `${y}%`,
+      }}
+    />
+  );
+};

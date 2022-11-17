@@ -326,7 +326,7 @@ export default function VideoPanel({
           thisParticipantSetting.video.layout === "Default" &&
           performers
             .sort((a, b) => {
-              return a.identity > b.identity ? -1 : 1;
+              return a.identity < b.identity ? -1 : 1;
             })
             .map((p, i, a) => {
               const rows = Math.round(Math.sqrt(a.length));

@@ -1,19 +1,9 @@
-import React, {
-  Dispatch,
-  useEffect,
-  useState,
-  useReducer,
-  SetStateAction,
-} from "react";
+import React, { Dispatch, useEffect, useState, SetStateAction } from "react";
 import {
   RoomStateStage,
   UpdateStateActions,
 } from "../../../../types/controlStates";
-import {
-  PanelStates,
-  Preset,
-  PresetAction,
-} from "../../../../types/stageStates";
+import { PanelStates } from "../../../../types/stageStates";
 import { useRoom } from "@livekit/react-core";
 import { styled } from "ui/theme/theme";
 
@@ -23,6 +13,7 @@ import {
   ParticipantControl,
   ServerUpdate,
   ParticipantPerformer,
+  Preset,
 } from "@thegoodwork/ximi-types/src/room";
 import { Participant, Room, RoomEvent } from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
@@ -231,15 +222,13 @@ function StageSidebar({
   activePanel,
   setActivePanel,
   updateState,
-  presets,
-  setPresets,
+  stageSettings,
   room,
 }: {
   activePanel: PanelStates;
   setActivePanel: Dispatch<SetStateAction<PanelStates>>;
   updateState: Dispatch<UpdateStateActions>;
-  presets: any[];
-  setPresets: Dispatch<PresetAction>;
+  stageSettings: RoomUpdatePayload["update"];
   room?: Room;
 }) {
   return (
@@ -293,7 +282,7 @@ function StageSidebar({
           >
             Message
           </Button>
-          <Presets presets={presets} setPresets={setPresets} />
+          <Presets stageSettings={stageSettings} room={room} />
         </div>
         <Button
           size="sm"
@@ -323,27 +312,6 @@ function StageSidebar({
   );
 }
 
-const initialState = Array.apply(null, Array(12)).map((_a, i) => {
-  return {
-    name: `SLOT${i < 9 ? `0${i + 1}` : i + 1}`,
-    saved: false,
-    index: i,
-  };
-});
-
-function reducer(_state: Preset[], action: PresetAction) {
-  if (action.type === "update-preset") {
-    const updatedPreset = {
-      name: action.name,
-      saved: action.saved,
-      index: action.index,
-    };
-    _state.splice(action.index, 1, updatedPreset);
-    const __state = _state.slice();
-    return __state;
-  } else return initialState;
-}
-
 export default function Stage({
   state,
   updateState,
@@ -360,7 +328,6 @@ export default function Stage({
 
   const { connect, room, error, participants } = useRoom();
 
-  const [presets, setPresets] = useReducer(reducer, initialState);
   const [activePanel, setActivePanel] = useState<PanelStates>("audio");
 
   useEffect(() => {
@@ -379,8 +346,12 @@ export default function Stage({
             try {
               const json = JSON.parse(string) as ServerUpdate;
 
-              if (json && json.type === "room-update") {
+              if (!json.type) {
+                return;
+              }
+              if (json.type === "room-update") {
                 setStageSettings(() => json.update);
+
                 const thisParticipant = rm.localParticipant;
                 const thisParticipantSettings = json.update?.participants?.find(
                   (p) =>
@@ -428,14 +399,15 @@ export default function Stage({
           participantsSettings={stageSettings?.participants || []}
           room={room}
         />
-        <StageSidebar
-          presets={presets}
-          setPresets={setPresets}
-          updateState={updateState}
-          activePanel={activePanel}
-          setActivePanel={setActivePanel}
-          room={room}
-        />
+        {stageSettings && (
+          <StageSidebar
+            stageSettings={stageSettings}
+            activePanel={activePanel}
+            setActivePanel={setActivePanel}
+            room={room}
+            updateState={updateState}
+          />
+        )}
       </StyledStage>
     </div>
   );

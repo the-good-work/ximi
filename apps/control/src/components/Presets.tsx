@@ -1,11 +1,13 @@
-import React, { Dispatch } from "react";
-import Text from "ui/Texts/Text";
+import React, { FocusEventHandler, useEffect, useState } from "react";
 import { styled } from "ui/theme/theme";
 import { SaveSharp, Play } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
-import { Preset, PresetAction } from "../../../../types/stageStates";
+import Text from "ui/Texts/Text";
+import { Preset } from "@thegoodwork/ximi-types";
 import Input from "ui/Form/Input";
 import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
+import { RoomUpdatePayload } from "@thegoodwork/ximi-types/src/room";
+import { Room } from "livekit-client";
 
 const StyledRoot = styled(Root, {
   height: "100%",
@@ -64,27 +66,32 @@ const StyledPresetSingle = styled("div", {
 
 function PresetSingle({
   preset,
-  setPresets,
+  onSave,
+  onLoad,
 }: {
   preset: Preset;
-  setPresets: Dispatch<PresetAction>;
+  onSave: (name?: string) => Promise<void>;
+  onLoad: () => void;
 }) {
+  const [_name, setName] = useState(preset.name);
+
+  useEffect(() => {
+    setName(() => preset.name);
+  }, [preset, preset.name]);
+
   return (
     <StyledPresetSingle>
       <div className="name">
         <Input
           maxLength="6"
           variant="presets"
-          placeholder={preset.name}
-          onBlur={(e: any) => {
-            if (e.target.value.length > 0) {
-              setPresets({
-                type: "update-preset",
-                name: e.target.value,
-                saved: preset.saved,
-                index: preset.index,
-              });
-            }
+          value={_name}
+          placeholder={`SLOT${preset.index + 1}`}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setName(e.target.value);
+          }}
+          onBlur={() => {
+            onSave(_name);
           }}
           css={{
             fontSize: "$2xs",
@@ -93,7 +100,8 @@ function PresetSingle({
             width: "100%",
             height: "100%",
             boxSizing: "border-box",
-            color: preset.saved ? "$accent" : "$text",
+            color: "$text",
+            //color: preset?.participants?.length ? "$accent" : "$text",
             border: "none",
             outline: "none",
             position: "relative",
@@ -104,12 +112,7 @@ function PresetSingle({
       <div className="save">
         <IconButton
           onClick={() => {
-            setPresets({
-              type: "update-preset",
-              name: preset.name,
-              saved: true,
-              index: preset.index,
-            });
+            onSave(_name);
           }}
           css={{ borderRadius: "0" }}
           variant="ghost"
@@ -120,9 +123,9 @@ function PresetSingle({
       <div className="load">
         <IconButton
           onClick={() => {
-            console.log(`load ${preset.name}`);
+            onLoad();
           }}
-          state={preset.saved ? "active" : "disabled"}
+          state={preset?.participants?.length ? "active" : "disabled"}
           css={{ borderRadius: "0 $xs $xs 0" }}
           variant="ghost"
           iconSize="sm"
@@ -134,12 +137,15 @@ function PresetSingle({
 }
 
 export default function Presets({
-  presets,
-  setPresets,
+  stageSettings,
+  room,
 }: {
-  presets: any[];
-  setPresets: Dispatch<PresetAction>;
+  stageSettings: RoomUpdatePayload["update"];
+  room?: Room;
 }) {
+  if (!room) {
+    return <></>;
+  }
   return (
     <StyledPresets>
       <Text size="xs" css={{ textTransform: "uppercase" }}>
@@ -148,12 +154,47 @@ export default function Presets({
       <StyledRoot>
         <StyledViewport>
           <div className="presetsList">
-            {presets.length > 0 ? (
-              presets.map((_a, i) => {
+            {stageSettings.presets.length > 0 ? (
+              stageSettings.presets.map((_preset, i) => {
                 return (
                   <PresetSingle
-                    preset={presets[i]}
-                    setPresets={setPresets}
+                    preset={stageSettings.presets[i]}
+                    onLoad={async () => {
+                      await fetch(
+                        `${process.env.REACT_APP_SERVER_HOST}/room/edit-preset`,
+                        {
+                          method: "PATCH",
+                          body: JSON.stringify({
+                            type: "LOAD_PRESET",
+                            room_name: room.name,
+                            index: i,
+                          }),
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                        }
+                      );
+                    }}
+                    onSave={async (name?: string) => {
+                      await fetch(
+                        `${process.env.REACT_APP_SERVER_HOST}/room/edit-preset`,
+                        {
+                          method: "PATCH",
+                          body: JSON.stringify({
+                            type: "SAVE_PRESET",
+                            room_name: room.name,
+                            preset: {
+                              index: i,
+                              name: name || _preset.name,
+                              participants: stageSettings.participants || [],
+                            },
+                          }),
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                        }
+                      );
+                    }}
                     key={i}
                   />
                 );

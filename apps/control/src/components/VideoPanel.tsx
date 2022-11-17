@@ -1,3 +1,4 @@
+import { useParticipant } from "@livekit/react-core";
 import {
   ParticipantPerformer,
   RoomUpdateAction,
@@ -5,8 +6,14 @@ import {
   Slot,
   VideoLayout,
 } from "@thegoodwork/ximi-types/src/room";
-import { Participant, Room } from "livekit-client";
-import { useState } from "react";
+import {
+  Participant,
+  RemoteParticipant,
+  RemoteTrackPublication,
+  Room,
+  Track,
+} from "livekit-client";
+import { useEffect, useRef, useState } from "react";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
 
@@ -129,7 +136,7 @@ const VideoGrid = styled("div", {
   gap: "2px",
 });
 
-const ParticipantVideo = styled("div", {
+const ParticipantVideoWrapper = styled("div", {
   background: "$videoBackgroundGradient",
   width: "100%",
   height: "100%",
@@ -345,9 +352,10 @@ export default function VideoPanel({
               const gridArea = `${y1} / ${x1} / ${y2} / ${x2}`;
 
               return (
-                <ParticipantVideo key={i} css={{ gridArea }}>
+                <ParticipantVideoWrapper key={i} css={{ gridArea }}>
                   <Text>{p.identity}</Text>
-                </ParticipantVideo>
+                  <ParticipantVideo participant={p as RemoteParticipant} />
+                </ParticipantVideoWrapper>
               );
             })}
         {thisParticipantSetting &&
@@ -360,8 +368,11 @@ export default function VideoPanel({
 
             const gridArea = `${y1} / ${x1} / ${y2} / ${x2}`;
 
+            const p = performers.find((p) => p.identity === slot.nickname);
+
             return (
-              <ParticipantVideo key={i} css={{ gridArea }}>
+              <ParticipantVideoWrapper key={i} css={{ gridArea }}>
+                {p && <ParticipantVideo participant={p as RemoteParticipant} />}
                 <select
                   value={slot.nickname || "empty"}
                   onChange={(e) => {
@@ -382,7 +393,7 @@ export default function VideoPanel({
                   ))}
                   <option value={"empty"}>--</option>
                 </select>
-              </ParticipantVideo>
+              </ParticipantVideoWrapper>
             );
           })}
       </VideoGrid>
@@ -501,3 +512,41 @@ export default function VideoPanel({
     </StyledVideoPanel>
   );
 }
+
+const ParticipantVideo = ({
+  participant,
+}: {
+  participant: RemoteParticipant;
+}) => {
+  const p = useParticipant(participant);
+  const videoRef = useRef<HTMLVideoElement>();
+  const firstVideoTrack = p.publications.find(
+    (pub) => pub.kind === Track.Kind.Video
+  ) as RemoteTrackPublication | undefined;
+
+  useEffect(() => {
+    if (firstVideoTrack) {
+      if (!firstVideoTrack.isSubscribed) {
+        firstVideoTrack.setSubscribed(true);
+      } else {
+        firstVideoTrack.setEnabled(true);
+        if (videoRef.current) {
+          firstVideoTrack.track?.attach(videoRef.current);
+        }
+      }
+    }
+  }, [firstVideoTrack, firstVideoTrack?.isSubscribed]);
+
+  return (
+    <>
+      <video
+        ref={videoRef as React.LegacyRef<HTMLVideoElement>}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+    </>
+  );
+};

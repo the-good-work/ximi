@@ -337,6 +337,7 @@ export default function AudioMixCard({
   thisParticipant,
   roomName,
   type,
+  passcode,
 }: {
   audioMixMute: string[];
   audioDelay?: number;
@@ -344,6 +345,7 @@ export default function AudioMixCard({
   participants: Participant[];
   roomName: string;
   type: "PERFORMER" | "CONTROL";
+  passcode: string;
 }) {
   const performerParticipants = participants.filter((p) => {
     try {
@@ -463,16 +465,16 @@ export default function AudioMixCard({
           <div className="footer-box stream-link">
             <div className="header">
               <LinkOutline color="inherit" width="14px" />
-              <Text size="2xs">Copy Stream Link</Text>
+              <Text size="2xs" css={{ textTransform: "uppercase" }}>
+                Copy Stream Link
+              </Text>
             </div>
             <div className="buttons">
               <Button
                 onClick={() => {
-                  let input = document.querySelector(
-                    `#${`stream_url_${thisParticipant.sid}`}`
+                  navigator.clipboard.writeText(
+                    `${process.env.REACT_APP_OUTPUT_HOST}/?room=${roomName}&passcode=${passcode}&target=${thisParticipant.identity}&withAudio=false`
                   );
-                  // input?.select();
-                  // document.execCommand("copy");
                 }}
                 size="sm"
                 variant="outline"
@@ -492,7 +494,9 @@ export default function AudioMixCard({
               </Button>
               <Button
                 onClick={() => {
-                  console.log("Copy video and audio link");
+                  navigator.clipboard.writeText(
+                    `${process.env.REACT_APP_OUTPUT_HOST}/?room=${roomName}&passcode=${passcode}&target=${thisParticipant.identity}&withAudio=true`
+                  );
                 }}
                 size="sm"
                 variant="outline"
@@ -538,7 +542,9 @@ export default function AudioMixCard({
           <div className="footer-box audio-delay">
             <div className="header">
               <HourglassOutline color="inherit" width="14px" />
-              <Text size="2xs">Output Audio Delay</Text>
+              <Text size="2xs" css={{ textTransform: "uppercase" }}>
+                Output Audio Delay
+              </Text>
             </div>
             <div className="inputs">
               <div className="input-group">

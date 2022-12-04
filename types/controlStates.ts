@@ -36,7 +36,6 @@ export type UpdateStateActions =
       type: "confirm-create-room";
       room: Room;
       token: string;
-      passcode: string;
     };
 
 export type RoomStateInit = {

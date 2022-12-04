@@ -1,5 +1,5 @@
 import { Participant } from "livekit-client";
-import React, { MouseEventHandler, useEffect, useState } from "react";
+import React, { MouseEventHandler } from "react";
 import {
   HourglassOutline,
   LinkOutline,

@@ -71,9 +71,6 @@ export default function Stage({
   }, []);
 
   useEffect(() => {
-    // TODO: work on audioMixMute next
-    // every time audioMixMute changes (from Zahid's send data)
-
     participants.forEach((participant) => {
       if (participant.isLocal) {
         return;
@@ -99,10 +96,6 @@ export default function Stage({
         return;
       }
     });
-
-    // loop thru participants and subscribe/unsubscribe to audio track accordingly
-    // state will indiciate which are the ones on mute (i.e. to unsub)
-    //
   }, [participants, state]);
 
   if (error) {

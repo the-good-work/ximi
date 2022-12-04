@@ -53,9 +53,19 @@ function reducer(_state: ReducerStates, action: UpdateStateActions) {
     action.type === "submit-passcode" &&
     _state.screen === "join-room-screen"
   ) {
+    const _s = _state;
+
+    if (!_s.room) {
+      return _state;
+    }
+
     const __state: RoomStateStage = {
       screen: "stage-screen",
-      room: _state.room,
+      room: {
+        room: _s.room.room,
+        participants: _s.room.participants,
+        passcode: action.passcode,
+      },
       token: action.token,
     };
     return __state;

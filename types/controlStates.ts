@@ -1,5 +1,6 @@
 export type Room = {
   room: string;
+  passcode?: string;
   participants: number;
 } | null;
 
@@ -26,6 +27,7 @@ export type UpdateStateActions =
   | {
       type: "submit-passcode";
       token: string;
+      passcode: string;
     }
   | {
       type: "create-room";
@@ -34,6 +36,7 @@ export type UpdateStateActions =
       type: "confirm-create-room";
       room: Room;
       token: string;
+      passcode: string;
     };
 
 export type RoomStateInit = {

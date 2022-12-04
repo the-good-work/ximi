@@ -86,7 +86,8 @@ export default function JoinRoom({
             .then((r) => {
               updateState({
                 type: "submit-passcode",
-                token: r.data,
+                token: r.data as string,
+                passcode: pass,
               });
             })
             .catch(() => {

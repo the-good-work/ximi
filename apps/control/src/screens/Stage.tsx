@@ -13,7 +13,6 @@ import {
   ParticipantControl,
   ServerUpdate,
   ParticipantPerformer,
-  Preset,
 } from "@thegoodwork/ximi-types/src/room";
 import { Participant, Room, RoomEvent } from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
@@ -125,12 +124,14 @@ function StagePanel({
   activePanel,
   participantsSettings,
   roomName,
+  roomPasscode,
   participants,
 }: {
   room?: Room;
   activePanel: PanelStates;
   participantsSettings: RoomUpdatePayload["update"]["participants"];
   roomName: string;
+  roomPasscode: string;
   participants: Participant[];
 }) {
   if (participantsSettings) {
@@ -179,7 +180,7 @@ function StagePanel({
                       <AudioMixCard
                         key={p.sid}
                         thisParticipant={p}
-                        passcode={`00000`}
+                        passcode={roomPasscode}
                         participants={participants}
                         roomName={roomName}
                         type={meta.type}
@@ -329,6 +330,8 @@ export default function Stage({
 
   const { connect, room, error, participants } = useRoom();
 
+  console.log(state);
+
   const [activePanel, setActivePanel] = useState<PanelStates>("audio");
 
   useEffect(() => {
@@ -395,6 +398,7 @@ export default function Stage({
         <AudioLayout audioMixMute={audioMixMute} participants={participants} />
         <StagePanel
           roomName={room?.name || ""}
+          roomPasscode={state.room?.passcode || ""}
           participants={participants}
           activePanel={activePanel}
           participantsSettings={stageSettings?.participants || []}

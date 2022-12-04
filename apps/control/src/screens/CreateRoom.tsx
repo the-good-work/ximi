@@ -1,12 +1,6 @@
 import React, { Dispatch, useState } from "react";
 import Heading from "ui/Texts/Heading";
-import {
-  ReturnDownBack,
-  ArrowForward,
-  Backspace,
-  CloseCircleOutline,
-  ReturnDownForward,
-} from "react-ionicons";
+import { ReturnDownBack, ReturnDownForward } from "react-ionicons";
 import { ApiPayload } from "@thegoodwork/ximi-types";
 import { UpdateStateActions } from "../../../../types/controlStates";
 import Text from "ui/Texts/Text";
@@ -131,6 +125,7 @@ export default function CreateRoom({
         type: "confirm-create-room",
         room: {
           room: room.name,
+          passcode: room.passcode,
           participants: 1,
         },
         token: json.data.token,

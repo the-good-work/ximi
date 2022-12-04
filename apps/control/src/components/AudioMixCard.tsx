@@ -370,10 +370,6 @@ export default function AudioMixCard({
     console.log(err);
   }
 
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {}, []);
-
   return (
     <StyledDiv type={type}>
       <div>
@@ -456,6 +452,8 @@ export default function AudioMixCard({
                     target={p}
                   />
                 );
+              } else {
+                return false;
               }
             })}
         </div>

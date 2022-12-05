@@ -6,6 +6,7 @@ import {
 import {
   MessagePayload,
   PerformerUpdatePayload,
+  PongPayload,
   ServerUpdate,
 } from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
@@ -47,28 +48,45 @@ export default function Stage({
     })
       .then((room) => {
         if (room) {
-          room.on(RoomEvent.DataReceived, (payload: Uint8Array) => {
-            const string = decoder.decode(payload);
+          room.on(
+            RoomEvent.DataReceived,
+            (payload: Uint8Array, remoteParticipant?: RemoteParticipant) => {
+              const string = decoder.decode(payload);
 
-            try {
-              const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
+              try {
+                const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
-              if (update.type === "performer-update") {
-                if (update.update.name === state.properties.name) {
-                  setAudioMixMute(update.update.audioMixMute);
-                  setVideo(update.update.video);
+                if (update.type === "performer-update") {
+                  if (update.update.name === state.properties.name) {
+                    setAudioMixMute(update.update.audioMixMute);
+                    setVideo(update.update.video);
+                  }
+                } else if (update.type === "message") {
+                  toast({
+                    title: update.message,
+                    description: update.sender,
+                  });
+                } else if (update.type === "ping") {
+                  const payload = JSON.stringify({
+                    type: "pong",
+                    id: update.id,
+                    target: update.target,
+                  } as PongPayload);
+
+                  const data = encoder.encode(payload);
+                  if (remoteParticipant) {
+                    room.localParticipant.publishData(
+                      data,
+                      DataPacket_Kind.RELIABLE,
+                      [remoteParticipant]
+                    );
+                  }
                 }
-              } else if (update.type === "message") {
-                console.log("hey");
-                toast({
-                  title: update.message,
-                  description: update.sender,
-                });
+              } catch (err) {
+                console.log(err);
               }
-            } catch (err) {
-              console.log(err);
             }
-          });
+          );
         }
       })
       .catch((err) => {

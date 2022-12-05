@@ -1,4 +1,4 @@
-import { ServerUpdate } from "@thegoodwork/ximi-types/src/room";
+import { PingPayload, ServerUpdate } from "@thegoodwork/ximi-types/src/room";
 import {
   ConnectionState,
   DataPacket_Kind,
@@ -7,7 +7,7 @@ import {
   Room,
   RoomEvent,
 } from "livekit-client";
-import React, { MouseEventHandler, useEffect } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import {
   HourglassOutline,
   LinkOutline,
@@ -367,6 +367,8 @@ export default function AudioMixCard({
     }
   });
 
+  const [ping, setPing] = useState(0);
+
   const isPublishingAudio =
     thisParticipant && thisParticipant.audioTracks.size > 0;
   const isPublishingVideo =
@@ -382,36 +384,50 @@ export default function AudioMixCard({
   }
 
   useEffect(() => {
-    function parseDataReceived(
-      payload: Uint8Array,
-      participant?: RemoteParticipant
-    ) {
+    if (isControl) {
+      return;
+    }
+
+    if (!room) {
+      return;
+    }
+
+    let pingIntervalId: number | undefined;
+    let pingIdentifier: number = Math.floor(Math.random() * 100);
+    let pingTimestamp = Date.now();
+
+    function parseDataReceived(payload: Uint8Array) {
       const decoder = new TextDecoder();
       const data = decoder.decode(payload);
       try {
         const json = JSON.parse(data) as ServerUpdate;
         if (json.type === "pong") {
-          console.log(json.target);
+          if (
+            json.target === room?.localParticipant.identity &&
+            json.id === pingIdentifier
+          ) {
+            const pingDuration = Math.floor(Date.now() - pingTimestamp);
+            setPing(pingDuration);
+          }
         }
       } catch (err) {}
     }
 
-    let pingIntervalId: number | undefined;
-    let pingIdentifier: number = Math.floor(Math.random() * 100);
-
-    if (!room) {
-      return;
-    }
     if (room.state === ConnectionState.Connected) {
       room.on(RoomEvent.DataReceived, parseDataReceived);
       pingIntervalId = window.setInterval(() => {
+        pingIdentifier = Math.floor(Math.random() * 100);
+        pingTimestamp = Date.now();
         const payload = JSON.stringify({
           type: "ping",
-          target: room.localParticipant.name,
-        } as ServerUpdate & { type: "ping" });
+          target: room.localParticipant.identity,
+          id: pingIdentifier,
+        } as PingPayload);
         const encoder = new TextEncoder();
         const data = encoder.encode(payload);
-        room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE);
+        room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE, [
+          thisParticipant as RemoteParticipant,
+        ]);
       }, 5000);
     } else {
       room.off(RoomEvent.DataReceived, parseDataReceived);
@@ -422,7 +438,7 @@ export default function AudioMixCard({
       room.off(RoomEvent.DataReceived, parseDataReceived);
       clearInterval(pingIntervalId);
     };
-  }, [room, room?.state]);
+  }, [room, room?.state, thisParticipant, isControl]);
 
   return (
     <StyledDiv type={type}>
@@ -436,7 +452,7 @@ export default function AudioMixCard({
             {!thisParticipant.isLocal && (
               <div className="latency">
                 <SwapHorizontal color="inherit" width="20px" height="20px" />
-                <Text size="xs">{""}</Text>
+                <Text size="xs">{ping === 0 ? "-" : ping}</Text>
               </div>
             )}
           </div>

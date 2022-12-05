@@ -185,6 +185,7 @@ function StagePanel({
                       <AudioMixCard
                         key={p.sid}
                         thisParticipant={p}
+                        room={room}
                         passcode={roomPasscode}
                         participants={participants}
                         roomName={roomName}

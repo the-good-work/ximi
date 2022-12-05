@@ -1,5 +1,13 @@
-import { Participant } from "livekit-client";
-import React, { MouseEventHandler } from "react";
+import { ServerUpdate } from "@thegoodwork/ximi-types/src/room";
+import {
+  ConnectionState,
+  DataPacket_Kind,
+  Participant,
+  RemoteParticipant,
+  Room,
+  RoomEvent,
+} from "livekit-client";
+import React, { MouseEventHandler, useEffect } from "react";
 import {
   HourglassOutline,
   LinkOutline,
@@ -338,6 +346,7 @@ export default function AudioMixCard({
   roomName,
   type,
   passcode,
+  room,
 }: {
   audioMixMute: string[];
   audioDelay?: number;
@@ -346,6 +355,7 @@ export default function AudioMixCard({
   roomName: string;
   type: "PERFORMER" | "CONTROL";
   passcode: string;
+  room?: Room;
 }) {
   const performerParticipants = participants.filter((p) => {
     try {
@@ -363,12 +373,56 @@ export default function AudioMixCard({
     thisParticipant && thisParticipant.videoTracks.size > 0;
 
   let isControl = false;
+
   try {
     const meta = thisParticipant && JSON.parse(thisParticipant.metadata || "");
     isControl = meta.type === "CONTROL";
   } catch (err) {
     console.log(err);
   }
+
+  useEffect(() => {
+    function parseDataReceived(
+      payload: Uint8Array,
+      participant?: RemoteParticipant
+    ) {
+      const decoder = new TextDecoder();
+      const data = decoder.decode(payload);
+      try {
+        const json = JSON.parse(data) as ServerUpdate;
+        if (json.type === "pong") {
+          console.log(json.target);
+        }
+      } catch (err) {}
+    }
+
+    let pingIntervalId: number | undefined;
+    let pingIdentifier: number = Math.floor(Math.random() * 100);
+
+    if (!room) {
+      return;
+    }
+    if (room.state === ConnectionState.Connected) {
+      room.on(RoomEvent.DataReceived, parseDataReceived);
+      pingIntervalId = window.setInterval(() => {
+        const payload = JSON.stringify({
+          type: "ping",
+          target: room.localParticipant.name,
+        } as ServerUpdate & { type: "ping" });
+        const encoder = new TextEncoder();
+        const data = encoder.encode(payload);
+        room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE);
+      }, 5000);
+    } else {
+      room.off(RoomEvent.DataReceived, parseDataReceived);
+      window.clearInterval(pingIntervalId);
+    }
+
+    return () => {
+      room.off(RoomEvent.DataReceived, parseDataReceived);
+      clearInterval(pingIntervalId);
+    };
+  }, [room, room?.state]);
 
   return (
     <StyledDiv type={type}>

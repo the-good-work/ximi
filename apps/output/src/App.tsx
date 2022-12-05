@@ -3,7 +3,6 @@ import { useParticipant, useRoom } from "@livekit/react-core";
 import queryString from "query-string";
 import {
   Participant,
-  ParticipantEvent,
   RemoteTrackPublication,
   RoomEvent,
   Track,

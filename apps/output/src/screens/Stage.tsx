@@ -9,10 +9,7 @@ import {
 } from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
 import { RemoteParticipant, RoomEvent } from "livekit-client";
-import ControlTray from "../components/ControlTray";
-import VideoLayout from "../components/VideoLayout";
 import AudioLayout from "../components/AudioLayout";
-import MessageModal from "../components/MessageModal";
 
 // const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -111,27 +108,7 @@ export default function Stage({
 
   return (
     <div className="content noscroll nopadding">
-      <VideoLayout
-        participants={participants}
-        videoState={video}
-        showDebug={showDebug}
-      />
-
       <AudioLayout participants={participants} audioMixMute={audioMixMute} />
-
-      <MessageModal open={messageOpen} setOpen={setMessageOpen} />
-
-      <ControlTray
-        state={state}
-        room={room}
-        updateState={updateState}
-        audioMixMute={audioMixMute}
-        open={trayOpen}
-        setOpen={setTrayOpen}
-        setOpenMessage={setMessageOpen}
-        showDebug={showDebug}
-        setShowDebug={setShowDebug}
-      />
     </div>
   );
 }

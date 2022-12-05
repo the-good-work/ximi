@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "eslint-config-react-app": "^7.0.1",
-    "@thegoodwork/ximi-types": "github:the-good-work/ximi-types#b79cb847cbefe3572c2c77cb399556ca6bfb6fe3",
     "ui": "*"
   }
 }

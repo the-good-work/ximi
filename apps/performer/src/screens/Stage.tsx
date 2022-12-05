@@ -4,17 +4,19 @@ import {
   UpdateStateActions,
 } from "../../../../types/performerStates";
 import {
+  MessagePayload,
   PerformerUpdatePayload,
   ServerUpdate,
 } from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
-import { RemoteParticipant, RoomEvent } from "livekit-client";
+import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
 import VideoLayout from "../components/VideoLayout";
 import AudioLayout from "../components/AudioLayout";
 import MessageModal from "../components/MessageModal";
+import { useToast } from "ui";
 
-// const encoder = new TextEncoder();
+const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export default function Stage({
@@ -37,6 +39,8 @@ export default function Stage({
     { layout: "Default", slots: [] }
   );
 
+  const { toast } = useToast();
+
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token, {
       autoSubscribe: false,
@@ -54,6 +58,12 @@ export default function Stage({
                   setAudioMixMute(update.update.audioMixMute);
                   setVideo(update.update.video);
                 }
+              } else if (update.type === "message") {
+                console.log("hey");
+                toast({
+                  title: update.message,
+                  description: update.sender,
+                });
               }
             } catch (err) {
               console.log(err);
@@ -112,7 +122,25 @@ export default function Stage({
 
       <AudioLayout participants={participants} audioMixMute={audioMixMute} />
 
-      <MessageModal open={messageOpen} setOpen={setMessageOpen} />
+      <MessageModal
+        open={messageOpen}
+        setOpen={setMessageOpen}
+        sendMessage={(message) => {
+          if (!room) return;
+          const msgData = JSON.stringify({
+            type: "message",
+            message,
+            sender: state.properties.name,
+          } as MessagePayload);
+          const data = encoder.encode(msgData);
+          room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE);
+
+          toast({
+            title: message,
+            description: "Message Sent",
+          });
+        }}
+      />
 
       <ControlTray
         state={state}

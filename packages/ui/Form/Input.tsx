@@ -103,8 +103,8 @@ export default function Input({
   css?: any;
   variant?: "default" | "presets";
   placeholder?: string;
-  onChange?: ChangeEventHandler;
-  onBlur?: FocusEventHandler;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   as?: any;
   props?: any;
   pattern?: string;

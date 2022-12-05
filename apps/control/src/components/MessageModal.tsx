@@ -1,6 +1,6 @@
 import { styled } from "@stitches/react";
-import { Dispatch } from "react";
-import { ArrowForward, Backspace, CloseCircleOutline } from "react-ionicons";
+import { Dispatch, useState } from "react";
+import { ArrowForward, Backspace } from "react-ionicons";
 import Button from "ui/Buttons/Button";
 import Input from "ui/Form/Input";
 
@@ -42,7 +42,7 @@ const keys = [
   "B",
   "N",
   "M",
-  "clr",
+  "space",
   "confirm",
 ];
 
@@ -50,26 +50,25 @@ const Keypad = styled("div", {
   display: "grid",
   gridTemplateColumns: "repeat(10, 1fr)",
   gridTemplateRows: "repeat(4, 1fr)",
+  gap: "$2xs",
 
   ".confirm": {
     gridColumn: "span 2",
-  },
-
-  "@base": {
-    gap: "$xs",
-  },
-  "@md": {
-    gap: "$sm",
   },
 });
 
 export default function MessageModal({
   open,
   setOpen,
+  sendMessage,
 }: {
   open: boolean;
   setOpen: Dispatch<boolean>;
+  sendMessage: (message: string) => void;
 }) {
+  const [messageInput, setMessageInput] = useState("");
+  const inputElem = document.getElementById("message-input");
+
   return open ? (
     <>
       <ModalOverlay
@@ -79,11 +78,24 @@ export default function MessageModal({
       />
       <ModalContent>
         <Input
+          id="message-input"
+          autoFocus={true}
+          value={messageInput}
           onKeyDown={(e) => {
-            console.log(e.key);
             if (e.key === "Escape") {
               setOpen(false);
+              setMessageInput("");
+            } else if (e.key === "Enter" || e.key === "Return") {
+              const _msg = messageInput;
+              if (_msg.length) {
+                sendMessage(_msg);
+              }
+              setMessageInput("");
+              inputElem?.focus();
             }
+          }}
+          onChange={(e) => {
+            setMessageInput(e.target.value);
           }}
         />
         <div id="keys">
@@ -96,7 +108,12 @@ export default function MessageModal({
                     key={"confirm"}
                     className={"confirm"}
                     onClick={() => {
-                      // handleNickname("confirm", nickname);
+                      const _msg = messageInput;
+                      if (_msg.length) {
+                        sendMessage(_msg);
+                      }
+                      setMessageInput("");
+                      inputElem?.focus();
                     }}
                     css={{
                       path: { stroke: "$text", fill: "transparent" },
@@ -106,19 +123,20 @@ export default function MessageModal({
                     type="primary"
                   />
                 );
-              } else if (k === "clr") {
+              } else if (k === "space") {
                 return (
                   <Button
                     css={{
                       path: { stroke: "$text", fill: "transparent" },
                     }}
                     variant="keyboard"
-                    key={"clr"}
-                    className={"clr"}
+                    key={"space"}
+                    className={"space"}
                     onClick={() => {
-                      //handleNickname("clr", nickname);
+                      setMessageInput((msg) => `${msg}${` `}`);
+                      inputElem?.focus();
                     }}
-                    aria-label="Clear nickname"
+                    aria-label="Space"
                     icon={` `}
                   />
                 );
@@ -130,7 +148,10 @@ export default function MessageModal({
                     className={"bsp"}
                     css={{ span: { path: { fill: "$text" } } }}
                     onClick={() => {
-                      //handleNickname("bsp", nickname);
+                      setMessageInput((msg) =>
+                        msg.substring(0, msg.length - 1)
+                      );
+                      inputElem?.focus();
                     }}
                     aria-label="Backspace"
                     icon={<Backspace color="inherit" />}
@@ -143,7 +164,8 @@ export default function MessageModal({
                     key={k}
                     className={"key"}
                     onClick={() => {
-                      //handleNickname(k, nickname);
+                      setMessageInput((msg) => `${msg}${k}`);
+                      inputElem?.focus();
                     }}
                   >
                     {k}
@@ -176,4 +198,10 @@ const ModalContent = styled("div", {
   left: "50%",
   display: "flex",
   flexDirection: "column",
+  gap: "$xs",
+
+  input: {
+    boxSizing: "border-box",
+    padding: "$2xs",
+  },
 });

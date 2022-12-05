@@ -48,7 +48,7 @@ const Root = styled(RadixToast.Root, {
   borderRadius: "$xs",
   width: "100%",
   boxSizing: "border-box",
-  zIndex: 5000,
+  zIndex: 50000,
 
   "&[data-state=open]": {
     animation: `${animToastIn} .5s ease-in`,

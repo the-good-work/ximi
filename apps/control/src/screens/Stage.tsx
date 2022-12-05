@@ -13,8 +13,9 @@ import {
   ParticipantControl,
   ServerUpdate,
   ParticipantPerformer,
+  MessagePayload,
 } from "@thegoodwork/ximi-types/src/room";
-import { Participant, Room, RoomEvent } from "livekit-client";
+import { DataPacket_Kind, Participant, Room, RoomEvent } from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
 import AudioMixCard from "../components/AudioMixCard";
 import Text from "ui/Texts/Text";
@@ -29,6 +30,8 @@ import PanelButton from "../components/PanelButton";
 import Button from "ui/Buttons/Button";
 import Presets from "../components/Presets";
 import AudioLayout from "../components/AudioLayout";
+import { useToast } from "ui/Feedback/Toast";
+import MessageModal from "../components/MessageModal";
 
 const decoder = new TextDecoder();
 
@@ -118,6 +121,8 @@ const StyledSidebar = styled("div", {
     },
   },
 });
+
+const encoder = new TextEncoder();
 
 function StagePanel({
   room,
@@ -233,6 +238,9 @@ function StageSidebar({
   stageSettings: RoomUpdatePayload["update"];
   room?: Room;
 }) {
+  const [messageOpen, setMessageOpen] = useState(false);
+  const { toast } = useToast();
+
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -281,6 +289,9 @@ function StageSidebar({
                 },
               },
             }}
+            onClick={() => {
+              setMessageOpen(true);
+            }}
           >
             Message
           </Button>
@@ -310,6 +321,25 @@ function StageSidebar({
           Exit
         </Button>
       </div>
+
+      <MessageModal
+        open={messageOpen}
+        setOpen={setMessageOpen}
+        sendMessage={(message) => {
+          if (!room) return;
+          const msgData = JSON.stringify({
+            type: "message",
+            message,
+            sender: "CONTROL",
+          } as MessagePayload);
+          const data = encoder.encode(msgData);
+          room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE);
+          toast({
+            title: message,
+            description: "Message Sent",
+          });
+        }}
+      />
     </StyledSidebar>
   );
 }
@@ -329,10 +359,8 @@ export default function Stage({
     useState<(ServerUpdate & { type: "room-update" })["update"]>();
 
   const { connect, room, error, participants } = useRoom();
-
-  console.log(state);
-
   const [activePanel, setActivePanel] = useState<PanelStates>("audio");
+  const { toast } = useToast();
 
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.token, {
@@ -365,6 +393,13 @@ export default function Stage({
                 if (thisParticipantSettings) {
                   setAudioMixMute(thisParticipantSettings.audioMixMute);
                 }
+              }
+
+              if (json.type === "message") {
+                toast({
+                  title: json.message,
+                  description: json.sender,
+                });
               }
             } catch (err) {
               console.log(err);

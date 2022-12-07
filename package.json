@@ -13,7 +13,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@thegoodwork/ximi-types": "github:the-good-work/ximi-types#1e548c6e33c2b643e44f5b70c5bf36b9b301c4cf",
+    "@thegoodwork/ximi-types": "github:the-good-work/ximi-types#c8706005c66625e51b529fbb3cf219ad4805e63e",
     "eslint-config-custom": "*",
     "eslint-config-react-app": "^7.0.1",
     "prettier": "latest",

@@ -49,12 +49,19 @@ function App() {
             try {
               const json = JSON.parse(string) as ServerUpdate;
 
-              console.log(json);
               if (!json.type) {
                 return;
               }
+
+              console.log({ json });
+
               if (json.type === "room-update") {
                 console.log(json);
+              }
+
+              if (json.type === "output-update") {
+                const delay = json.update.performer.audioOutDelay || 0;
+                console.log({ delay });
               }
             } catch (err) {
               console.log(err);

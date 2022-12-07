@@ -307,7 +307,7 @@ async function applyDelay(
         type: "UPDATE_DELAY",
         room_name,
         participant,
-        delay,
+        delay: parseInt(delay),
       }),
       headers: {
         "Content-Type": "application/json",

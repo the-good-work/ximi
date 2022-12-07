@@ -16,6 +16,7 @@ function App() {
   const [target, setTarget] = useState<string>();
   const [withAudio, setWithAudio] = useState<boolean>(false);
   const thisParticipant = participants.find((p) => p.identity === target);
+  const [delay, setDelay] = useState(0);
 
   useEffect(() => {
     // get param upon load
@@ -53,15 +54,9 @@ function App() {
                 return;
               }
 
-              console.log({ json });
-
-              if (json.type === "room-update") {
-                console.log(json);
-              }
-
               if (json.type === "output-update") {
                 const delay = json.update.performer.audioOutDelay || 0;
-                console.log({ delay });
+                setDelay(delay);
               }
             } catch (err) {
               console.log(err);
@@ -77,7 +72,9 @@ function App() {
     <div id="App">
       {thisParticipant && (
         <>
-          {withAudio && <PerformerAudio performer={thisParticipant} />}
+          {withAudio && (
+            <PerformerAudio performer={thisParticipant} delay={delay} />
+          )}
           <PerformerVideo performer={thisParticipant} />
         </>
       )}
@@ -87,21 +84,44 @@ function App() {
 
 export default App;
 
-const PerformerAudio = ({ performer }: { performer: Participant }) => {
+const PerformerAudio = ({
+  performer,
+  delay,
+}: {
+  performer: Participant;
+  delay: number;
+}) => {
   const [start, setStart] = useState<boolean>(false);
+
   const p = useParticipant(performer);
+
   const audioRef = useRef<HTMLAudioElement>();
   const firstAudioTrack = p.publications.find(
     (pub) => pub.kind === Track.Kind.Audio
   ) as RemoteTrackPublication | undefined;
+
+  /* refs to AudioContext (HTML WebAudio) objects */
+  const AudioCtxRef = useRef<AudioContext>();
+  const mediaStream = useRef<MediaStream>();
+  const mediaStreamSource = useRef<MediaStreamAudioSourceNode>();
+  const delayNode = useRef<DelayNode>();
+
+  useEffect(() => {
+    if (delayNode.current) {
+      delayNode.current.delayTime.value = delay / 1000;
+    }
+  }, [delay]);
+
   useEffect(() => {
     if (firstAudioTrack) {
       if (!firstAudioTrack.isSubscribed) {
         firstAudioTrack.setSubscribed(true);
       } else {
         firstAudioTrack.setEnabled(true);
+
         if (audioRef.current) {
           firstAudioTrack.track?.attach(audioRef.current);
+          audioRef.current.muted = true;
         }
       }
     }
@@ -112,14 +132,41 @@ const PerformerAudio = ({ performer }: { performer: Participant }) => {
       {!start && (
         <button
           onClick={() => {
-            setStart(!start);
+            const track = firstAudioTrack?.track;
+
+            if (
+              !mediaStream.current &&
+              track &&
+              track.mediaStreamTrack instanceof MediaStreamTrack
+            ) {
+              const AudioContext = window.AudioContext;
+
+              AudioCtxRef.current = new AudioContext();
+              delayNode.current = new DelayNode(AudioCtxRef.current, {
+                maxDelayTime: 5,
+                delayTime: delay,
+              });
+
+              const audioDom = track.attach();
+              audioDom.muted = true;
+
+              mediaStream.current = new MediaStream([track.mediaStreamTrack]);
+              mediaStreamSource.current =
+                AudioCtxRef.current.createMediaStreamSource(
+                  mediaStream.current
+                );
+              mediaStreamSource.current
+                .connect(delayNode.current)
+                .connect(AudioCtxRef.current.destination);
+            }
+            setStart(true);
           }}
           style={{
             position: "fixed",
             bottom: "10px",
             right: "10px",
             zIndex: 5,
-            background: "transparent",
+            background: "pink",
             color: "white",
             appearance: "none",
             border: 0,

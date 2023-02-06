@@ -65,7 +65,7 @@ const StyledButton = styled("button", {
         span: { path: { fill: "$accent" } },
       },
       disabled: {
-        span: { path: { fill: "none" } },
+        span: { path: { fill: "$grey" } },
         pointerEvents: "none",
       },
     },

@@ -86,7 +86,7 @@ const StyledViewport = styled(Viewport, {
 
 const StyledSidebar = styled("div", {
   display: "flex",
-  width: "250px",
+  width: "350px",
   flexDirection: "column",
   boxSizing: "border-box",
   alignItems: "start",

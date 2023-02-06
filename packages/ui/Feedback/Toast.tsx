@@ -111,7 +111,7 @@ const Viewport = styled(RadixToast.Viewport, {
   width: "80%",
   boxSizing: "border-box",
   position: "fixed",
-  bottom: "20px",
+  bottom: "100px",
   transform: "translate(-50%, 0)",
   zIndex: 5000,
 });

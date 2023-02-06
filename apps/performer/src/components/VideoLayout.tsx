@@ -158,6 +158,7 @@ const VideoSlot = ({
         height: `${h}%`,
         left: `${x}%`,
         top: `${y}%`,
+        overflow: "hidden",
       }}
     >
       <video
@@ -165,7 +166,7 @@ const VideoSlot = ({
           setFlipped(!flipped);
         }}
         style={{
-          transform: `scaleX(${flipped ? -1 : 1})`,
+          transform: ` translate(-50%, -50%) scaleX(${flipped ? -1 : 1})`,
         }}
         ref={videoRef as LegacyRef<HTMLVideoElement>}
       />
@@ -227,11 +228,11 @@ const VideoContainer = styled("div", {
 
   video: {
     position: "absolute",
-    top: 0,
-    left: 0,
+    top: "50%",
+    left: "50%",
     width: "100%",
-    height: "100%",
-    objectFit: "cover",
+    aspectRatio: 16 / 9,
+    objectFit: "contain",
     background: "$videoBackgroundGradient",
     zIndex: 1,
   },

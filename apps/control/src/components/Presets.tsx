@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "ui/theme/theme";
-import { SaveSharp, Play, Trash } from "react-ionicons";
+import {
+  SaveSharp,
+  Play,
+  Trash,
+  Ellipse,
+  Download,
+  CloudUpload,
+} from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
 import Text from "ui/Texts/Text";
 import { Participant, Preset } from "@thegoodwork/ximi-types";
@@ -9,6 +16,7 @@ import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
 import { RoomUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import { Room } from "livekit-client";
 import hash from "object-hash";
+import { useToast } from "ui/Feedback/Toast";
 
 const StyledRoot = styled(Root, {
   height: "100%",
@@ -32,6 +40,8 @@ const StyledPresets = styled("div", {
   display: "flex",
   flexDirection: "column",
   gap: "$2xs",
+  textAlign: "left",
+
   ".presetsList": {
     height: "100%",
     display: "flex",
@@ -201,9 +211,10 @@ export default function Presets({
           `SLOT${i + 1}` === stageSettings.currentPreset
       )?.participants as Participant[]) || []),
     ].filter((p) => p.type === "PERFORMER");
-    console.log(pNow, pPreset);
     setPresetTouched(() => hash(pNow) !== hash(pPreset));
   }, [room, stageSettings]);
+
+  const { toast } = useToast();
 
   if (!room) {
     return <></>;
@@ -211,16 +222,102 @@ export default function Presets({
 
   return (
     <StyledPresets>
-      <Text
-        size="xs"
-        css={{ textTransform: "uppercase", padding: ".5em 0", lineHeight: 1 }}
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
       >
-        Presets
-        <br />
-        <Text size="2xs" css={{ color: "$grey", lineHeight: "1" }}>
-          {presetTouched ? "Unsaved changes" : <>&nbsp;</>}
+        <Text
+          size="xs"
+          css={{
+            textTransform: "uppercase",
+            padding: ".5em 0",
+            lineHeight: 1,
+            position: "relative",
+            display: "block",
+          }}
+        >
+          Presets{" "}
+          {presetTouched ? (
+            <span
+              style={{
+                fontSize: "30px",
+                lineHeight: "1",
+                display: "block",
+                position: "absolute",
+                left: "calc(100% + .1em)",
+                top: "20%",
+                color: "$brand",
+              }}
+            >
+              *
+            </span>
+          ) : (
+            <>&nbsp;</>
+          )}
         </Text>
-      </Text>
+        <div>
+          <IconButton
+            css={{ border: "none" }}
+            icon={<Download />}
+            iconSize="sm"
+            onClick={() => {
+              const payload = {
+                ...stageSettings,
+                participants: stageSettings.participants
+                  ? stageSettings.participants.filter(
+                      (p) => p.type !== "CONTROL"
+                    )
+                  : [],
+              };
+              var dataStr =
+                "data:text/json;charset=utf-8," +
+                encodeURIComponent(JSON.stringify(payload));
+
+              var anchor = document.createElement("a");
+              anchor.setAttribute("href", dataStr);
+              anchor.setAttribute("download", `presets-${room.name}.json`);
+              anchor.click();
+            }}
+          />
+          <IconButton
+            css={{ border: "none" }}
+            icon={<CloudUpload />}
+            iconSize="sm"
+            onClick={() => {
+              const inputDom = document.getElementById("preset-file-upload");
+              inputDom?.click();
+            }}
+          />
+        </div>
+        <input
+          id="preset-file-upload"
+          type="file"
+          accept="application/json"
+          multiple={false}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (!f) {
+              return;
+            }
+
+            f.text().then((text) => {
+              try {
+                const preset = JSON.parse(text);
+              } catch (err) {
+                toast({
+                  title: "Error loading preset",
+                  description: "The file uploaded might be corrupted",
+                  tone: "warning",
+                });
+              }
+            });
+          }}
+          style={{ position: "absolute", left: "-10000em" }}
+        />
+      </div>
 
       <StyledRoot>
         <StyledViewport>

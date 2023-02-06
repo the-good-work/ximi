@@ -3,7 +3,7 @@ import { styled } from "ui/theme/theme";
 import { SaveSharp, Play, Trash } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
 import Text from "ui/Texts/Text";
-import { Preset } from "@thegoodwork/ximi-types";
+import { Participant, Preset } from "@thegoodwork/ximi-types";
 import Input from "ui/Form/Input";
 import { Root, Viewport, Scrollbar } from "@radix-ui/react-scroll-area";
 import { RoomUpdatePayload } from "@thegoodwork/ximi-types/src/room";
@@ -191,14 +191,17 @@ export default function Presets({
     if (!stageSettings.participants) {
       return;
     }
-    const pNow = [...stageSettings.participants];
+    const pNow = [...stageSettings.participants].filter(
+      (p) => p.type === "PERFORMER"
+    );
     const pPreset = [
-      ...(stageSettings.presets.find(
+      ...((stageSettings.presets.find(
         (preset, i) =>
           preset.name === stageSettings.currentPreset ||
           `SLOT${i + 1}` === stageSettings.currentPreset
-      )?.participants || []),
-    ];
+      )?.participants as Participant[]) || []),
+    ].filter((p) => p.type === "PERFORMER");
+    console.log(pNow, pPreset);
     setPresetTouched(() => hash(pNow) !== hash(pPreset));
   }, [room, stageSettings]);
 

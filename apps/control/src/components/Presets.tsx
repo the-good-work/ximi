@@ -163,16 +163,18 @@ function PresetSingle({
           icon={<Play />}
         />
       </div>
-      <div className="clear">
-        <IconButton
-          onClick={() => onClear()}
-          state={preset?.participants?.length ? "default" : "disabled"}
-          css={{ borderRadius: "0 $xs $xs 0" }}
-          variant="ghost"
-          iconSize="sm"
-          icon={<Trash />}
-        />
-      </div>
+      {active && (
+        <div className="clear">
+          <IconButton
+            onClick={() => onClear()}
+            state={preset?.participants?.length ? "default" : "disabled"}
+            css={{ borderRadius: "0 $xs $xs 0" }}
+            variant="ghost"
+            iconSize="sm"
+            icon={<Trash />}
+          />
+        </div>
+      )}
     </StyledPresetSingle>
   );
 }

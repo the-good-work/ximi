@@ -237,6 +237,33 @@ export default function Presets({
                         {
                           method: "PATCH",
                           body: JSON.stringify({
+                            type: "SAVE_PRESET",
+                            room_name: room.name,
+                            preset: {
+                              index: i,
+                              name: _preset.name,
+                              participants:
+                                _preset.participants === undefined
+                                  ? []
+                                  : _preset.participants.map((p) => ({
+                                      ...p,
+                                      audioMixMute: [],
+                                      audioOutDelay: 0,
+                                      video: { slots: [], layout: "Default" },
+                                    })),
+                            },
+                          }),
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                        }
+                      );
+
+                      await fetch(
+                        `${process.env.REACT_APP_SERVER_HOST}/room/edit-preset`,
+                        {
+                          method: "PATCH",
+                          body: JSON.stringify({
                             type: "LOAD_PRESET",
                             room_name: room.name,
                             index: i,

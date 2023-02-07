@@ -197,6 +197,7 @@ export default function Presets({
   room?: Room;
 }) {
   const [presetTouched, setPresetTouched] = useState<boolean>(false);
+
   useEffect(() => {
     if (!stageSettings.participants) {
       return;
@@ -211,7 +212,10 @@ export default function Presets({
           `SLOT${i + 1}` === stageSettings.currentPreset
       )?.participants as Participant[]) || []),
     ].filter((p) => p.type === "PERFORMER");
-    setPresetTouched(() => hash(pNow) !== hash(pPreset));
+
+    setPresetTouched(
+      () => hash(pNow) !== hash(pPreset) && stageSettings.currentPreset !== ""
+    );
   }, [room, stageSettings]);
 
   const { toast } = useToast();

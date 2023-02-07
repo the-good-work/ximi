@@ -209,8 +209,6 @@ export default function Presets({
     setPresetTouched(
       () => hash(pNow) !== hash(pPreset) && stageSettings.currentPreset !== ""
     );
-
-    console.log(pPreset, pNow);
   }, [room, stageSettings]);
 
   const { toast } = useToast();

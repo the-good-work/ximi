@@ -303,7 +303,6 @@ export default function Presets({
             f.text().then((text) => {
               try {
                 const loadedPresetFile = JSON.parse(text);
-                console.log(loadedPresetFile);
 
                 const presets = loadedPresetFile.presets;
 
@@ -321,7 +320,7 @@ export default function Presets({
                   headers: {
                     "Content-Type": "application/json",
                   },
-                }).then((res) => {
+                }).then(() => {
                   toast({
                     title: "Presets loaded from file",
                     tone: "default",
@@ -429,7 +428,10 @@ export default function Presets({
                             preset: {
                               index: i,
                               name: name || _preset.name,
-                              participants: stageSettings.participants || [],
+                              participants:
+                                stageSettings.participants?.filter(
+                                  (p) => p.type === "PERFORMER"
+                                ) || [],
                             },
                           }),
                           headers: {

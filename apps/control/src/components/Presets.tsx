@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "ui/theme/theme";
-import {
-  SaveSharp,
-  Play,
-  Trash,
-  Ellipse,
-  Download,
-  CloudUpload,
-} from "react-ionicons";
+import { SaveSharp, Play, Trash, Download, CloudUpload } from "react-ionicons";
 import IconButton from "ui/Buttons/IconButton";
 import Text from "ui/Texts/Text";
 import { Participant, Preset } from "@thegoodwork/ximi-types";
@@ -115,7 +108,7 @@ function PresetSingle({
         <Input
           maxLength="6"
           variant="presets"
-          value={_name || `SLOT${preset.index + 1}`}
+          value={_name}
           placeholder={`SLOT${preset.index + 1}`}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setName(e.target.value);
@@ -216,6 +209,8 @@ export default function Presets({
     setPresetTouched(
       () => hash(pNow) !== hash(pPreset) && stageSettings.currentPreset !== ""
     );
+
+    console.log(pPreset, pNow);
   }, [room, stageSettings]);
 
   const { toast } = useToast();
@@ -309,8 +304,33 @@ export default function Presets({
 
             f.text().then((text) => {
               try {
-                const preset = JSON.parse(text);
+                const loadedPresetFile = JSON.parse(text);
+                console.log(loadedPresetFile);
+
+                const presets = loadedPresetFile.presets;
+
+                if (presets.length !== 12) {
+                  throw new Error("Preset file corrupted");
+                }
+
+                fetch(`${process.env.REACT_APP_SERVER_HOST}/room/edit-preset`, {
+                  method: "PATCH",
+                  body: JSON.stringify({
+                    type: "LOAD_PRESET_FILE",
+                    room_name: room.name,
+                    presets: presets,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }).then((res) => {
+                  toast({
+                    title: "Presets loaded from file",
+                    tone: "default",
+                  });
+                });
               } catch (err) {
+                console.log(err);
                 toast({
                   title: "Error loading preset",
                   description: "The file uploaded might be corrupted",

@@ -31,6 +31,7 @@ export default function Stage({
   const [trayOpen, setTrayOpen] = useState<boolean>(false);
   const [messageOpen, setMessageOpen] = useState<boolean>(false);
   const [showDebug, setShowDebug] = useState<boolean>(false);
+  const [tick, setTick] = useState<0 | 1>(0);
 
   const [audioMixMute, setAudioMixMute] = useState<
     PerformerUpdatePayload["update"]["audioMixMute"]
@@ -55,8 +56,11 @@ export default function Stage({
 
               try {
                 const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
-
-                if (update.type === "performer-update") {
+                console.log(update.type);
+                /*@ts-ignore */
+                if (update.type === "tick") {
+                  setTick((t) => (t === 0 ? 1 : 0));
+                } else if (update.type === "performer-update") {
                   if (update.update.name === state.properties.name) {
                     setAudioMixMute(update.update.audioMixMute);
                     setVideo(update.update.video);
@@ -105,7 +109,7 @@ export default function Stage({
       }
       try {
         const metadata = JSON.parse(participant.metadata || "");
-        if (metadata.type === "PERFORMER") {
+        if (metadata.type === "PERFORMER" || metadata.type === "SCOUT") {
           (participant as RemoteParticipant).audioTracks.forEach(
             (publication) => {
               const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
@@ -124,7 +128,7 @@ export default function Stage({
         return;
       }
     });
-  }, [participants, state]);
+  }, [participants, state, tick]);
 
   if (error) {
     console.log(error);

@@ -56,6 +56,9 @@ export default function ControlTray({
     return <></>;
   }
 
+  console.log(room?.participants);
+  console.log(Array.from(room?.participants.values()).filter(onlyPerformers));
+
   return (
     <>
       <ButtonTray open={open ? "open" : "closed"}>
@@ -308,7 +311,7 @@ const AudioStateBar = styled("div", {
 const onlyPerformers = (p: Participant) => {
   try {
     const meta = JSON.parse(p.metadata || "");
-    return meta?.type === "PERFORMER";
+    return meta?.type === "PERFORMER" || meta?.type === "SCOUT";
   } catch (err) {
     return false;
   }

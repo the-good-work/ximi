@@ -153,19 +153,15 @@ function StagePanel({
             <StyledViewport>
               <StyledAudioPanel>
                 {participants
-
                   .sort((a, b) => (a.identity > b.identity ? 1 : -1))
                   .sort((a, b) => {
                     try {
-                      const typeA = JSON.parse(a.metadata || "")?.type;
-                      const typeB = JSON.parse(b.metadata || "")?.type;
-                      if (typeA === "PERFORMER" && typeB === "CONTROL") {
-                        return -1;
-                      } else if (typeA === "CONTROL" && typeB === "PERFORMER") {
-                        return 1;
-                      } else {
-                        return 0;
-                      }
+                      const order = { PERFORMER: 0, SCOUT: 1, CONTROL: 2 };
+                      const typeA = JSON.parse(a.metadata || "")
+                        ?.type as keyof typeof order;
+                      const typeB = JSON.parse(b.metadata || "")
+                        ?.type as keyof typeof order;
+                      return order[typeA] - order[typeB];
                     } catch (_err) {
                       return 0;
                     }
@@ -192,7 +188,8 @@ function StagePanel({
                         type={meta.type}
                         audioMixMute={participantSettings?.audioMixMute || []}
                         audioDelay={
-                          participantSettings?.type === "PERFORMER"
+                          participantSettings?.type === "PERFORMER" ||
+                          participantSettings?.type === "SCOUT"
                             ? participantSettings?.audioOutDelay
                             : 0
                         }

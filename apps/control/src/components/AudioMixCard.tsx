@@ -19,6 +19,8 @@ import {
   VolumeMuteSharp,
   GitCommitOutline,
   ArrowForward,
+  Telescope,
+  DesktopOutline,
 } from "react-ionicons";
 import Button from "ui/Buttons/Button";
 import Input from "ui/Form/Input";
@@ -29,6 +31,7 @@ const StyledDiv = styled("div", {
   variants: {
     type: {
       CONTROL: { border: "3px solid $accent" },
+      SCOUT: { border: "1px solid $accent" },
       PERFORMER: {
         border: "1px solid $brand",
       },
@@ -353,14 +356,14 @@ export default function AudioMixCard({
   thisParticipant: Participant;
   participants: Participant[];
   roomName: string;
-  type: "PERFORMER" | "CONTROL";
+  type: "PERFORMER" | "CONTROL" | "SCOUT";
   passcode: string;
   room?: Room;
 }) {
   const performerParticipants = participants.filter((p) => {
     try {
       const meta = JSON.parse(p.metadata || "{}");
-      return meta.type === "PERFORMER";
+      return meta.type === "PERFORMER" || meta.type === "SCOUT";
     } catch (err) {
       console.log(err);
       return false;
@@ -446,7 +449,14 @@ export default function AudioMixCard({
         <div className="header">
           <div>
             <div className="identity">
-              <PersonCircle color="inherit" width="20px" height="20px" />
+              {type === "SCOUT" ? (
+                <Telescope color="inherit" width="20px" height="20px" />
+              ) : type === "CONTROL" ? (
+                <DesktopOutline color="inherit" width="20px" height="20px" />
+              ) : (
+                <PersonCircle color="inherit" width="20px" height="20px" />
+              )}
+
               <Text size="xs">{thisParticipant?.identity}</Text>
             </div>
             {!thisParticipant.isLocal && (

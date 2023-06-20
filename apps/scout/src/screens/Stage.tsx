@@ -31,6 +31,7 @@ export default function Stage({
   const [trayOpen, setTrayOpen] = useState<boolean>(false);
   const [messageOpen, setMessageOpen] = useState<boolean>(false);
   const [showDebug, setShowDebug] = useState<boolean>(false);
+  const [tick, setTick] = useState<0 | 1>(0);
 
   const [audioMixMute, setAudioMixMute] = useState<
     PerformerUpdatePayload["update"]["audioMixMute"]
@@ -53,7 +54,10 @@ export default function Stage({
               try {
                 const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
-                if (update.type === "scout-update") {
+                /*@ts-ignore*/
+                if (update.type === "tick") {
+                  setTick((t) => (t === 0 ? 1 : 0));
+                } else if (update.type === "scout-update") {
                   if (update.update.name === state.properties.name) {
                     setAudioMixMute(update.update.audioMixMute);
                     setTextPoster(update.update.textPoster);
@@ -122,7 +126,7 @@ export default function Stage({
         return;
       }
     });
-  }, [participants, state]);
+  }, [participants, state, tick]);
 
   if (error) {
     console.log(error);

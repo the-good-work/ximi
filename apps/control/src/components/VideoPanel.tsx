@@ -281,7 +281,7 @@ export default function VideoPanel({
       ? participants.filter((p: Participant) => {
           try {
             const meta = JSON.parse(p.metadata || "");
-            return meta?.type === "PERFORMER" ? true : false;
+            return meta?.type === "PERFORMER" || meta?.type === "SCOUT";
           } catch (err) {
             return false;
           }
@@ -480,6 +480,14 @@ export default function VideoPanel({
       <div className="participants">
         {performers
           .sort((a, b) => (a.identity < b.identity ? -1 : 1))
+          .filter((p) => {
+            try {
+              const meta = JSON.parse(p.metadata || "");
+              return meta.type === "PERFORMER";
+            } catch (err) {
+              return false;
+            }
+          })
           .map((p: Participant) => {
             const thisPerformerSettings = (
               participantsSettings as ParticipantPerformer[]

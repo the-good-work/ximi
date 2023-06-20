@@ -368,7 +368,7 @@ export default function Stage({
       autoSubscribe: false,
     })
       .then((rm) => {
-        console.log("connected");
+        console.log(rm);
         if (rm) {
           updateState({
             type: "set-control-name",
@@ -378,7 +378,7 @@ export default function Stage({
             const string = decoder.decode(payload);
             try {
               const json = JSON.parse(string) as ServerUpdate;
-
+              console.log("data", json);
               if (!json.type) {
                 return;
               }

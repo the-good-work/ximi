@@ -1,6 +1,6 @@
 {
   "name": "scout",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.5",
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "dev": "export PORT=3100; craco start",
+    "dev": "export PORT=3400; craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject"

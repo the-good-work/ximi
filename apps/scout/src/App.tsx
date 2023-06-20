@@ -138,7 +138,7 @@ function App() {
             return s.properties.name;
           }
         })(state)}
-        variant="performer"
+        variant="scout"
         room={
           state.screen !== "room-list-screen"
             ? state.properties.room

@@ -9,6 +9,7 @@ import {
   TimeOutline,
   LayersOutline,
   Home,
+  TelescopeOutline,
   PersonOutline,
 } from "react-ionicons";
 
@@ -64,7 +65,7 @@ export default function Header({
   participantName,
 }: {
   room: string;
-  variant: "performer" | "control";
+  variant: "performer" | "control" | "scout";
   participantName: string;
 }) {
   let [currentDate, setCurrentDate] = useState(new Date());
@@ -96,7 +97,13 @@ export default function Header({
             }}
             size="sm"
             color="accent"
-            icon={<PersonOutline color="inherit" />}
+            icon={
+              variant === "scout" ? (
+                <TelescopeOutline color="inherit" />
+              ) : (
+                <PersonOutline color="inherit" />
+              )
+            }
           />
           <Text size="2xs">{participantName}</Text>
         </div>

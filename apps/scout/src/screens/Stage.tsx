@@ -4,17 +4,20 @@ import {
   UpdateStateActions,
 } from "../../../../types/performerStates";
 import {
+  MessagePayload,
   PerformerUpdatePayload,
+  PongPayload,
   ServerUpdate,
 } from "@thegoodwork/ximi-types/src/room";
 import { useRoom } from "@livekit/react-core";
-import { RemoteParticipant, RoomEvent } from "livekit-client";
+import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
-import VideoLayout from "../components/VideoLayout";
+import TextPoster from "../components/TextPoster";
 import AudioLayout from "../components/AudioLayout";
 import MessageModal from "../components/MessageModal";
+import { useToast } from "ui";
 
-// const encoder = new TextEncoder();
+const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export default function Stage({
@@ -33,9 +36,8 @@ export default function Stage({
     PerformerUpdatePayload["update"]["audioMixMute"]
   >([]);
 
-  const [video, setVideo] = useState<PerformerUpdatePayload["update"]["video"]>(
-    { layout: "Default", slots: [] }
-  );
+  const { toast } = useToast();
+  const [textPoster, setTextPoster] = useState("");
 
   useEffect(() => {
     connect(`${process.env.REACT_APP_LIVEKIT_HOST}`, state.properties.token, {
@@ -43,22 +45,46 @@ export default function Stage({
     })
       .then((room) => {
         if (room) {
-          room.on(RoomEvent.DataReceived, (payload: Uint8Array) => {
-            const string = decoder.decode(payload);
+          room.on(
+            RoomEvent.DataReceived,
+            (payload: Uint8Array, remoteParticipant?: RemoteParticipant) => {
+              const string = decoder.decode(payload);
 
-            try {
-              const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
+              try {
+                const update: ServerUpdate = JSON.parse(string) as ServerUpdate;
 
-              if (update.type === "performer-update") {
-                if (update.update.name === state.properties.name) {
-                  setAudioMixMute(update.update.audioMixMute);
-                  setVideo(update.update.video);
+                if (update.type === "scout-update") {
+                  if (update.update.name === state.properties.name) {
+                    setAudioMixMute(update.update.audioMixMute);
+                    setTextPoster(update.update.textPoster);
+                  }
+                } else if (update.type === "message") {
+                  toast({
+                    title: update.message,
+                    description: update.sender,
+                  });
+                } else if (update.type === "ping") {
+                  const payload = JSON.stringify({
+                    type: "pong",
+                    id: update.id,
+                    target: update.target,
+                  } as PongPayload);
+
+                  const data = encoder.encode(payload);
+
+                  if (remoteParticipant) {
+                    room.localParticipant.publishData(
+                      data,
+                      DataPacket_Kind.RELIABLE,
+                      [remoteParticipant]
+                    );
+                  }
                 }
+              } catch (err) {
+                console.log(err);
               }
-            } catch (err) {
-              console.log(err);
             }
-          });
+          );
         }
       })
       .catch((err) => {
@@ -71,16 +97,13 @@ export default function Stage({
   }, []);
 
   useEffect(() => {
-    // TODO: work on audioMixMute next
-    // every time audioMixMute changes (from Zahid's send data)
-
     participants.forEach((participant) => {
       if (participant.isLocal) {
         return;
       }
       try {
         const metadata = JSON.parse(participant.metadata || "");
-        if (metadata.type === "PERFORMER") {
+        if (metadata.type === "PERFORMER" || metadata.type === "SCOUT") {
           (participant as RemoteParticipant).audioTracks.forEach(
             (publication) => {
               const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio
@@ -99,10 +122,6 @@ export default function Stage({
         return;
       }
     });
-
-    // loop thru participants and subscribe/unsubscribe to audio track accordingly
-    // state will indiciate which are the ones on mute (i.e. to unsub)
-    //
   }, [participants, state]);
 
   if (error) {
@@ -111,15 +130,37 @@ export default function Stage({
 
   return (
     <div className="content noscroll nopadding">
-      <VideoLayout
-        participants={participants}
-        videoState={video}
-        showDebug={showDebug}
-      />
+      {/*
+				<VideoLayout
+					participants={participants}
+					videoState={video}
+					showDebug={showDebug}
+				/>
+			*/}
+
+      <TextPoster text={textPoster} />
 
       <AudioLayout participants={participants} audioMixMute={audioMixMute} />
 
-      <MessageModal open={messageOpen} setOpen={setMessageOpen} />
+      <MessageModal
+        open={messageOpen}
+        setOpen={setMessageOpen}
+        sendMessage={(message) => {
+          if (!room) return;
+          const msgData = JSON.stringify({
+            type: "message",
+            message,
+            sender: state.properties.name,
+          } as MessagePayload);
+          const data = encoder.encode(msgData);
+          room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE);
+
+          toast({
+            title: message,
+            description: "Message Sent",
+          });
+        }}
+      />
 
       <ControlTray
         state={state}

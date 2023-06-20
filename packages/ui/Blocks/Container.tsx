@@ -105,6 +105,20 @@ const StyledContainer = styled("main", {
       },
     },
     variant: {
+      scout: {
+        "@base": {
+          ".frame": { display: "none" },
+          ".content": { padding: "$md" },
+          ".content-scroll .scroll": { padding: "$md" },
+        },
+        "@sm": {
+          ".frame": { display: "flex" },
+        },
+        "@md": {
+          ".content": { padding: "$3xl" },
+          ".content-scroll .scroll": { padding: "$3xl" },
+        },
+      },
       performer: {
         "@base": {
           ".frame": { display: "none" },
@@ -147,7 +161,7 @@ export default function Container({
   children: ReactNode;
   isFullWidth?: boolean;
   room: string;
-  variant: "performer" | "control";
+  variant: "performer" | "control" | "scout";
   participantName?: string;
 }) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);

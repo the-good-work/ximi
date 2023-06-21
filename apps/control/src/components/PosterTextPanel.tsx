@@ -39,7 +39,7 @@ export default function PosterTextPanel({
       : [];
 
   const [activeScout, setActiveScout] = useState<string>(
-    performers?.[0].identity
+    performers?.[0]?.identity || ""
   );
 
   const thisScoutSettings = participantsSettings?.find(

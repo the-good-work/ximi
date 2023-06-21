@@ -23,6 +23,7 @@ import {
   DesktopOutline,
 } from "react-ionicons";
 import Button from "ui/Buttons/Button";
+import { useToast } from "ui/Feedback/Toast";
 import Input from "ui/Form/Input";
 import Text from "ui/Texts/Text";
 import { styled } from "ui/theme/theme";
@@ -371,6 +372,7 @@ export default function AudioMixCard({
   });
 
   const [ping, setPing] = useState(0);
+  const { toast } = useToast();
 
   const isPublishingAudio =
     thisParticipant && thisParticipant.audioTracks.size > 0;
@@ -538,7 +540,7 @@ export default function AudioMixCard({
             })}
         </div>
       </div>
-      {type === "PERFORMER" && (
+      {["PERFORMER", "SCOUT"].indexOf(type) > -1 && (
         <div className="footer">
           <div className="footer-box stream-link">
             <div className="header">
@@ -553,6 +555,10 @@ export default function AudioMixCard({
                   navigator.clipboard.writeText(
                     `${process.env.REACT_APP_OUTPUT_HOST}/?room=${roomName}&passcode=${passcode}&target=${thisParticipant.identity}&withAudio=false`
                   );
+                  toast({
+                    title: "Copied",
+                    description: `${thisParticipant.identity} video only link`,
+                  });
                 }}
                 size="sm"
                 variant="outline"
@@ -575,6 +581,10 @@ export default function AudioMixCard({
                   navigator.clipboard.writeText(
                     `${process.env.REACT_APP_OUTPUT_HOST}/?room=${roomName}&passcode=${passcode}&target=${thisParticipant.identity}&withAudio=true`
                   );
+                  toast({
+                    title: "Copied",
+                    description: `${thisParticipant.identity} video + audio link`,
+                  });
                 }}
                 size="sm"
                 variant="outline"

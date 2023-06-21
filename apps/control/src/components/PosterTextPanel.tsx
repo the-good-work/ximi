@@ -47,6 +47,34 @@ export default function PosterTextPanel({
   );
 
   const [text, setText] = useState<string>("");
+  const [savingText, setSavingText] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (room?.name === undefined) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      if (text !== thisScoutSettings?.textPoster) {
+        setSavingText(() => true);
+        applyTextPosterSetting(room.name, activeScout, text)
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setSavingText(() => false);
+          });
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [text, activeScout, thisScoutSettings?.textPoster, room?.name]);
+
+  useEffect(() => {
+    if (typeof thisScoutSettings?.textPoster === "string") {
+      setText(() => thisScoutSettings.textPoster);
+    }
+  }, [activeScout, thisScoutSettings?.textPoster]);
 
   if (
     !room ||
@@ -78,17 +106,22 @@ export default function PosterTextPanel({
     <StyledTextPanel>
       <div className="poster-panel">
         <div className="text-input">
-          <div className="textarea-mirror">{thisScoutSettings.textPoster}</div>
+          <div className="textarea-mirror">
+            {thisScoutSettings.textPoster}&#8203;
+          </div>
           <textarea
+            //disabled={savingText}
             key={activeScout}
-            value={thisScoutSettings.textPoster}
+            value={text}
+            // value={thisScoutSettings.textPoster}
             // this is jumping because async update https://react.dev/reference/react-dom/components/textarea#my-text-area-caret-jumps-to-the-beginning-on-every-keystroke
             onChange={async (e) => {
-              await applyTextPosterSetting(
-                room.name,
-                activeScout,
-                e.target.value
-              );
+              setText(e.target.value);
+              // await applyTextPosterSetting(
+              //   room.name,
+              //   activeScout,
+              //   e.target.value
+              // );
             }}
           />
         </div>
@@ -97,11 +130,12 @@ export default function PosterTextPanel({
         {performers.map((p) => (
           <ScoutButton
             type="button"
+            disabled={savingText}
             className={`${p.identity === activeScout ? "active" : ""}`}
+            key={p.identity}
             onClick={() => {
               setActiveScout(() => p.identity);
             }}
-            key={p.identity}
           >
             <Text size="xs">{p.identity}</Text>
           </ScoutButton>
@@ -154,12 +188,13 @@ const StyledTextPanel = styled("div", {
         display: "block",
         width: "100%",
         height: "auto",
-        whiteSpace: "pre-wrap",
+        whiteSpace: "pre-line",
         padding: "0",
         textAlign: "center",
         fontSize: "$2xl",
         fontFamily: "$rubik",
         lineHeight: "1.4",
+        color: "rgba(255,255,255,.2)",
       },
     },
   },
@@ -231,5 +266,9 @@ const ScoutButton = styled("button", {
 
   "&.active": {
     background: "$brand",
+  },
+
+  "&[disabled]": {
+    cursor: "wait",
   },
 });

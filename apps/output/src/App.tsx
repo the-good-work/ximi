@@ -8,6 +8,7 @@ import {
   Track,
 } from "livekit-client";
 import { ServerUpdate } from "@thegoodwork/ximi-types/src/room";
+import { VolumeHighOutline } from "react-ionicons";
 
 const decoder = new TextDecoder();
 
@@ -166,13 +167,13 @@ const PerformerAudio = ({
             bottom: "10px",
             right: "10px",
             zIndex: 5,
-            background: "pink",
+            background: "transparent",
             color: "white",
             appearance: "none",
             border: 0,
           }}
         >
-          Start
+          <VolumeHighOutline color={"white"} />
         </button>
       )}
       <audio ref={audioRef as LegacyRef<HTMLAudioElement>} />

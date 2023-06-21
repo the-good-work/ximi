@@ -1,4 +1,4 @@
-export type PanelStates = "audio" | "video";
+export type PanelStates = "audio" | "video" | "text";
 
 export type Preset = {
   name: string;

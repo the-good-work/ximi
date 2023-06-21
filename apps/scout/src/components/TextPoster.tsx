@@ -6,6 +6,7 @@ const StyledTextPoster = styled("div", {
   height: "100%,",
   color: "$text",
   fontSize: "10vh",
+  whiteSpace: "pre-line",
 });
 
 export default function TextPoster({ text }: { text: string }) {

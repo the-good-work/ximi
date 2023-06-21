@@ -13,6 +13,7 @@ import {
   ParticipantControl,
   ServerUpdate,
   ParticipantPerformer,
+  ParticipantScout,
   MessagePayload,
 } from "@thegoodwork/ximi-types/src/room";
 import { DataPacket_Kind, Participant, Room, RoomEvent } from "livekit-client";
@@ -22,10 +23,12 @@ import Text from "ui/Texts/Text";
 import {
   ChatboxSharp,
   ExitSharp,
+  TextSharp,
   VideocamSharp,
   VolumeHighSharp,
 } from "react-ionicons";
 import VideoPanel from "../components/VideoPanel";
+import PosterTextPanel from "../components/PosterTextPanel";
 import PanelButton from "../components/PanelButton";
 import Button from "ui/Buttons/Button";
 import Presets from "../components/Presets";
@@ -202,7 +205,7 @@ function StagePanel({
           </StyledRoot>
         );
       }
-    } else {
+    } else if (activePanel === "video") {
       return (
         <StyledRoot>
           <StyledViewport>
@@ -213,6 +216,23 @@ function StagePanel({
                 participantsSettings.filter(
                   (p) => p.type === "PERFORMER"
                 ) as ParticipantPerformer[]
+              }
+            />
+          </StyledViewport>
+          <Scrollbar orientation="vertical" />
+        </StyledRoot>
+      );
+    } else {
+      return (
+        <StyledRoot>
+          <StyledViewport>
+            <PosterTextPanel
+              room={room}
+              participants={participants}
+              participantsSettings={
+                participantsSettings.filter(
+                  (p) => p.type === "SCOUT"
+                ) as ParticipantScout[]
               }
             />
           </StyledViewport>
@@ -271,6 +291,15 @@ function StageSidebar({
         icon={<VideocamSharp />}
       >
         Video
+      </PanelButton>
+      <PanelButton
+        onClick={() => {
+          setActivePanel("text");
+        }}
+        active={activePanel === "text"}
+        icon={<TextSharp />}
+      >
+        Text
       </PanelButton>
       <div className="controls">
         <div>

@@ -196,7 +196,7 @@ export default function Presets({
       return;
     }
     const pNow = [...stageSettings.participants].filter(
-      (p) => p.type === "PERFORMER"
+      (p) => p.type === "PERFORMER" || p.type === "SCOUT"
     );
     const pPreset = [
       ...((stageSettings.presets.find(
@@ -204,7 +204,7 @@ export default function Presets({
           preset.name === stageSettings.currentPreset ||
           `SLOT${i + 1}` === stageSettings.currentPreset
       )?.participants as Participant[]) || []),
-    ].filter((p) => p.type === "PERFORMER");
+    ].filter((p) => p.type === "PERFORMER" || p.type === "SCOUT");
 
     setPresetTouched(
       () => hash(pNow) !== hash(pPreset) && stageSettings.currentPreset !== ""
@@ -430,7 +430,8 @@ export default function Presets({
                               name: name || _preset.name,
                               participants:
                                 stageSettings.participants?.filter(
-                                  (p) => p.type === "PERFORMER"
+                                  (p) =>
+                                    p.type === "PERFORMER" || p.type === "SCOUT"
                                 ) || [],
                             },
                           }),

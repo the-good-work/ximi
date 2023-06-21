@@ -5,6 +5,7 @@ import {
 } from "@thegoodwork/ximi-types/src/room";
 import { Participant, Room } from "livekit-client";
 import { useEffect, useState } from "react";
+import Text from "ui/Texts/Text";
 
 type Unpacked<T> = T extends (infer U)[]
   ? U
@@ -76,32 +77,34 @@ export default function PosterTextPanel({
   return (
     <StyledTextPanel>
       <div className="poster-panel">
-        <textarea
-          key={activeScout}
-          value={thisScoutSettings.textPoster}
-          // this is jumping because async update https://react.dev/reference/react-dom/components/textarea#my-text-area-caret-jumps-to-the-beginning-on-every-keystroke
-          onChange={async (e) => {
-            await applyTextPosterSetting(
-              room.name,
-              activeScout,
-              e.target.value
-            );
-          }}
-        />
+        <div className="text-input">
+          <div className="textarea-mirror">{thisScoutSettings.textPoster}</div>
+          <textarea
+            key={activeScout}
+            value={thisScoutSettings.textPoster}
+            // this is jumping because async update https://react.dev/reference/react-dom/components/textarea#my-text-area-caret-jumps-to-the-beginning-on-every-keystroke
+            onChange={async (e) => {
+              await applyTextPosterSetting(
+                room.name,
+                activeScout,
+                e.target.value
+              );
+            }}
+          />
+        </div>
       </div>
       <div className="select-scout">
         {performers.map((p) => (
-          <button
+          <ScoutButton
             type="button"
+            className={`${p.identity === activeScout ? "active" : ""}`}
             onClick={() => {
               setActiveScout(() => p.identity);
             }}
-            style={{
-              background: p.identity === activeScout ? "pink" : "unset",
-            }}
+            key={p.identity}
           >
-            {p.identity}
-          </button>
+            <Text size="xs">{p.identity}</Text>
+          </ScoutButton>
         ))}
       </div>
     </StyledTextPanel>
@@ -124,20 +127,47 @@ const StyledTextPanel = styled("div", {
     height: "calc(100vh - 160px)",
     display: "flex",
     alignItems: "center",
-    textarea: {
-      display: "block",
+
+    ".text-input": {
+      position: "relative",
       width: "100%",
-      lineHeight: "1.4",
-      height: "80%",
-      background: "transparent",
-      color: "$text",
-      appearance: "none",
-      border: "0",
-      padding: "0",
-      textAlign: "center",
-      fontSize: "$2xl",
-      fontFamily: "$rubik",
+
+      textarea: {
+        display: "block",
+        width: "100%",
+        height: "100%",
+        background: "transparent",
+        color: "$text",
+        appearance: "none",
+        outline: "none",
+        border: "0",
+        padding: "0",
+        textAlign: "center",
+        fontSize: "$2xl",
+        fontFamily: "$rubik",
+        lineHeight: "1.4",
+        position: "absolute",
+        top: 0,
+        left: 0,
+      },
+      ".textarea-mirror": {
+        display: "block",
+        width: "100%",
+        height: "auto",
+        whiteSpace: "pre-wrap",
+        padding: "0",
+        textAlign: "center",
+        fontSize: "$2xl",
+        fontFamily: "$rubik",
+        lineHeight: "1.4",
+      },
     },
+  },
+
+  ".select-scout": {
+    display: "flex",
+    justifyContent: "center",
+    gap: "$xs",
   },
 });
 
@@ -166,3 +196,40 @@ async function applyTextPosterSetting(
 
   return response;
 }
+
+const ScoutButton = styled("button", {
+  appearance: "none",
+  outline: "none",
+  border: "1px solid $brand",
+  padding: "$2xs",
+  background: "$background",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  boxSizing: "border-box",
+  width: "100px",
+  gap: "$2xs",
+  fontWeight: "$normal",
+
+  "> div": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    width: "20px",
+    img: {
+      display: "block",
+      width: "100%",
+    },
+  },
+
+  "&:hover": {
+    cursor: "pointer",
+    background: "$brand",
+  },
+
+  "&.active": {
+    background: "$brand",
+  },
+});

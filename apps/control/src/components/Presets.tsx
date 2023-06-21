@@ -368,12 +368,26 @@ export default function Presets({
                               participants:
                                 _preset.participants === undefined
                                   ? []
-                                  : _preset.participants.map((p) => ({
-                                      ...p,
-                                      audioMixMute: [],
-                                      audioOutDelay: 0,
-                                      video: { slots: [], layout: "Default" },
-                                    })),
+                                  : _preset.participants.map((p) =>
+                                      p.type === "PERFORMER"
+                                        ? {
+                                            ...p,
+                                            audioMixMute: [],
+                                            audioOutDelay: 0,
+                                            video: {
+                                              slots: [],
+                                              layout: "Default",
+                                            },
+                                          }
+                                        : p.type === "SCOUT"
+                                        ? {
+                                            ...p,
+                                            audioMixMute: [],
+                                            audioOutDelay: 0,
+                                            textPoster: "",
+                                          }
+                                        : undefined
+                                    ),
                             },
                           }),
                           headers: {

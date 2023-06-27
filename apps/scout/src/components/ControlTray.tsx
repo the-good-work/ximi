@@ -3,12 +3,14 @@ import React, { Dispatch, useState } from "react";
 import ToggleIconButton from "ui/Buttons/ToggleIconButton";
 import {
   Bug,
+  Star,
   Chatbox,
   Exit,
   Videocam,
   VolumeHigh,
   VolumeMute,
   VolumeMuteOutline,
+  Text,
 } from "react-ionicons";
 import {
   RoomStateStage,
@@ -34,6 +36,8 @@ export default function ControlTray({
   audioMixMute,
   showDebug,
   setShowDebug,
+  mode,
+  toggleMode,
 }: {
   room?: Room;
   state: RoomStateStage;
@@ -47,6 +51,9 @@ export default function ControlTray({
 
   showDebug: boolean;
   setShowDebug: Dispatch<boolean>;
+
+  mode: "video" | "text";
+  toggleMode: Dispatch<"video" | "text">;
 }) {
   const [muted, setMuted] = useState<boolean>(false);
 
@@ -172,6 +179,13 @@ export default function ControlTray({
           onClick={() => setShowDebug(!showDebug)}
           size={open ? "lg" : "md"}
           icon={<Bug />}
+        />
+
+        <ToggleIconButton
+          active={mode === "video"}
+          onClick={() => toggleMode(mode === "video" ? "text" : "video")}
+          size={open ? "lg" : "md"}
+          icon={mode === "text" ? <Text /> : <Star />}
         />
         <ToggleIconButton
           size={open ? "lg" : "md"}

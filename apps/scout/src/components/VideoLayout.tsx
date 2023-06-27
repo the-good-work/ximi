@@ -8,7 +8,6 @@ import {
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import { styled } from "@stitches/react";
 import { useParticipant } from "@livekit/react-core";
-import { VideoConfiguration } from "livekit-client/dist/src/proto/livekit_models";
 
 const onlyPerformers = (p: Participant) => {
   try {
@@ -22,60 +21,27 @@ const onlyPerformers = (p: Participant) => {
 export default function VideoLayout({
   showDebug,
   participants,
-  videoState,
+  visible,
 }: {
   participants: Participant[];
   showDebug: boolean;
-  videoState: PerformerUpdatePayload["update"]["video"];
+  visible: boolean;
 }) {
-  return (
-    <VideoLayoutContainer>
-      {videoState.layout === "Default"
-        ? participants
-            .filter(onlyPerformers)
-            .sort((a, b) => (a.identity < b.identity ? -1 : 1))
-            .map((p, i, a) => {
-              const rows = Math.round(Math.sqrt(a.length));
-              const columns = Math.ceil(a.length / rows);
-              return (
-                <VideoSlot
-                  participant={p}
-                  key={`${p.identity}_slot${i}_${videoState.layout}`}
-                  w={(1 / columns) * 100}
-                  h={(1 / rows) * 100}
-                  x={((i % columns) / columns) * 100}
-                  y={((Math.ceil((i + 1) / columns) - 1) / rows) * 100}
-                  debug={showDebug}
-                />
-              );
-            })
-        : videoState.slots.map((slot, i) => {
-            const p = participants.find((p) => p.identity === slot.nickname);
+  const localParticipant = participants.find((p) => p.isLocal);
+  if (!localParticipant) {
+    return <></>;
+  }
 
-            if (!p || p === undefined) {
-              return (
-                <VideoEmptySlot
-                  w={slot.size.w * 100}
-                  h={slot.size.h * 100}
-                  key={`empty_slot${i}_${videoState.layout}`}
-                  x={slot.position.x * 100}
-                  y={slot.position.y * 100}
-                />
-              );
-            } else {
-              return (
-                <VideoSlot
-                  debug={showDebug}
-                  participant={p}
-                  w={slot.size.w * 100}
-                  h={slot.size.h * 100}
-                  key={`${p.identity}_slot${i}_${videoState.layout}`}
-                  x={slot.position.x * 100}
-                  y={slot.position.y * 100}
-                />
-              );
-            }
-          })}
+  return (
+    <VideoLayoutContainer style={{ opacity: visible ? 1 : 0 }}>
+      <VideoSlot
+        participant={localParticipant}
+        x={0}
+        y={0}
+        w={100}
+        h={100}
+        debug={showDebug}
+      />
     </VideoLayoutContainer>
   );
 }

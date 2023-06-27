@@ -14,6 +14,7 @@ import { DataPacket_Kind, RemoteParticipant, RoomEvent } from "livekit-client";
 import ControlTray from "../components/ControlTray";
 import TextPoster from "../components/TextPoster";
 import AudioLayout from "../components/AudioLayout";
+import VideoLayout from "../components/VideoLayout";
 import MessageModal from "../components/MessageModal";
 import { useToast } from "ui";
 
@@ -32,6 +33,7 @@ export default function Stage({
   const [messageOpen, setMessageOpen] = useState<boolean>(false);
   const [showDebug, setShowDebug] = useState<boolean>(false);
   const [tick, setTick] = useState<0 | 1>(0);
+  const [mode, setMode] = useState<"video" | "text">("text");
 
   const [audioMixMute, setAudioMixMute] = useState<
     PerformerUpdatePayload["update"]["audioMixMute"]
@@ -134,16 +136,13 @@ export default function Stage({
 
   return (
     <div className="content noscroll nopadding">
-      {/*
-				<VideoLayout
-					participants={participants}
-					videoState={video}
-					showDebug={showDebug}
-				/>
-			*/}
+      <TextPoster text={textPoster} visible={mode === "text"} />
 
-      <TextPoster text={textPoster} />
-
+      <VideoLayout
+        participants={participants}
+        showDebug={showDebug}
+        visible={mode === "video"}
+      />
       <AudioLayout participants={participants} audioMixMute={audioMixMute} />
 
       <MessageModal
@@ -176,6 +175,8 @@ export default function Stage({
         setOpenMessage={setMessageOpen}
         showDebug={showDebug}
         setShowDebug={setShowDebug}
+        mode={mode}
+        toggleMode={setMode}
       />
     </div>
   );

@@ -9,6 +9,16 @@ const StyledTextPoster = styled("div", {
   whiteSpace: "pre-line",
 });
 
-export default function TextPoster({ text }: { text: string }) {
-  return <StyledTextPoster>{text}</StyledTextPoster>;
+export default function TextPoster({
+  text,
+  visible,
+}: {
+  text: string;
+  visible: boolean;
+}) {
+  return (
+    <StyledTextPoster style={{ opacity: visible ? 1 : 0 }}>
+      {text}
+    </StyledTextPoster>
+  );
 }

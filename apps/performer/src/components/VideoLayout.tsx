@@ -8,7 +8,6 @@ import {
 import { PerformerUpdatePayload } from "@thegoodwork/ximi-types/src/room";
 import { styled } from "@stitches/react";
 import { useParticipant } from "@livekit/react-core";
-import { VideoConfiguration } from "livekit-client/dist/src/proto/livekit_models";
 
 const onlyPerformers = (p: Participant) => {
   try {
@@ -126,7 +125,7 @@ const VideoSlot = ({
           console.log(`subscribing ${videoTrack.trackSid}`);
           (videoTrack as RemoteTrackPublication).setSubscribed(true);
           (videoTrack as RemoteTrackPublication).setVideoQuality(
-            VideoQuality.MEDIUM
+            VideoQuality.LOW
           );
         }
         if (!participant.isLocal && !videoTrack.isEnabled) {

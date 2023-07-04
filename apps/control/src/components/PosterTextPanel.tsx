@@ -82,7 +82,20 @@ export default function PosterTextPanel({
     !participants ||
     thisScoutSettings === undefined
   ) {
-    return <></>;
+    return (
+      <div
+        style={{
+          color: "white",
+          height: "70vh",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Awaiting scouts
+      </div>
+    );
   }
 
   if (performers.length < 1) {
@@ -110,18 +123,12 @@ export default function PosterTextPanel({
             {thisScoutSettings.textPoster}&#8203;
           </div>
           <textarea
-            //disabled={savingText}
+            placeholder="Start typing"
             key={activeScout}
+            style={{ resize: "none" }}
             value={text}
-            // value={thisScoutSettings.textPoster}
-            // this is jumping because async update https://react.dev/reference/react-dom/components/textarea#my-text-area-caret-jumps-to-the-beginning-on-every-keystroke
             onChange={async (e) => {
               setText(e.target.value);
-              // await applyTextPosterSetting(
-              //   room.name,
-              //   activeScout,
-              //   e.target.value
-              // );
             }}
           />
         </div>

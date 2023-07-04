@@ -160,7 +160,7 @@ export default function ControlTray({
               );
             } else {
               const videoTrack = await createLocalVideoTrack({
-                resolution: VideoPresets.h720,
+                resolution: VideoPresets.h360,
               });
               await localParticipant.publishTrack(videoTrack);
             }

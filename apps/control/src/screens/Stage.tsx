@@ -23,6 +23,7 @@ import Text from "ui/Texts/Text";
 import {
   ChatboxSharp,
   ExitSharp,
+  Eye,
   TextSharp,
   VideocamSharp,
   VolumeHighSharp,
@@ -147,7 +148,7 @@ function StagePanel({
       if (participantsSettings.length <= 0) {
         return (
           <StyledEmptyState>
-            <Text>Loading...</Text>
+            <Text>Awaiting performers...</Text>
           </StyledEmptyState>
         );
       } else {
@@ -259,6 +260,10 @@ function StageSidebar({
   const [messageOpen, setMessageOpen] = useState(false);
   const { toast } = useToast();
 
+  const roomHasScout = stageSettings.participants?.find(
+    (p) => p.type === "SCOUT"
+  );
+
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -299,7 +304,16 @@ function StageSidebar({
         active={activePanel === "text"}
         icon={<TextSharp />}
       >
-        Text
+        Scout Text
+      </PanelButton>
+      <PanelButton
+        onClick={() => {
+          setActivePanel("scout-view");
+        }}
+        active={activePanel === "scout-view"}
+        icon={<Eye />}
+      >
+        Scout View
       </PanelButton>
       <div className="controls">
         <div>

@@ -353,8 +353,8 @@ export default function VideoPanel({
 
               return (
                 <ParticipantVideoWrapper key={i} css={{ gridArea }}>
-                  <Text>{p.identity}</Text>
                   <ParticipantVideo participant={p as RemoteParticipant} />
+                  <Text css={{ zIndex: 3 }}>{p.identity}</Text>
                 </ParticipantVideoWrapper>
               );
             })}

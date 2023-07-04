@@ -36,6 +36,7 @@ import Presets from "../components/Presets";
 import AudioLayout from "../components/AudioLayout";
 import { useToast } from "ui/Feedback/Toast";
 import MessageModal from "../components/MessageModal";
+import ScoutView from "../components/ScoutView";
 
 const decoder = new TextDecoder();
 
@@ -223,11 +224,28 @@ function StagePanel({
           <Scrollbar orientation="vertical" />
         </StyledRoot>
       );
-    } else {
+    } else if (activePanel === "text") {
       return (
         <StyledRoot>
           <StyledViewport>
             <PosterTextPanel
+              room={room}
+              participants={participants}
+              participantsSettings={
+                participantsSettings.filter(
+                  (p) => p.type === "SCOUT"
+                ) as ParticipantScout[]
+              }
+            />
+          </StyledViewport>
+          <Scrollbar orientation="vertical" />
+        </StyledRoot>
+      );
+    } else {
+      return (
+        <StyledRoot>
+          <StyledViewport>
+            <ScoutView
               room={room}
               participants={participants}
               participantsSettings={

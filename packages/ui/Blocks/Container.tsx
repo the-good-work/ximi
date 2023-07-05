@@ -177,42 +177,43 @@ export default function Container({
               participantName={participantName || "-"}
             />
             {children}
-            {variant === "performer" && (
-              <IconButton
-                onClick={() => {
-                  setIsFullScreen(!isFullScreen);
-                  let elem = document.getElementById("App");
+            {variant === "performer" ||
+              (variant === "scout" && (
+                <IconButton
+                  onClick={() => {
+                    setIsFullScreen(!isFullScreen);
+                    let elem = document.getElementById("App");
 
-                  if (!document.fullscreenElement) {
-                    elem?.requestFullscreen().catch((err) => {
-                      alert(
-                        `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-                      );
-                    });
-                  } else {
-                    document.exitFullscreen();
+                    if (!document.fullscreenElement) {
+                      elem?.requestFullscreen().catch((err) => {
+                        alert(
+                          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+                        );
+                      });
+                    } else {
+                      document.exitFullscreen();
+                    }
+                  }}
+                  css={{
+                    position: "fixed",
+                    bottom: "$sm",
+                    right: "$sm",
+                    zIndex: 30,
+                  }}
+                  iconSize="md"
+                  variant="outline"
+                  aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
+                    isFullScreen ? "active" : "inactive"
+                  }`}
+                  icon={
+                    isFullScreen ? (
+                      <Contract color="inherit" />
+                    ) : (
+                      <Expand color="inherit" />
+                    )
                   }
-                }}
-                css={{
-                  position: "fixed",
-                  bottom: "$sm",
-                  right: "$sm",
-                  zIndex: 30,
-                }}
-                iconSize="md"
-                variant="outline"
-                aria-label={`Toggle fullscreen. Fullscreen mode is currently ${
-                  isFullScreen ? "active" : "inactive"
-                }`}
-                icon={
-                  isFullScreen ? (
-                    <Contract color="inherit" />
-                  ) : (
-                    <Expand color="inherit" />
-                  )
-                }
-              />
-            )}
+                />
+              ))}
           </div>
           {variant === "performer" && (
             <RoadBlock>

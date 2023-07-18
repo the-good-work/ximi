@@ -77,7 +77,6 @@ export default function PosterTextPanel({
   }, [activeScout, thisScoutSettings?.textPoster]);
 
   const setAllText = useCallback(() => {
-    console.log(room?.name);
     if (!room?.name) {
       return;
     }
@@ -86,7 +85,6 @@ export default function PosterTextPanel({
         ? applyTextPosterSetting(room.name, p.identity, text)
         : null;
     });
-    console.log(promises);
     return Promise.all(promises);
   }, [text, performers, room?.name]);
 
@@ -164,13 +162,13 @@ export default function PosterTextPanel({
         <span className="sep"> </span>
         <ScoutButton
           type="button"
+          style={{ width: "20ch", padding: "6px 3px" }}
           disabled={savingText}
           onClick={async () => {
-            console.log("hey");
             await setAllText();
           }}
         >
-          <Text size="2xs">Apply to All Units</Text>
+          <Text size="2xs">Apply to All Scouts</Text>
         </ScoutButton>
       </div>
     </StyledTextPanel>

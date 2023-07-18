@@ -4,7 +4,7 @@ import {
   RoomUpdatePayload,
 } from "@thegoodwork/ximi-types/src/room";
 import { Participant, Room } from "livekit-client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Text from "ui/Texts/Text";
 
 type Unpacked<T> = T extends (infer U)[]
@@ -75,6 +75,20 @@ export default function PosterTextPanel({
       setText(() => thisScoutSettings.textPoster);
     }
   }, [activeScout, thisScoutSettings?.textPoster]);
+
+  const setAllText = useCallback(() => {
+    console.log(room?.name);
+    if (!room?.name) {
+      return;
+    }
+    const promises = performers.map((p) => {
+      return !!p.identity
+        ? applyTextPosterSetting(room.name, p.identity, text)
+        : null;
+    });
+    console.log(promises);
+    return Promise.all(promises);
+  }, [text, performers, room?.name]);
 
   if (
     !room ||
@@ -147,6 +161,17 @@ export default function PosterTextPanel({
             <Text size="xs">{p.identity}</Text>
           </ScoutButton>
         ))}
+        <span className="sep"> </span>
+        <ScoutButton
+          type="button"
+          disabled={savingText}
+          onClick={async () => {
+            console.log("hey");
+            await setAllText();
+          }}
+        >
+          <Text size="2xs">Apply to All Units</Text>
+        </ScoutButton>
       </div>
     </StyledTextPanel>
   );
@@ -209,7 +234,16 @@ const StyledTextPanel = styled("div", {
   ".select-scout": {
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
     gap: "$xs",
+
+    ".sep": {
+      display: "block",
+      border: 0,
+      borderLeft: "1px solid $accent",
+      height: "1em",
+      margin: "0 4px",
+    },
   },
 });
 

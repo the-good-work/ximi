@@ -159,7 +159,8 @@ export default function PosterTextPanel({
             <Text size="xs">{p.identity}</Text>
           </ScoutButton>
         ))}
-        <span className="sep"> </span>
+      </div>
+      <div className="apply-all">
         <ScoutButton
           type="button"
           style={{ width: "20ch", padding: "6px 3px" }}
@@ -188,9 +189,9 @@ const StyledTextPanel = styled("div", {
 
   ".poster-panel": {
     width: "100%",
-    height: "calc(100vh - 160px)",
     display: "flex",
     alignItems: "center",
+    height: "calc(100vh - 250px)",
 
     ".text-input": {
       position: "relative",
@@ -231,17 +232,16 @@ const StyledTextPanel = styled("div", {
 
   ".select-scout": {
     display: "flex",
+    flexWrap: "wrap",
+    height: "70px",
     justifyContent: "center",
     alignItems: "center",
     gap: "$xs",
-
-    ".sep": {
-      display: "block",
-      border: 0,
-      borderLeft: "1px solid $accent",
-      height: "1em",
-      margin: "0 4px",
-    },
+  },
+  ".apply-all": {
+    height: "30px",
+    display: "flex",
+    justifyContent: "center",
   },
 });
 

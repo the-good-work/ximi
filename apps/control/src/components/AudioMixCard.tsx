@@ -42,7 +42,6 @@ const StyledDiv = styled("div", {
   height: "100%",
   width: "100%",
   minHeight: "240px",
-  maxHeight: "370px",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "space-between",

@@ -25,7 +25,7 @@ const StyledViewport = styled(Viewport, {
 const StyledPresets = styled("div", {
   border: "2px solid $brand",
   width: "100%",
-  height: "calc(100vh - 150px - 9.75rem)",
+  height: "calc(100vh - 190px - 9.75rem)",
   background: "$background",
   overflow: "hidden",
   boxSizing: "border-box",

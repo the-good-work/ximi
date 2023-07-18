@@ -16,7 +16,13 @@ import {
   ParticipantScout,
   MessagePayload,
 } from "@thegoodwork/ximi-types/src/room";
-import { DataPacket_Kind, Participant, Room, RoomEvent } from "livekit-client";
+import {
+  createLocalAudioTrack,
+  DataPacket_Kind,
+  Participant,
+  Room,
+  RoomEvent,
+} from "livekit-client";
 import { Root, Scrollbar, Viewport } from "@radix-ui/react-scroll-area";
 import AudioMixCard from "../components/AudioMixCard";
 import Text from "ui/Texts/Text";
@@ -24,6 +30,7 @@ import {
   ChatboxSharp,
   ExitSharp,
   Eye,
+  MicSharp,
   TextSharp,
   VideocamSharp,
   VolumeHighSharp,
@@ -278,10 +285,6 @@ function StageSidebar({
   const [messageOpen, setMessageOpen] = useState(false);
   const { toast } = useToast();
 
-  const roomHasScout = stageSettings.participants?.find(
-    (p) => p.type === "SCOUT"
-  );
-
   return (
     <StyledSidebar>
       <div className="topSpacer" />
@@ -490,6 +493,8 @@ export default function Stage({
     <div className="content noscroll smallpadding">
       <StyledStage>
         <AudioLayout audioMixMute={audioMixMute} participants={participants} />
+
+        <MicControls room={room} />
         <StagePanel
           roomName={room?.name || ""}
           roomPasscode={state.room?.passcode || ""}
@@ -511,3 +516,62 @@ export default function Stage({
     </div>
   );
 }
+
+function MicControls({ room }: { room: Room | undefined }) {
+  if (room?.state !== "connected") {
+    return <></>;
+  }
+  return (
+    <StyledMicControls>
+      <button
+        className={`${
+          room.localParticipant.audioTracks.size > 0 ? "active" : ""
+        }`}
+        onClick={async () => {
+          if (room.localParticipant.audioTracks.size > 0) {
+            room.localParticipant.audioTracks.forEach((track) => {
+              if (track.audioTrack) {
+                room.localParticipant.unpublishTrack(track.audioTrack);
+              }
+            });
+          } else {
+            const track = await createLocalAudioTrack({
+              echoCancellation: true,
+              noiseSuppression: true,
+              channelCount: 2,
+              sampleRate: 48000,
+              autoGainControl: false,
+            });
+            await room.localParticipant.publishTrack(track);
+          }
+        }}
+      >
+        <MicSharp color="white" />
+      </button>
+    </StyledMicControls>
+  );
+}
+
+const StyledMicControls = styled("div", {
+  position: "absolute",
+  bottom: "20px",
+  left: "20px",
+  background: "$background",
+  zIndex: "5",
+
+  button: {
+    background: "transparent",
+    border: "1px solid $brand",
+    borderRadius: "3px",
+    color: "$text",
+    padding: "$xs",
+    display: "block",
+    width: "40px",
+    height: "40px",
+    cursor: "pointer",
+
+    "&.active": {
+      background: "$brand",
+    },
+  },
+});

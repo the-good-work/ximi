@@ -109,7 +109,11 @@ export default function Stage({
       }
       try {
         const metadata = JSON.parse(participant.metadata || "");
-        if (metadata.type === "PERFORMER" || metadata.type === "SCOUT") {
+        if (
+          metadata.type === "PERFORMER" ||
+          metadata.type === "SCOUT" ||
+          metadata.type === "CONTROL"
+        ) {
           (participant as RemoteParticipant).audioTracks.forEach(
             (publication) => {
               const shouldSubscribe = true; // some sort of logic determining whether we should be listening to this participant's audio

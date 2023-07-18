@@ -5,7 +5,11 @@ import { Participant, RemoteParticipant } from "livekit-client";
 const onlyPerformers = (p: Participant) => {
   try {
     const meta = JSON.parse(p.metadata || "");
-    return meta?.type === "PERFORMER" || meta?.type === "SCOUT";
+    return (
+      meta?.type === "PERFORMER" ||
+      meta?.type === "SCOUT" ||
+      meta?.type === "CONTROL"
+    );
   } catch (err) {
     return false;
   }

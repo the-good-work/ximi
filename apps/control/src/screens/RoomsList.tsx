@@ -100,9 +100,9 @@ export default function RoomsList({
                 return (
                   <ListButton
                     onClick={() => {
-                      if (r.participants >= 9) {
-                        return;
-                      }
+                      //if (r.participants >= 9) {
+                      //  return;
+                      //}
                       updateState({
                         type: "select-room",
                         room: r,

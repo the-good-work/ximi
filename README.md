@@ -12,3 +12,7 @@ This repository is a turbo monorepo containing:
 2. XIMI server
 
 Refactor will allow monorepo to all run with `pnpm` instead of npm, and upgrade all dependency packages as well as the node version to v18.x.
+
+## Development
+
+A livekit backend is needed to run the application. On macOS, `brew install livekit` should install the latest version of livekit.

@@ -3,6 +3,7 @@ import {
   RoomServiceClient,
   WebhookReceiver,
   AccessToken,
+  Room,
 } from 'livekit-server-sdk';
 
 @Injectable()
@@ -21,6 +22,10 @@ export class LivekitService {
       process.env.LIVEKIT_KEY,
       process.env.LIVEKIT_SECRET,
     );
+  }
+
+  async getRoom(roomName: string): Promise<Room[]> {
+    return this.client.listRooms([roomName]);
   }
 
   generateTokenForRoom(roomName: string, participantIdentity: string): string {

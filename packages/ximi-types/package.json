@@ -1,0 +1,15 @@
+{
+  "name": "@thegoodwork/ximi-types",
+  "version": "1.0.5",
+  "description": "",
+  "main": "index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}

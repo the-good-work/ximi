@@ -10,3 +10,6 @@ export * from "./Texts/Heading";
 export * from "./Form/Input";
 export * from "./Composites/ScreenContainer";
 export * from "./Feedback/Toast";
+
+import * as tailwind from "./tailwind";
+export { tailwind };

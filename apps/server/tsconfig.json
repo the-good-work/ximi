@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/validation-schema/*": ["../../packages/validation-schema/*"]
+    },
+    "jsx": "react-jsx",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,

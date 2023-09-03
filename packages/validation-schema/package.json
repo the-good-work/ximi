@@ -1,17 +1,20 @@
 {
   "name": "validation-schema",
   "version": "0.0.1",
-  "main": "./index.ts",
-  "types": "./index.ts",
-  "license": "MIT",
-  "scripts": {},
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsup src/index.ts --dts --watch",
+    "build": "tsup src/index.ts --dts --minify"
+  },
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
-    "tsconfig": "*",
-    "typescript": "^4.5.2"
+    "typescript": "*",
+    "tsconfig": "workspace:*"
   },
   "dependencies": {
+    "tsup": "^7.2.0",
     "yup": "^1.2.0"
   }
 }

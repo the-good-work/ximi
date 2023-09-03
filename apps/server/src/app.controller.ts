@@ -16,13 +16,7 @@ import * as Yup from 'yup';
 import { ApiBody } from '@nestjs/swagger';
 import { yupToOpenAPISchema } from './util/yup-to-openapi-schema';
 import { YupValidationPipe } from './util/yup.pipe';
-
-export const createRoomSchema = Yup.object({
-  roomName: Yup.string().required().max(10).min(2),
-  passcode: Yup.string().max(5).min(5).required(),
-})
-  .required()
-  .noUnknown();
+import { createRoomSchema } from 'validation-schema';
 
 @Controller()
 export class AppController {
@@ -32,7 +26,7 @@ export class AppController {
   async getRoomExists(
     @Param() { roomName }: { roomName: string },
   ): Promise<boolean> {
-    const _rooms = await this.livekit.getRoom(roomName);
+    const _rooms = await this.livekit.getRoom(roomName.toUpperCase());
 
     if (_rooms.length < 1) {
       return false;
@@ -43,7 +37,20 @@ export class AppController {
 
   @Get('rooms')
   async listRooms(): Promise<Room[]> {
-    return await this.livekit.client.listRooms();
+    const rooms = await this.livekit.client.listRooms();
+    return rooms.map((room) => {
+      let metaWithoutPasscode: unknown;
+      try {
+        const _m = JSON.parse(room.metadata);
+        if (_m.passcode) {
+          delete _m.passcode;
+        }
+        metaWithoutPasscode = _m;
+      } catch (err) {
+        metaWithoutPasscode = {};
+      }
+      return { ...room, metadata: JSON.stringify(metaWithoutPasscode) };
+    });
   }
 
   @Post('room')
@@ -60,10 +67,26 @@ export class AppController {
     });
   }
 
+  @Get('room/:roomName/identity/:identity/exists')
+  async identityExistsInRoom(
+    @Param() params: { roomName: string; identity: string },
+  ): Promise<boolean> {
+    const { roomName, identity } = params;
+    const participantsInRoom = await this.livekit.client.listParticipants(
+      roomName,
+    );
+    return participantsInRoom.reduce((p, c) => {
+      if (p === true) {
+        return p;
+      }
+      return c.identity === identity;
+    }, false);
+  }
+
   @Post('token/:roomName/:identity')
   async generateToken(@Param() params: any): Promise<string> {
     const { roomName, identity } = params;
-    const _room = await this.livekit.client.listRooms(roomName);
+    const _room = await this.livekit.client.listRooms([roomName]);
     if (_room.length < 1) {
       throw new NotFoundException('Room not found');
     }
@@ -72,12 +95,15 @@ export class AppController {
 
   @Post('livekit/webhook')
   async handleWebhooks(@Req() req: RawBodyRequest<Request>) {
-    const raw = req.rawBody;
-    const event = this.livekit.webhookReceiver.receive(
-      raw.toString(),
-      req.get('Authorization'),
-    );
-
-    console.log(event);
+    const raw = req.body;
+    if (raw) {
+      const event = this.livekit.webhookReceiver.receive(
+        raw.toString('utf8'),
+        req.get('Authorization'),
+      );
+      console.log({ event });
+    } else {
+      console.warn('didnt parse');
+    }
   }
 }

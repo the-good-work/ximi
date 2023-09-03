@@ -5,8 +5,8 @@ import { FaSpinner } from "react-icons/fa6";
 import { Header, Layout } from "ui/tailwind";
 import { Dialog, Transition } from "@headlessui/react";
 import useSWR from "swr";
-import { ErrorMessage, Field, Formik, useFormikContext } from "formik";
-import { createRoomSchema } from "validation-schema";
+import { ErrorMessage, Field, Formik } from "formik";
+import { createRoomSchema, joinRoomSchemaForRoom } from "validation-schema";
 import * as Yup from "yup";
 import { Fragment } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -39,17 +39,29 @@ const Screen: React.FC<{
   setToken: Dispatch<SetStateAction<string | undefined>>;
   setConnect: Dispatch<SetStateAction<boolean>>;
   setRoomname: Dispatch<SetStateAction<string | undefined>>;
-}> = ({ room }) => {
+}> = ({ room, setToken, setConnect, setRoomname }) => {
   return (
     <Layout>
       <Header roomName={room} version={__APP_VERSION__} />
-      {room === undefined ? <RoomListScreen /> : <div>join</div>}
+      {room === undefined ? (
+        <RoomListScreen
+          setToken={setToken}
+          setConnect={setConnect}
+          setRoomname={setRoomname}
+        />
+      ) : (
+        <div>join</div>
+      )}
       <Toaster />
     </Layout>
   );
 };
 
-const RoomListScreen = () => {
+const RoomListScreen: React.FC<{
+  setToken: Dispatch<SetStateAction<string | undefined>>;
+  setConnect: Dispatch<SetStateAction<boolean>>;
+  setRoomname: Dispatch<SetStateAction<string | undefined>>;
+}> = ({ setToken, setConnect, setRoomname }) => {
   const { data, isValidating, error, mutate } = useSWR(
     "list-rooms",
     async () => {
@@ -65,6 +77,14 @@ const RoomListScreen = () => {
 
   const [showLoading, setShowLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(true);
+  const [joiningRoom, setJoiningRoom] = useState<string>("HAHA");
+
+  const connectToRoom = (passcode: string, identity: string) => {
+    setToken(() => "fjskdjkfd");
+    setRoomname(() => "room");
+    setConnect(() => true);
+  };
 
   useEffect(() => {
     if (isValidating) {
@@ -118,6 +138,134 @@ const RoomListScreen = () => {
           Create room
         </Button>
       </div>
+
+      <Transition show={showJoinModal} as={Fragment}>
+        <Dialog className="relative" onClose={() => setShowJoinModal(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="transition duration-100 ease-out"
+            enterFrom="opacity-0"
+            enterTo="opacity-1"
+            leave="transition duration-75 ease-out"
+            leaveFrom="transform opacity-100"
+            leaveTo="transform opacity-0"
+          >
+            <div className="fixed inset-0 z-10 bg-bg/80">&nbsp;</div>
+          </Transition.Child>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-300"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-90"
+          >
+            <Dialog.Panel className="z-20 w-full max-w-lg p-0 border rounded-md bg-bg border-brand text-text top-[50%] left-[50%] fixed transform translate-x-[-50%] translate-y-[-50%]">
+              <Dialog.Title className="py-2 text-xl text-center">
+                Join Room {joiningRoom}
+              </Dialog.Title>
+
+              <Formik<Yup.InferType<ReturnType<typeof joinRoomSchemaForRoom>>>
+                validationSchema={joinRoomSchemaForRoom}
+                initialValues={{ roomName: "", passcode: "", identity: "" }}
+                validateOnMount={true}
+                onSubmit={async ({ roomName, passcode }) => {
+                  try {
+                    const response = await fetch(
+                      `${
+                        import.meta.env.VITE_XIMI_SERVER_HOST || ""
+                      }/room/join`,
+                      {
+                        method: "POST",
+                        body: JSON.stringify({ roomName, passcode }),
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      },
+                    );
+                    return response;
+                  } catch (err) {
+                    toast.error("An error has occurred");
+                  }
+                }}
+              >
+                {({ isValid, isSubmitting, submitForm, resetForm, values }) => (
+                  <form>
+                    <div className="p-4 border-y border-brand">
+                      <div className="flex flex-col items-center my-2 gap-1">
+                        <label className="text-sm uppercase">Room name</label>
+                        <Field
+                          name="roomName"
+                          className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm uppercase"
+                          placeholder="Myroom"
+                          disabled={isSubmitting}
+                        />
+
+                        <div className="text-sm text-negative">
+                          <ErrorMessage name="roomName" />
+                          &nbsp;
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-center my-2 gap-1">
+                        <label className="text-sm uppercase">Passcode</label>
+
+                        <Field
+                          name="passcode"
+                          type="password"
+                          disabled={isSubmitting}
+                          className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm"
+                          placeholder="*****"
+                        />
+                        <div className="text-sm text-negative">
+                          <ErrorMessage name="passcode" />
+                          &nbsp;
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex p-4 gap-4">
+                      <Button onClick={() => setShowCreateModal(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={async () => {
+                          const _roomName = values.roomName.toUpperCase();
+                          const response =
+                            (await submitForm()) as unknown as Response;
+                          if (
+                            response.status === 200 ||
+                            response.status === 201
+                          ) {
+                            setShowCreateModal(() => false);
+                            resetForm();
+                            mutate();
+                            toast.success(`Created room ${_roomName}`);
+                          } else {
+                            setShowCreateModal(() => false);
+                            const data = await response?.json();
+                            if (Array.isArray(data?.message)) {
+                              (data.message as string[]).forEach((m) =>
+                                toast.error(m),
+                              );
+                            } else {
+                              toast.error("An error has occurred. ");
+                            }
+                          }
+                        }}
+                        disabled={!isValid || isSubmitting}
+                      >
+                        {isSubmitting ? "Submitting" : "Submit"}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+              </Formik>
+            </Dialog.Panel>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
 
       <Transition show={showCreateModal} as={Fragment}>
         <Dialog
@@ -251,38 +399,4 @@ const RoomListScreen = () => {
       </Transition>
     </div>
   );
-};
-
-const CheckRoomExists = () => {
-  const { setFieldError, values } =
-    useFormikContext<Yup.InferType<typeof createRoomSchema>>();
-
-  useEffect(() => {
-    if (values.roomName === "") {
-      return;
-    }
-    try {
-      fetch(
-        `${import.meta.env.VITE_XIMI_SERVER_HOST || ""}/room/${
-          values.roomName
-        }/exists`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      ).then((res) => {
-        res.json().then((exists) => {
-          if (exists) {
-            setFieldError("roomName", `room ${values.roomName} already exists`);
-          }
-        });
-      });
-    } catch (err) {
-      console.log("Error validating room exists");
-    }
-  }, [values.roomName, setFieldError]);
-
-  return null;
 };

@@ -1,1 +1,1 @@
-export { createRoomSchema, joinRoomSchemaForRoom } from "./room.schema";
+export * from "./room.schema";

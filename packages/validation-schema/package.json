@@ -1,11 +1,11 @@
 {
   "name": "validation-schema",
   "version": "0.0.1",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tsup src/index.ts --dts --watch",
-    "build": "tsup src/index.ts --dts --minify"
+    "dev": "tsup src/index.ts --dts --format esm,cjs --watch",
+    "build": "tsup src/index.ts --dts --format esm,cjs --minify"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

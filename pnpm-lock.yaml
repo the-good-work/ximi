@@ -161,7 +161,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/ui
       validation-schema:
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/validation-schema
       yup:
         specifier: ^1.2.0

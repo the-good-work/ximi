@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "jsx": "preserve",
+    "module": "ESNext",
+    "target": "esnext",
     "lib": ["esnext", "dom"]
   },
   "extends": "tsconfig/react-library.json",
-  "include": ["."],
+  "include": ["src"],
   "exclude": ["dist", "build", "node_modules"]
 }

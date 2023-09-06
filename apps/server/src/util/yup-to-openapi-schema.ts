@@ -82,9 +82,10 @@ const parseNode: (
   }
 };
 
-export const yupToOpenAPISchema: (yupSchema: Schema) => ApiBodyOptions = (
-  yupSchema,
-) => {
+export const yupToOpenAPISchema: (
+  yupSchema: Schema,
+  description?: string,
+) => ApiBodyOptions = (yupSchema, description) => {
   const schemaDescription = yupSchema.describe();
-  return { schema: parseNode(schemaDescription) };
+  return { schema: parseNode(schemaDescription), description };
 };

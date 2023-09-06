@@ -6,6 +6,16 @@ rtc:
   port_range_end: 60000
   use_external_ip: false
   use_mdns: false
+  #stun_servers:
+  #  - stun.relay.metered.ca:80
+  #turn_servers:
+  #  - host: a.relay.metered.ca
+  #    port:
+  #      443
+  #      # tls, tcp, or udp
+  #    protocol: tls
+  #    username: '9d17da4330d48571b6fa210e'
+  #    credential: 'arvhL4qlS+oJJk/e'
 redis:
   address:
     127.0.0.1:6379

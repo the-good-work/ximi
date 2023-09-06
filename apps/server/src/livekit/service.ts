@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { XIMIRole } from 'ximi-types';
 import {
   RoomServiceClient,
   WebhookReceiver,
@@ -28,11 +29,15 @@ export class LivekitService {
     return this.client.listRooms([roomName]);
   }
 
-  generateTokenForRoom(roomName: string, participantIdentity: string): string {
+  generateTokenForRoom(
+    roomName: string,
+    participantIdentity: string,
+    role: XIMIRole,
+  ): string {
     const at = new AccessToken(
       process.env.LIVEKIT_KEY,
       process.env.LIVEKIT_SECRET,
-      { identity: participantIdentity },
+      { identity: participantIdentity, metadata: JSON.stringify({ role }) },
     );
     at.addGrant({ roomJoin: true, room: roomName });
     const token = at.toJwt();

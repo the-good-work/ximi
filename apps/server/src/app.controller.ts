@@ -4,10 +4,13 @@ import {
   Get,
   Param,
   Post,
+  Patch,
   RawBodyRequest,
-  NotFoundException,
   Req,
   UsePipes,
+  NotFoundException,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Room } from 'livekit-server-sdk';
@@ -16,7 +19,15 @@ import * as Yup from 'yup';
 import { ApiBody } from '@nestjs/swagger';
 import { yupToOpenAPISchema } from './util/yup-to-openapi-schema';
 import { YupValidationPipe } from './util/yup.pipe';
-import { createRoomSchema } from 'validation-schema';
+import { createRoomSchema, joinRoomSchema } from 'validation-schema';
+import { config } from 'dotenv';
+import {
+  SetPresetNameAction,
+  SwitchActivePresetAction,
+  XimiRoomState,
+} from 'ximi-types';
+
+config();
 
 @Controller()
 export class AppController {
@@ -54,16 +65,22 @@ export class AppController {
   }
 
   @Post('room')
-  @UsePipes(new YupValidationPipe(createRoomSchema))
-  @ApiBody(yupToOpenAPISchema(createRoomSchema))
+  @UsePipes(new YupValidationPipe(createRoomSchema(process.env.HOST)))
+  @ApiBody(yupToOpenAPISchema(createRoomSchema(process.env.HOST)))
   async createRoom(
-    @Body() body: Yup.InferType<typeof createRoomSchema>,
+    @Body() body: Yup.InferType<ReturnType<typeof createRoomSchema>>,
   ): Promise<Room> {
+    const initialMeta: XimiRoomState = {
+      passcode: body.passcode,
+      activePreset: 0,
+      presets: new Array(12).fill(0).map((_, n) => ({
+        participants: {},
+        name: `PRESET${n + 1}`,
+      })),
+    };
     return await this.livekit.client.createRoom({
       name: body.roomName.toUpperCase(),
-      metadata: JSON.stringify({
-        passcode: body.passcode,
-      }),
+      metadata: JSON.stringify(initialMeta),
     });
   }
 
@@ -83,14 +100,142 @@ export class AppController {
     }, false);
   }
 
-  @Post('token/:roomName/:identity')
-  async generateToken(@Param() params: any): Promise<string> {
-    const { roomName, identity } = params;
-    const _room = await this.livekit.client.listRooms([roomName]);
-    if (_room.length < 1) {
+  @Post('room/token/control')
+  @UsePipes(new YupValidationPipe(joinRoomSchema()))
+  @ApiBody(yupToOpenAPISchema(joinRoomSchema()))
+  async generateControlToken(
+    @Body() body: Yup.InferType<ReturnType<typeof joinRoomSchema>>,
+  ): Promise<{ token: string }> {
+    const { identity, passcode, roomName } = body;
+
+    // check room exists first
+    const room = await this.livekit.getRoom(roomName);
+    if (room.length < 1) {
       throw new NotFoundException('Room not found');
     }
-    return this.livekit.generateTokenForRoom(roomName, identity);
+
+    try {
+      const { passcode: actualPasscode } = JSON.parse(room[0].metadata) as {
+        passcode: string;
+      };
+
+      if (passcode !== actualPasscode) {
+        throw new UnauthorizedException('Incorrect passcode');
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    return {
+      token: this.livekit.generateTokenForRoom(roomName, identity, 'CONTROL'),
+    };
+  }
+
+  @Post('room/identity/check')
+  async checkIdentityAvailableForRoom(
+    @Body() body: { identity: string; roomName: string },
+  ): Promise<{ ok: boolean }> {
+    const { roomName, identity } = body;
+    const participants = await this.livekit.client.listParticipants(roomName);
+
+    const existingParticipantIdentities = participants.map((p) => p.identity);
+    return { ok: existingParticipantIdentities.indexOf(identity) < 0 };
+  }
+
+  @Post('room/passcode/check')
+  async checkPasscodeForRoom(
+    @Body() body: { passcode: string; roomName: string },
+  ): Promise<{ ok: boolean }> {
+    const { roomName, passcode } = body;
+    const room = await this.livekit.getRoom(roomName);
+    console.log(1, { room });
+    if (room.length < 1) {
+      throw new NotFoundException('Room not found');
+    }
+
+    try {
+      const metadata = JSON.parse(room[0].metadata) as XimiRoomState;
+      return { ok: metadata.passcode === passcode };
+    } catch (err) {
+      console.log(err);
+      throw new BadRequestException(err);
+    }
+  }
+
+  @Post('room/token/performer')
+  @UsePipes(new YupValidationPipe(joinRoomSchema()))
+  @ApiBody(yupToOpenAPISchema(joinRoomSchema(), 'Generate a performer token'))
+  async generatePerformerToken(
+    @Body() body: Yup.InferType<ReturnType<typeof joinRoomSchema>>,
+  ): Promise<{ token: string }> {
+    const { identity, passcode, roomName } = body;
+
+    // check room exists first
+    const room = await this.livekit.getRoom(roomName);
+    if (room.length < 1) {
+      throw new NotFoundException('Room not found');
+    }
+
+    try {
+      const { passcode: actualPasscode } = JSON.parse(room[0].metadata) as {
+        passcode: string;
+      };
+
+      if (passcode !== actualPasscode) {
+        throw new UnauthorizedException('Incorrect passcode');
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    return {
+      token: this.livekit.generateTokenForRoom(roomName, identity, 'PERFORMER'),
+    };
+  }
+
+  @Patch('room/state')
+  async updateRoomState(
+    @Body() body: SwitchActivePresetAction | SetPresetNameAction,
+  ) {
+    const { type, roomName } = body;
+
+    const room = await this.livekit.getRoom(roomName);
+
+    if (room.length < 1) {
+      throw new NotFoundException('Room not found');
+    }
+
+    try {
+      const metadata = JSON.parse(room[0].metadata) as XimiRoomState;
+
+      //TODO: make a Yup validation schema for this to make sure updates are always correct
+
+      switch (type) {
+        case 'set-active-preset': {
+          const { activePreset } = body;
+
+          this.livekit.client.updateRoomMetadata(
+            roomName,
+            JSON.stringify(Object.assign(metadata, { activePreset })),
+          );
+          break;
+        }
+
+        case 'set-preset-name': {
+          const { preset, name } = body;
+          const update = { ...metadata };
+          update.presets[preset].name = name;
+
+          this.livekit.client.updateRoomMetadata(
+            roomName,
+            JSON.stringify(update),
+          );
+          break;
+        }
+      }
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   @Post('livekit/webhook')

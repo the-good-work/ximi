@@ -44,7 +44,7 @@ const Header: React.FC<{
           <FaV /> {version}
         </li>
         <li>
-          <FaCalendar /> {format(date, "EEE d MMM hh:mm:ss b")}
+          <FaCalendar /> {format(date, "EEE d MMM hh:mm:ss aa")}
         </li>
       </ul>
     </div>

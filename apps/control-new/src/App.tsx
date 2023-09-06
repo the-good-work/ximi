@@ -5,28 +5,38 @@ import { FaSpinner } from "react-icons/fa6";
 import { Header, Layout } from "ui/tailwind";
 import { Dialog, Transition } from "@headlessui/react";
 import useSWR from "swr";
-import { ErrorMessage, Field, Formik } from "formik";
-import { createRoomSchema, joinRoomSchemaForRoom } from "validation-schema";
+import { ErrorMessage, Field, Formik, useFormikContext } from "formik";
+import {
+  createRoomSchema,
+  joinRoomSchema,
+} from "validation-schema/dist/index.mjs";
 import * as Yup from "yup";
 import { Fragment } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import { Stage } from "./Stage";
+import { joinRoomSchemaForRoom } from "validation-schema";
+
+const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
 
 function App() {
   const [roomname, setRoomname] = useState<string>();
+  const [identity, setIdentity] = useState<string>();
   const [token, setToken] = useState<string>();
   const [connect, setConnect] = useState<boolean>(false);
 
   return (
     <LiveKitRoom
       token={token}
-      serverUrl="ws://localhost:7880"
+      serverUrl={import.meta.env.VITE_XIMI_LIVEKIT_HOST}
       connect={connect}
     >
       <Screen
         room={roomname}
+        identity={identity}
         setToken={setToken}
         setConnect={setConnect}
         setRoomname={setRoomname}
+        setIdentity={setIdentity}
       />
     </LiveKitRoom>
   );
@@ -36,21 +46,24 @@ export default App;
 
 const Screen: React.FC<{
   room?: string;
+  identity?: string;
   setToken: Dispatch<SetStateAction<string | undefined>>;
   setConnect: Dispatch<SetStateAction<boolean>>;
   setRoomname: Dispatch<SetStateAction<string | undefined>>;
-}> = ({ room, setToken, setConnect, setRoomname }) => {
+  setIdentity: Dispatch<SetStateAction<string | undefined>>;
+}> = ({ identity, room, setToken, setConnect, setRoomname, setIdentity }) => {
   return (
     <Layout>
-      <Header roomName={room} version={__APP_VERSION__} />
-      {room === undefined ? (
+      <Header roomName={room} version={__APP_VERSION__} identity={identity} />
+      {room === undefined || identity === undefined ? (
         <RoomListScreen
           setToken={setToken}
           setConnect={setConnect}
           setRoomname={setRoomname}
+          setIdentity={setIdentity}
         />
       ) : (
-        <div>join</div>
+        <Stage />
       )}
       <Toaster />
     </Layout>
@@ -61,13 +74,12 @@ const RoomListScreen: React.FC<{
   setToken: Dispatch<SetStateAction<string | undefined>>;
   setConnect: Dispatch<SetStateAction<boolean>>;
   setRoomname: Dispatch<SetStateAction<string | undefined>>;
-}> = ({ setToken, setConnect, setRoomname }) => {
+  setIdentity: Dispatch<SetStateAction<string | undefined>>;
+}> = ({ setToken, setConnect, setRoomname, setIdentity }) => {
   const { data, isValidating, error, mutate } = useSWR(
     "list-rooms",
     async () => {
-      const r = await fetch(
-        `${import.meta.env.VITE_XIMI_SERVER_HOST || ""}/rooms`,
-      );
+      const r = await fetch(`${SERVER_HOST}/rooms`);
       return await r.json();
     },
     {
@@ -77,14 +89,8 @@ const RoomListScreen: React.FC<{
 
   const [showLoading, setShowLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showJoinModal, setShowJoinModal] = useState(true);
-  const [joiningRoom, setJoiningRoom] = useState<string>("HAHA");
-
-  const connectToRoom = (passcode: string, identity: string) => {
-    setToken(() => "fjskdjkfd");
-    setRoomname(() => "room");
-    setConnect(() => true);
-  };
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [joiningRoom, setJoiningRoom] = useState<string>("");
 
   useEffect(() => {
     if (isValidating) {
@@ -116,7 +122,13 @@ const RoomListScreen: React.FC<{
             scrollbarGutter: "stable",
           }}
         >
-          <RoomList rooms={data} />
+          <RoomList
+            rooms={data}
+            onClick={(roomName) => {
+              setJoiningRoom(roomName);
+              setShowJoinModal(true);
+            }}
+          />
         </div>
       </div>
 
@@ -131,8 +143,6 @@ const RoomListScreen: React.FC<{
           size="base"
           onClick={async () => {
             setShowCreateModal(() => true);
-            // await createRoom(`RM${Math.floor(Math.random() * 25)}`);
-            // mutate();
           }}
         >
           Create room
@@ -167,100 +177,122 @@ const RoomListScreen: React.FC<{
               </Dialog.Title>
 
               <Formik<Yup.InferType<ReturnType<typeof joinRoomSchemaForRoom>>>
-                validationSchema={joinRoomSchemaForRoom}
-                initialValues={{ roomName: "", passcode: "", identity: "" }}
+                validationSchema={joinRoomSchemaForRoom(
+                  SERVER_HOST,
+                  joiningRoom,
+                )}
+                initialValues={{
+                  passcode: "",
+                  identity: "",
+                  // roomName: joiningRoom,
+                }}
                 validateOnMount={true}
-                onSubmit={async ({ roomName, passcode }) => {
+                onSubmit={async (
+                  { passcode, identity: _identity },
+                  { setFieldError, resetForm },
+                ) => {
+                  const identity = _identity.toUpperCase();
                   try {
+                    // first, get a token
                     const response = await fetch(
-                      `${
-                        import.meta.env.VITE_XIMI_SERVER_HOST || ""
-                      }/room/join`,
+                      `${SERVER_HOST}/room/token/control`,
                       {
                         method: "POST",
-                        body: JSON.stringify({ roomName, passcode }),
+                        body: JSON.stringify({
+                          identity,
+                          passcode,
+                          roomName: joiningRoom,
+                        }),
                         headers: {
                           "Content-Type": "application/json",
                         },
                       },
                     );
-                    return response;
+
+                    const data = await response.json();
+
+                    if (typeof data.token === "string") {
+                      setToken(() => data.token);
+                      setRoomname(() => joiningRoom);
+                      setIdentity(() => identity);
+                      setConnect(() => true);
+                      resetForm();
+                      setShowJoinModal(false);
+                    } else {
+                      if (data?.message === "Incorrect passcode") {
+                        setFieldError("passcode", "Passcode incorrect");
+                      } else {
+                        throw new Error(data?.message);
+                      }
+                    }
                   } catch (err) {
+                    setShowJoinModal(false);
                     toast.error("An error has occurred");
                   }
                 }}
               >
-                {({ isValid, isSubmitting, submitForm, resetForm, values }) => (
-                  <form>
-                    <div className="p-4 border-y border-brand">
-                      <div className="flex flex-col items-center my-2 gap-1">
-                        <label className="text-sm uppercase">Room name</label>
-                        <Field
-                          name="roomName"
-                          className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm uppercase"
-                          placeholder="Myroom"
-                          disabled={isSubmitting}
-                        />
+                {({ isValid, isSubmitting, submitForm, resetForm }) => {
+                  return (
+                    <form>
+                      <JoinRoomName joiningRoom={joiningRoom} />
+                      <div className="p-4 border-y border-brand">
+                        <div className="flex flex-col items-center my-2 gap-1">
+                          <label className="text-sm uppercase">Name</label>
+                          <Field
+                            name="identity"
+                            className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm uppercase"
+                            placeholder="Alice"
+                            disabled={isSubmitting}
+                            data-1p-ignore
+                            autoComplete="off"
+                          />
 
-                        <div className="text-sm text-negative">
-                          <ErrorMessage name="roomName" />
-                          &nbsp;
+                          <div className="text-sm text-negative">
+                            <ErrorMessage name="identity" />
+                            &nbsp;
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-center my-2 gap-1">
+                          <label className="text-sm uppercase">Passcode</label>
+
+                          <Field
+                            name="passcode"
+                            type="password"
+                            disabled={isSubmitting}
+                            className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm"
+                            placeholder="*****"
+                            data-1p-ignore
+                            autoComplete="off"
+                          />
+                          <div className="text-sm text-negative">
+                            <ErrorMessage name="passcode" />
+                            &nbsp;
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex flex-col items-center my-2 gap-1">
-                        <label className="text-sm uppercase">Passcode</label>
-
-                        <Field
-                          name="passcode"
-                          type="password"
-                          disabled={isSubmitting}
-                          className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm"
-                          placeholder="*****"
-                        />
-                        <div className="text-sm text-negative">
-                          <ErrorMessage name="passcode" />
-                          &nbsp;
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex p-4 gap-4">
-                      <Button onClick={() => setShowCreateModal(false)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={async () => {
-                          const _roomName = values.roomName.toUpperCase();
-                          const response =
-                            (await submitForm()) as unknown as Response;
-                          if (
-                            response.status === 200 ||
-                            response.status === 201
-                          ) {
-                            setShowCreateModal(() => false);
+                      <div className="flex p-4 gap-4">
+                        <Button
+                          onClick={() => {
+                            setShowJoinModal(false);
                             resetForm();
-                            mutate();
-                            toast.success(`Created room ${_roomName}`);
-                          } else {
-                            setShowCreateModal(() => false);
-                            const data = await response?.json();
-                            if (Array.isArray(data?.message)) {
-                              (data.message as string[]).forEach((m) =>
-                                toast.error(m),
-                              );
-                            } else {
-                              toast.error("An error has occurred. ");
-                            }
-                          }
-                        }}
-                        disabled={!isValid || isSubmitting}
-                      >
-                        {isSubmitting ? "Submitting" : "Submit"}
-                      </Button>
-                    </div>
-                  </form>
-                )}
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={async () => {
+                            await submitForm();
+                          }}
+                          disabled={!isValid || isSubmitting}
+                        >
+                          {isSubmitting ? "Submitting" : "Submit"}
+                        </Button>
+                      </div>
+                    </form>
+                  );
+                }}
               </Formik>
             </Dialog.Panel>
           </Transition.Child>
@@ -298,22 +330,19 @@ const RoomListScreen: React.FC<{
                 Create a new room
               </Dialog.Title>
 
-              <Formik<Yup.InferType<typeof createRoomSchema>>
-                validationSchema={createRoomSchema}
+              <Formik<Yup.InferType<ReturnType<typeof createRoomSchema>>>
+                validationSchema={createRoomSchema(SERVER_HOST)}
                 initialValues={{ roomName: "", passcode: "" }}
                 validateOnMount={true}
                 onSubmit={async ({ roomName, passcode }) => {
                   try {
-                    const response = await fetch(
-                      `${import.meta.env.VITE_XIMI_SERVER_HOST || ""}/room`,
-                      {
-                        method: "POST",
-                        body: JSON.stringify({ roomName, passcode }),
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
+                    const response = await fetch(`${SERVER_HOST}/room`, {
+                      method: "POST",
+                      body: JSON.stringify({ roomName, passcode }),
+                      headers: {
+                        "Content-Type": "application/json",
                       },
-                    );
+                    });
                     return response;
                   } catch (err) {
                     toast.error("An error has occurred");
@@ -330,13 +359,14 @@ const RoomListScreen: React.FC<{
                           className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm uppercase"
                           placeholder="Myroom"
                           disabled={isSubmitting}
+                          autoComplete="off"
+                          data-1p-ignore
                         />
 
                         <div className="text-sm text-negative">
                           <ErrorMessage name="roomName" />
                           &nbsp;
                         </div>
-                        <CheckRoomExists />
                       </div>
 
                       <div className="flex flex-col items-center my-2 gap-1">
@@ -348,6 +378,8 @@ const RoomListScreen: React.FC<{
                           disabled={isSubmitting}
                           className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm"
                           placeholder="*****"
+                          autoComplete="off"
+                          data-1p-ignore
                         />
                         <div className="text-sm text-negative">
                           <ErrorMessage name="passcode" />
@@ -399,4 +431,14 @@ const RoomListScreen: React.FC<{
       </Transition>
     </div>
   );
+};
+
+const JoinRoomName = ({ joiningRoom }: { joiningRoom: string }) => {
+  const { setFieldValue } =
+    useFormikContext<Yup.InferType<ReturnType<typeof joinRoomSchema>>>();
+
+  useEffect(() => {
+    setFieldValue("roomName", joiningRoom);
+  }, [joiningRoom, setFieldValue]);
+  return <></>;
 };

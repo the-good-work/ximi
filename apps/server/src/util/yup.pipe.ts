@@ -9,6 +9,7 @@ class YupValidationPipe implements PipeTransform {
       await this.schema.validate(value);
       return value;
     } catch (error) {
+      console.log(2, error);
       throw new BadRequestException(error.errors, {
         cause: error,
       });

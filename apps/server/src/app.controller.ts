@@ -73,6 +73,7 @@ export class AppController {
     const initialMeta: XimiRoomState = {
       passcode: body.passcode,
       activePreset: 0,
+      currentPresetState: { participants: {}, name: `PRESET1` },
       presets: new Array(12).fill(0).map((_, n) => ({
         participants: {},
         name: `PRESET${n + 1}`,
@@ -196,7 +197,7 @@ export class AppController {
   @Patch('room/state')
   async updateRoomState(
     @Body() body: SwitchActivePresetAction | SetPresetNameAction,
-  ) {
+  ): Promise<{ ok: boolean }> {
     const { type, roomName } = body;
 
     const room = await this.livekit.getRoom(roomName);
@@ -214,7 +215,7 @@ export class AppController {
         case 'set-active-preset': {
           const { activePreset } = body;
 
-          this.livekit.client.updateRoomMetadata(
+          await this.livekit.client.updateRoomMetadata(
             roomName,
             JSON.stringify(Object.assign(metadata, { activePreset })),
           );
@@ -226,13 +227,16 @@ export class AppController {
           const update = { ...metadata };
           update.presets[preset].name = name;
 
-          this.livekit.client.updateRoomMetadata(
+          await this.livekit.client.updateRoomMetadata(
             roomName,
             JSON.stringify(update),
           );
+
           break;
         }
       }
+
+      return { ok: true };
     } catch (err) {
       throw new BadRequestException(err);
     }

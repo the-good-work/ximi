@@ -1,6 +1,8 @@
 import { useRoomInfo } from "@livekit/components-react";
 import { useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { PresetIndex, SetPresetNameAction, XimiRoomState } from "types";
+import * as Yup from "yup";
 
 const renamePreset = async (
   roomName: string,
@@ -13,18 +15,22 @@ const renamePreset = async (
     name: newName,
     roomName: roomName,
   };
-  await fetch(`${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`, {
-    method: "PATCH",
-    body: JSON.stringify(patch),
-    headers: {
-      "Content-Type": "application/json",
+  const req = await fetch(
+    `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
-  });
+  );
+  const data = await req.json();
+  return data;
 };
 
 const sanitizeNewName = (newName: string) => {
-  // TODO: SANIT sanitize name here using Yup cast
-  return newName;
+  return newName.replace(/[^a-zA-Z0-9]/g, "");
 };
 
 const PresetRenamer = () => {
@@ -70,11 +76,19 @@ const PresetRenamer = () => {
               newNameInputRef.current?.value.toUpperCase() || "",
             );
 
-            await renamePreset(
+            const result = await renamePreset(
               meta.name,
               roomState.activePreset,
               newName || activePresetName,
             );
+
+            if (result.ok === true && !!newName) {
+              toast(`Saved name ${newName}`, {
+                position: "bottom-right",
+                className: "bg-brand/80 text-text rounded-none",
+              });
+            }
+
             setEditing(false);
           }}
           onKeyUp={async (e) => {

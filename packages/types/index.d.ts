@@ -20,6 +20,7 @@ interface SetPresetNameAction extends RoomAction {
 interface XimiRoomState {
   passcode: string;
   activePreset: SwitchActivePresetAction["activePreset"];
+  currentPresetState: Preset;
   presets: Preset[];
 }
 
@@ -35,10 +36,17 @@ interface Preset {
   >;
 }
 
+interface MessageDataPayload {
+  from: string;
+  message: string;
+}
+
 export {
   XIMIRole,
   PresetIndex,
   SwitchActivePresetAction,
   SetPresetNameAction,
   XimiRoomState,
+  XimiParticipantState,
+  MessageDataPayload,
 };

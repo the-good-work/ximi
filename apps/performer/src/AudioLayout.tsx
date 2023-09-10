@@ -4,7 +4,7 @@ import {
   FaBinoculars,
   FaDesktop,
   FaMicrophone,
-  FaUser,
+  FaPerson,
   FaVideo,
 } from "react-icons/fa6";
 import { XimiParticipantState, XIMIRole, XimiRoomState } from "types";
@@ -83,7 +83,7 @@ const RemoteParticipantCard: React.FC<{
         <div className="flex items-center justify-between text-sm gap-2">
           <div className="flex items-center gap-2">
             {meta.role === "PERFORMER" ? (
-              <FaUser />
+              <FaPerson />
             ) : meta.role === "SCOUT" ? (
               <FaBinoculars />
             ) : (
@@ -113,16 +113,13 @@ const RemoteParticipantCard: React.FC<{
           </div>
         </div>
 
-        <div className="py-2 audiolayout">
+        <div className="audiolayout">
           {participants
             .filter((p) => p.participant.identity !== participant.identity)
             .filter((p) => p.meta.role !== "CONTROL")
             .map((p) => (
-              <button
-                key={`b_${p.participant.identity}`}
-                className="flex items-center p-1 text-xs border gap-1"
-              >
-                {p.meta.role === "PERFORMER" ? <FaUser /> : <FaBinoculars />}
+              <button key={`b_${p.participant.identity}`}>
+                {p.meta.role === "PERFORMER" ? <FaPerson /> : <FaBinoculars />}
                 {p.participant.identity}
               </button>
             ))}
@@ -153,7 +150,7 @@ const LocalParticipantCard: React.FC<{
         <div className="flex items-center justify-between text-sm gap-2">
           <div className="flex items-center gap-2">
             {meta.role === "PERFORMER" ? (
-              <FaUser />
+              <FaPerson />
             ) : meta.role === "SCOUT" ? (
               <FaBinoculars />
             ) : (
@@ -183,16 +180,13 @@ const LocalParticipantCard: React.FC<{
           </div>
         </div>
 
-        <div className="py-2 audiolayout">
+        <div className="audiolayout">
           {participants
             .filter((p) => p.participant.identity !== participant.identity)
             .filter((p) => p.meta.role !== "CONTROL")
             .map((p) => (
-              <button
-                key={`b_${p.participant.identity}`}
-                className="flex items-center p-1 text-xs border gap-1"
-              >
-                {p.meta.role === "PERFORMER" ? <FaUser /> : <FaBinoculars />}
+              <button key={`b_${p.participant.identity}`}>
+                {p.meta.role === "PERFORMER" ? <FaPerson /> : <FaBinoculars />}
                 {p.participant.identity}
               </button>
             ))}

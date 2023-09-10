@@ -12,7 +12,7 @@ export default {
         text: "#E8E8F4",
         grey: "#3C3C40",
         negative: "#D73C37",
-        disabled: "#99999F",
+        disabled: "#666668",
         bg: "#111113",
         /*
         videoBackgroundGradient:

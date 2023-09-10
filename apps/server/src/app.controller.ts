@@ -132,37 +132,6 @@ export class AppController {
     };
   }
 
-  @Post('room/identity/check')
-  async checkIdentityAvailableForRoom(
-    @Body() body: { identity: string; roomName: string },
-  ): Promise<{ ok: boolean }> {
-    const { roomName, identity } = body;
-    const participants = await this.livekit.client.listParticipants(roomName);
-
-    const existingParticipantIdentities = participants.map((p) => p.identity);
-    return { ok: existingParticipantIdentities.indexOf(identity) < 0 };
-  }
-
-  @Post('room/passcode/check')
-  async checkPasscodeForRoom(
-    @Body() body: { passcode: string; roomName: string },
-  ): Promise<{ ok: boolean }> {
-    const { roomName, passcode } = body;
-    const room = await this.livekit.getRoom(roomName);
-    console.log(1, { room });
-    if (room.length < 1) {
-      throw new NotFoundException('Room not found');
-    }
-
-    try {
-      const metadata = JSON.parse(room[0].metadata) as XimiRoomState;
-      return { ok: metadata.passcode === passcode };
-    } catch (err) {
-      console.log(err);
-      throw new BadRequestException(err);
-    }
-  }
-
   @Post('room/token/performer')
   @UsePipes(new YupValidationPipe(joinRoomSchema()))
   @ApiBody(yupToOpenAPISchema(joinRoomSchema(), 'Generate a performer token'))
@@ -192,6 +161,37 @@ export class AppController {
     return {
       token: this.livekit.generateTokenForRoom(roomName, identity, 'PERFORMER'),
     };
+  }
+
+  @Post('room/identity/check')
+  async checkIdentityAvailableForRoom(
+    @Body() body: { identity: string; roomName: string },
+  ): Promise<{ ok: boolean }> {
+    const { roomName, identity } = body;
+    const participants = await this.livekit.client.listParticipants(roomName);
+
+    const existingParticipantIdentities = participants.map((p) => p.identity);
+    return { ok: existingParticipantIdentities.indexOf(identity) < 0 };
+  }
+
+  @Post('room/passcode/check')
+  async checkPasscodeForRoom(
+    @Body() body: { passcode: string; roomName: string },
+  ): Promise<{ ok: boolean }> {
+    const { roomName, passcode } = body;
+    const room = await this.livekit.getRoom(roomName);
+    console.log(1, { room });
+    if (room.length < 1) {
+      throw new NotFoundException('Room not found');
+    }
+
+    try {
+      const metadata = JSON.parse(room[0].metadata) as XimiRoomState;
+      return { ok: metadata.passcode === passcode };
+    } catch (err) {
+      console.log(err);
+      throw new BadRequestException(err);
+    }
   }
 
   @Patch('room/state')

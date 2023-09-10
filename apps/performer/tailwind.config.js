@@ -5,7 +5,7 @@ export default {
   content: [
     "./index.html",
     "./src/*.{js,ts,jsx,tsx}",
-    "../performer/src/*.{js,ts,jsx,tsx}",
+    "../control/src/*.{js,ts,jsx,tsx}",
     "../../packages/ui/tailwind/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {

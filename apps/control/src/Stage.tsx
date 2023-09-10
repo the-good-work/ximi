@@ -2,10 +2,16 @@ import {
   AudioTrack,
   useLocalParticipant,
   useRemoteParticipants,
+  useRoomContext,
   useRoomInfo,
 } from "@livekit/components-react";
-import { createLocalAudioTrack } from "livekit-client";
-import { Fragment, useEffect, useState } from "react";
+import {
+  createLocalAudioTrack,
+  DataPacket_Kind,
+  RemoteParticipant,
+  RoomEvent,
+} from "livekit-client";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import * as classNames from "classnames";
 import {
   FaA,
@@ -19,7 +25,11 @@ import {
   FaVolumeHigh,
   FaVolumeXmark,
 } from "react-icons/fa6";
-import { SwitchActivePresetAction, XimiRoomState } from "types";
+import {
+  MessageDataPayload,
+  SwitchActivePresetAction,
+  XimiRoomState,
+} from "types";
 import { PresetRenamer } from "./PresetRenamer";
 import { AudioLayout } from "./AudioLayout";
 import { Dialog, Transition } from "@headlessui/react";
@@ -321,13 +331,55 @@ const MicControl = () => {
 
 const ChatControl = () => {
   const [showChatModal, setShowChatModal] = useState(false);
+  const room = useRoomContext();
   const { localParticipant } = useLocalParticipant();
 
-  localParticipant.on("dataReceived", (buf) => {
-    const decoder = new TextDecoder();
-    const data = decoder.decode(buf);
-    console.log({ data });
-  });
+  useEffect(() => {
+    const handleDataReceived = (payload: Uint8Array) => {
+      const decoder = new TextDecoder();
+      const data = decoder.decode(payload);
+
+      try {
+        const payload: MessageDataPayload | undefined = JSON.parse(data);
+        if (payload && payload.from) {
+          toast(
+            <div>
+              <h4 className="text-sm font-bold">{payload.from}</h4>
+              <p className="text-sm">{payload.message}</p>
+            </div>,
+            {
+              position: "bottom-right",
+              className: "bg-bg/80 border-brand border text-text rounded-none",
+            },
+          );
+        }
+      } catch (err) {
+        toast.error("Error parsing incoming data message", {
+          position: "bottom-right",
+          className: "bg-negative/80 text-text rounded-none",
+        });
+      }
+    };
+    room.on(RoomEvent.DataReceived, handleDataReceived);
+
+    return () => {
+      room.off(RoomEvent.DataReceived, handleDataReceived);
+    };
+  }, [room]);
+
+  const sendMessage = useCallback(
+    (text: string) => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(
+        JSON.stringify({
+          from: localParticipant.identity,
+          message: text,
+        } as MessageDataPayload),
+      );
+      return localParticipant.publishData(data, DataPacket_Kind.RELIABLE, {});
+    },
+    [localParticipant],
+  );
 
   return (
     <>
@@ -363,22 +415,51 @@ const ChatControl = () => {
                   message: "",
                 }}
                 validateOnMount={true}
-                onSubmit={async () => {
-                  //
+                onSubmit={async ({ message }, { resetForm }) => {
+                  await sendMessage(message);
+
+                  toast(
+                    <div>
+                      <h4 className="text-sm font-bold">
+                        {localParticipant.identity}
+                      </h4>
+                      <p className="text-sm">{message}</p>
+                    </div>,
+                    {
+                      position: "bottom-right",
+                      className:
+                        "bg-bg/80 border-text border text-text rounded-none",
+                    },
+                  );
+                  resetForm();
                 }}
               >
-                {({ isValid, isSubmitting, submitForm, resetForm }) => {
+                {({ isValid, submitForm, resetForm }) => {
                   return (
-                    <form className="flex flex-col p-4 gap-4">
+                    <form
+                      className="flex flex-col p-4 gap-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        submitForm();
+                      }}
+                    >
                       <Field
                         name="message"
                         className="text-2xl text-center border bg-bg border-grey [&:focus]:border-brand appearance-none outline-none rounded-sm w-full"
+                        autoComplete="false"
                       />
                       <div className="flex gap-4">
                         <Button onClick={() => setShowChatModal(false)}>
                           Cancel
                         </Button>
-                        <Button variant="primary">Send</Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            submitForm();
+                          }}
+                        >
+                          Send
+                        </Button>
                       </div>
                     </form>
                   );

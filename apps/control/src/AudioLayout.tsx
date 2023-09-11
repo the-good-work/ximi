@@ -221,7 +221,6 @@ const LocalParticipantCard: React.FC<{
               .filter((p) => p.meta.role !== "CONTROL")
               .sort(participantSort)
               .map((p) => {
-                console.log(p.meta);
                 return (
                   <AudioChannelBtn
                     key={`b_${p.participant.identity}`}

@@ -183,7 +183,6 @@ export class AppController {
   ): Promise<{ ok: boolean }> {
     const { roomName, passcode } = body;
     const room = await this.livekit.getRoom(roomName);
-    console.log(1, { room });
     if (room.length < 1) {
       throw new NotFoundException('Room not found');
     }

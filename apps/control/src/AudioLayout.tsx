@@ -1,4 +1,5 @@
 import { useParticipants, useRoomInfo } from "@livekit/components-react";
+import * as classNames from "classnames";
 import type { LocalParticipant, RemoteParticipant } from "livekit-client";
 import {
   FaBinoculars,
@@ -7,11 +8,26 @@ import {
   FaUser,
   FaVideo,
 } from "react-icons/fa6";
-import { XimiParticipantState, XIMIRole, XimiRoomState } from "types";
+import {
+  MuteAudioAction,
+  UnmuteAudioAction,
+  XimiParticipantState,
+  XIMIRole,
+  XimiRoomState,
+} from "types";
 
 type ParticipantWithMeta = {
   participant: LocalParticipant | RemoteParticipant;
   meta: XimiParticipantState;
+};
+
+const participantSort = (a: ParticipantWithMeta, b: ParticipantWithMeta) => {
+  const roles: XIMIRole[] = ["PERFORMER", "SCOUT", "CONTROL"];
+  return roles.indexOf(a.meta.role) - roles.indexOf(b.meta.role) !== 0
+    ? roles.indexOf(a.meta.role) - roles.indexOf(b.meta.role)
+    : a.participant.identity < b.participant.identity
+    ? -1
+    : 1;
 };
 
 const AudioLayout = () => {
@@ -34,14 +50,7 @@ const AudioLayout = () => {
   return (
     <div className="p-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {participantsWithMeta
-        .sort((a, b) => {
-          const roles: XIMIRole[] = ["PERFORMER", "SCOUT", "CONTROL"];
-          return roles.indexOf(a.meta.role) - roles.indexOf(b.meta.role) !== 0
-            ? roles.indexOf(a.meta.role) - roles.indexOf(b.meta.role)
-            : a.participant.identity < b.participant.identity
-            ? -1
-            : 1;
-        })
+        .sort(participantSort)
         .map((p) =>
           p.participant.isLocal ? (
             <LocalParticipantCard
@@ -113,19 +122,44 @@ const RemoteParticipantCard: React.FC<{
           </div>
         </div>
 
-        <div className="py-2 audiolayout">
-          {participants
-            .filter((p) => p.participant.identity !== participant.identity)
-            .filter((p) => p.meta.role !== "CONTROL")
-            .map((p) => (
-              <button
-                key={`b_${p.participant.identity}`}
-                className="flex items-center p-1 text-xs border gap-1"
-              >
-                {p.meta.role === "PERFORMER" ? <FaUser /> : <FaBinoculars />}
-                {p.participant.identity}
-              </button>
-            ))}
+        <div className="pt-2 mt-2 border-t audiolayout border-text/25">
+          <div className="flex flex-wrap gap-2">
+            {participants
+
+              .filter((p) => p.participant.identity !== participant.identity)
+              .filter((p) => p.meta.role !== "CONTROL")
+              .sort(participantSort)
+
+              .map((p) => (
+                <AudioChannelBtn
+                  key={`b_${p.participant.identity}`}
+                  p={p}
+                  isMuted={meta.audio.mute.indexOf(p.participant.identity) > -1}
+                  onClick={async () => {
+                    const patch: MuteAudioAction | UnmuteAudioAction = {
+                      type:
+                        meta.audio.mute.indexOf(p.participant.identity) > -1
+                          ? "unmute-audio"
+                          : "mute-audio",
+                      roomName: room.name,
+                      channel: p.participant.identity,
+                      forParticipant: participant.identity,
+                    };
+                    const r = await fetch(
+                      `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+                      {
+                        method: "PATCH",
+                        body: JSON.stringify(patch),
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      },
+                    );
+                    return await r.json();
+                  }}
+                />
+              ))}
+          </div>
         </div>
       </div>
     );
@@ -145,8 +179,6 @@ const LocalParticipantCard: React.FC<{
     if (room.metadata === undefined) {
       throw new Error("no room metadata");
     }
-    const roomState = JSON.parse(room.metadata) as XimiRoomState;
-    console.log(roomState);
 
     return (
       <div className="p-2 border-2 text-text border-accent box-border">
@@ -183,23 +215,71 @@ const LocalParticipantCard: React.FC<{
           </div>
         </div>
 
-        <div className="py-2 audiolayout">
-          {participants
-            .filter((p) => p.participant.identity !== participant.identity)
-            .filter((p) => p.meta.role !== "CONTROL")
-            .map((p) => (
-              <button
-                key={`b_${p.participant.identity}`}
-                className="flex items-center p-1 text-xs border gap-1"
-              >
-                {p.meta.role === "PERFORMER" ? <FaUser /> : <FaBinoculars />}
-                {p.participant.identity}
-              </button>
-            ))}
+        <div className="pt-2 mt-2 border-t audiolayout border-accent/">
+          <div className="flex flex-wrap gap-2">
+            {participants
+              .filter((p) => p.participant.identity !== participant.identity)
+              .filter((p) => p.meta.role !== "CONTROL")
+              .sort(participantSort)
+              .map((p) => (
+                <AudioChannelBtn
+                  key={`b_${p.participant.identity}`}
+                  p={p}
+                  isMuted={meta.audio.mute.indexOf(p.participant.identity) > -1}
+                  onClick={async () => {
+                    const patch: MuteAudioAction | UnmuteAudioAction = {
+                      type:
+                        meta.audio.mute.indexOf(p.participant.identity) > -1
+                          ? "unmute-audio"
+                          : "mute-audio",
+                      roomName: room.name,
+                      channel: p.participant.identity,
+                      forParticipant: participant.identity,
+                    };
+                    const r = await fetch(
+                      `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+                      {
+                        method: "PATCH",
+                        body: JSON.stringify(patch),
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      },
+                    );
+                    return await r.json();
+                  }}
+                />
+              ))}
+          </div>
         </div>
       </div>
     );
   } catch (err) {
     return <div>Error: err</div>;
   }
+};
+
+const AudioChannelBtn: React.FC<{
+  p: ParticipantWithMeta;
+  isMuted: boolean;
+  onClick: () => Promise<void>;
+}> = ({ p, isMuted, onClick }) => {
+  const audioChannelBtnCls = classNames(
+    "flex items-center relative justify-start w-32 p-1 overflow-hidden text-xs border gap-1 hover:bg-negative/50",
+    isMuted ? "border-negative bg-negative/75" : "bg-[transparent] border-text",
+    "[&:hover>span]:text-negative",
+  );
+
+  const spanCls = classNames(
+    "absolute right-0 top-[50%] w-6 h-6 block flex items-center justify-center translate-y-[-50%] text-[10px] font-bold",
+    isMuted ? "text-negative" : "text-text/25",
+  );
+
+  return (
+    <button className={audioChannelBtnCls} onClick={onClick}>
+      {p.meta.role === "PERFORMER" ? <FaUser /> : <FaBinoculars />}
+      {p.participant.identity}
+      <span className={spanCls}>M</span>
+    </button>
+  );
 };

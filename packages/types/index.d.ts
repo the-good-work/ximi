@@ -2,6 +2,10 @@ type XIMIRole = "PERFORMER" | "SCOUT" | "CONTROL" | "OUTPUT";
 
 type PresetIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
+type ParticipantIdentity = string;
+
+type VideoLayout = {} | null;
+
 interface RoomAction {
   roomName: string;
 }
@@ -17,15 +21,28 @@ interface SetPresetNameAction extends RoomAction {
   name: string;
 }
 
+interface MuteAudioAction extends RoomAction {
+  type: "mute-audio";
+  channel: string;
+  forParticipant: string;
+}
+
+interface UnmuteAudioAction extends RoomAction {
+  type: "unmute-audio";
+  channel: string;
+  forParticipant: string;
+}
+
 interface XimiRoomState {
   passcode: string;
   activePreset: SwitchActivePresetAction["activePreset"];
-  currentPresetState: Preset;
   presets: Preset[];
 }
 
 interface XimiParticipantState {
   role: XIMIRole;
+  audio: { mute: ParticipantIdentity[] };
+  video: { layout: VideoLayout };
 }
 
 interface Preset {
@@ -46,6 +63,8 @@ export {
   PresetIndex,
   SwitchActivePresetAction,
   SetPresetNameAction,
+  MuteAudioAction,
+  UnmuteAudioAction,
   XimiRoomState,
   XimiParticipantState,
   MessageDataPayload,

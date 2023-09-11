@@ -24,7 +24,10 @@ import { config } from 'dotenv';
 import {
   SetPresetNameAction,
   SwitchActivePresetAction,
+  MuteAudioAction,
   XimiRoomState,
+  XimiParticipantState,
+  UnmuteAudioAction,
 } from 'ximi-types';
 
 config();
@@ -73,7 +76,6 @@ export class AppController {
     const initialMeta: XimiRoomState = {
       passcode: body.passcode,
       activePreset: 0,
-      currentPresetState: { participants: {}, name: `PRESET1` },
       presets: new Array(12).fill(0).map((_, n) => ({
         participants: {},
         name: `PRESET${n + 1}`,
@@ -196,7 +198,12 @@ export class AppController {
 
   @Patch('room/state')
   async updateRoomState(
-    @Body() body: SwitchActivePresetAction | SetPresetNameAction,
+    @Body()
+    body:
+      | SwitchActivePresetAction
+      | SetPresetNameAction
+      | MuteAudioAction
+      | UnmuteAudioAction,
   ): Promise<{ ok: boolean }> {
     const { type, roomName } = body;
 
@@ -212,6 +219,58 @@ export class AppController {
       //TODO: make a Yup validation schema for this to make sure updates are always correct
 
       switch (type) {
+        case 'mute-audio':
+        case 'unmute-audio': {
+          const { forParticipant, channel } = body;
+
+          const p = await this.livekit.client.getParticipant(
+            roomName,
+            forParticipant,
+          );
+
+          if (p === undefined) {
+            throw new BadRequestException(
+              `No participant ${forParticipant} found`,
+            );
+          }
+
+          try {
+            const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+            const _roomMetadata = { ...metadata };
+
+            let newMute = [];
+
+            if (type === 'mute-audio') {
+              newMute = [...pMeta.audio.mute, channel];
+            } else {
+              newMute = [...pMeta.audio.mute].filter(
+                (identity) => identity !== channel,
+              );
+            }
+
+            pMeta.audio.mute = newMute;
+
+            _roomMetadata.presets[_roomMetadata.activePreset].participants[
+              p.identity
+            ] = { identity: p.identity, state: pMeta };
+
+            await this.livekit.client.updateParticipant(
+              roomName,
+              forParticipant,
+              JSON.stringify(pMeta),
+            );
+
+            await this.livekit.client.updateRoomMetadata(
+              roomName,
+              JSON.stringify(_roomMetadata),
+            );
+          } catch (err) {
+            throw new BadRequestException(err);
+          }
+
+          break;
+        }
+
         case 'set-active-preset': {
           const { activePreset } = body;
 

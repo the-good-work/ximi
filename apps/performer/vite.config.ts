@@ -12,7 +12,7 @@ export default ({ mode }) => {
       ) as string,
     },
     server: {
-      hmr: { clientPort: 3205, port: 3205 },
+      hmr: false,
       port: parseInt(process.env.VITE_PORT),
     },
   });

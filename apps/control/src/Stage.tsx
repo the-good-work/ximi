@@ -8,7 +8,6 @@ import {
 import {
   createLocalAudioTrack,
   DataPacket_Kind,
-  RemoteParticipant,
   RoomEvent,
 } from "livekit-client";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
@@ -36,6 +35,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Field, Formik } from "formik";
 import { Button } from "ui/tailwind";
 import { toast } from "react-hot-toast";
+import * as Yup from "yup";
 
 const ARR_12 = new Array(12).fill(0);
 
@@ -414,6 +414,9 @@ const ChatControl = () => {
                 initialValues={{
                   message: "",
                 }}
+                validationSchema={Yup.object({
+                  message: Yup.string().required(),
+                })}
                 validateOnMount={true}
                 onSubmit={async ({ message }, { resetForm }) => {
                   await sendMessage(message);
@@ -434,13 +437,13 @@ const ChatControl = () => {
                   resetForm();
                 }}
               >
-                {({ isValid, submitForm, resetForm }) => {
+                {({ isValid, submitForm }) => {
                   return (
                     <form
                       className="flex flex-col p-4 gap-4"
                       onSubmit={(e) => {
-                        e.preventDefault();
                         submitForm();
+                        e.preventDefault();
                       }}
                     >
                       <Field
@@ -454,6 +457,7 @@ const ChatControl = () => {
                         </Button>
                         <Button
                           variant="primary"
+                          disabled={!isValid}
                           onClick={() => {
                             submitForm();
                           }}

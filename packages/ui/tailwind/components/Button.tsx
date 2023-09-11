@@ -1,7 +1,6 @@
-import { Config } from "tailwindcss";
 import * as classNames from "classnames";
 
-type Size = keyof (Config["theme"]["fontSize"] & { [key: string]: unknown });
+type Size = "2xs" | "xs" | "sm" | "lg" | "xl" | "2xl" | "3xl";
 
 export const Button: React.FC<{
   size?: Size;
@@ -17,7 +16,7 @@ export const Button: React.FC<{
   disabled = false,
 }) => {
   const className = classNames(
-    `text-${size} w-full border py-1 px-2 rounded-md`,
+    `text-${String(size)} w-full border py-1 px-2 rounded-md`,
     {
       "bg-bg border-text text-text": variant === "default",
       "bg-brand border-text text-text": variant === "primary",

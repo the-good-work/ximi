@@ -28,6 +28,7 @@ import {
   XimiRoomState,
   XimiParticipantState,
   UnmuteAudioAction,
+  PresetIndex,
 } from 'ximi-types';
 
 config();
@@ -273,6 +274,49 @@ export class AppController {
 
         case 'set-active-preset': {
           const { activePreset } = body;
+
+          const pInfo = await this.livekit.client.listParticipants(roomName);
+
+          await Promise.all(
+            pInfo.map((p) => {
+              const thisParticipantNextStateInRoom = metadata.presets[
+                activePreset
+              ].participants[p.identity] as
+                | XimiRoomState['presets'][PresetIndex]['participants'][string];
+
+              // WARNING: there is a possibility that the user meta hasn't been set in the room meta yet
+              // even though type resolves correctly
+              // if thats the case we override with an empty participant state
+              if (!thisParticipantNextStateInRoom) {
+                try {
+                  const actualParticipantMeta: XimiParticipantState =
+                    JSON.parse(p.metadata);
+
+                  const initialParticipantState: XimiParticipantState = {
+                    role: actualParticipantMeta.role,
+                    audio: { mute: [] },
+                    video: { layout: null },
+                  };
+
+                  return this.livekit.client.updateParticipant(
+                    roomName,
+                    p.identity,
+                    JSON.stringify(initialParticipantState),
+                  );
+                } catch (err) {
+                  throw new BadRequestException(
+                    'JSON parse of participant metadata failed',
+                  );
+                }
+              } else {
+                return this.livekit.client.updateParticipant(
+                  roomName,
+                  p.identity,
+                  JSON.stringify(thisParticipantNextStateInRoom.state),
+                );
+              }
+            }),
+          );
 
           await this.livekit.client.updateRoomMetadata(
             roomName,

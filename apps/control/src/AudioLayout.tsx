@@ -13,7 +13,6 @@ import {
   UnmuteAudioAction,
   XimiParticipantState,
   XIMIRole,
-  XimiRoomState,
 } from "types";
 
 type ParticipantWithMeta = {
@@ -85,7 +84,6 @@ const RemoteParticipantCard: React.FC<{
     if (room.metadata === undefined) {
       throw new Error("no room metadata");
     }
-    const roomState = JSON.parse(room.metadata) as XimiRoomState;
 
     return (
       <div className="p-2 border text-text box-border">
@@ -164,6 +162,7 @@ const RemoteParticipantCard: React.FC<{
       </div>
     );
   } catch (err) {
+    console.log(err);
     return <div>Error: err</div>;
   }
 };
@@ -221,40 +220,46 @@ const LocalParticipantCard: React.FC<{
               .filter((p) => p.participant.identity !== participant.identity)
               .filter((p) => p.meta.role !== "CONTROL")
               .sort(participantSort)
-              .map((p) => (
-                <AudioChannelBtn
-                  key={`b_${p.participant.identity}`}
-                  p={p}
-                  isMuted={meta.audio.mute.indexOf(p.participant.identity) > -1}
-                  onClick={async () => {
-                    const patch: MuteAudioAction | UnmuteAudioAction = {
-                      type:
-                        meta.audio.mute.indexOf(p.participant.identity) > -1
-                          ? "unmute-audio"
-                          : "mute-audio",
-                      roomName: room.name,
-                      channel: p.participant.identity,
-                      forParticipant: participant.identity,
-                    };
-                    const r = await fetch(
-                      `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                      {
-                        method: "PATCH",
-                        body: JSON.stringify(patch),
-                        headers: {
-                          "Content-Type": "application/json",
+              .map((p) => {
+                console.log(p.meta);
+                return (
+                  <AudioChannelBtn
+                    key={`b_${p.participant.identity}`}
+                    p={p}
+                    isMuted={
+                      meta.audio.mute.indexOf(p.participant.identity) > -1
+                    }
+                    onClick={async () => {
+                      const patch: MuteAudioAction | UnmuteAudioAction = {
+                        type:
+                          meta.audio.mute.indexOf(p.participant.identity) > -1
+                            ? "unmute-audio"
+                            : "mute-audio",
+                        roomName: room.name,
+                        channel: p.participant.identity,
+                        forParticipant: participant.identity,
+                      };
+                      const r = await fetch(
+                        `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+                        {
+                          method: "PATCH",
+                          body: JSON.stringify(patch),
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
                         },
-                      },
-                    );
-                    return await r.json();
-                  }}
-                />
-              ))}
+                      );
+                      return await r.json();
+                    }}
+                  />
+                );
+              })}
           </div>
         </div>
       </div>
     );
   } catch (err) {
+    console.log(err);
     return <div>Error: err</div>;
   }
 };

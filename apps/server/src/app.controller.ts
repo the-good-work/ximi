@@ -29,6 +29,7 @@ import {
   XimiParticipantState,
   UnmuteAudioAction,
   PresetIndex,
+  SetAudioDelayAction,
 } from 'ximi-types';
 
 config();
@@ -202,6 +203,7 @@ export class AppController {
     body:
       | SwitchActivePresetAction
       | SetPresetNameAction
+      | SetAudioDelayAction
       | MuteAudioAction
       | UnmuteAudioAction,
   ): Promise<{ ok: boolean }> {
@@ -271,6 +273,46 @@ export class AppController {
           break;
         }
 
+        case 'set-audio-delay': {
+          const { forParticipant, delay } = body;
+
+          const p = await this.livekit.client.getParticipant(
+            roomName,
+            forParticipant,
+          );
+
+          if (p === undefined) {
+            throw new BadRequestException(
+              `No participant ${forParticipant} found`,
+            );
+          }
+
+          try {
+            const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+            const _roomMetadata = { ...metadata };
+
+            pMeta.audio.delay = delay;
+
+            _roomMetadata.presets[_roomMetadata.activePreset].participants[
+              p.identity
+            ] = { identity: p.identity, state: pMeta };
+
+            await this.livekit.client.updateParticipant(
+              roomName,
+              forParticipant,
+              JSON.stringify(pMeta),
+            );
+
+            await this.livekit.client.updateRoomMetadata(
+              roomName,
+              JSON.stringify(_roomMetadata),
+            );
+          } catch (err) {
+            throw new BadRequestException(err);
+          }
+          break;
+        }
+
         case 'set-active-preset': {
           const { activePreset } = body;
 
@@ -293,7 +335,7 @@ export class AppController {
 
                   const initialParticipantState: XimiParticipantState = {
                     role: actualParticipantMeta.role,
-                    audio: { mute: [] },
+                    audio: { mute: [], delay: 0 },
                     video: { layout: null },
                   };
 

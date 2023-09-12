@@ -36,6 +36,7 @@ const sanitizeNewName = (newName: string) => {
 const PresetRenamer = () => {
   const meta = useRoomInfo();
   const [editing, setEditing] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const newNameInputRef = useRef<HTMLInputElement>(null);
 
   // const setNewName = useCallback(async() =>, []);
@@ -72,6 +73,7 @@ const PresetRenamer = () => {
           ref={newNameInputRef}
           placeholder={activePresetName}
           onBlur={async () => {
+            setShowHint(false);
             const newName = sanitizeNewName(
               newNameInputRef.current?.value.toUpperCase() || "",
             );
@@ -105,10 +107,23 @@ const PresetRenamer = () => {
               setEditing(false);
             }
           }}
+          onFocus={() => {
+            setShowHint(true);
+          }}
           className={`w-48 h-8 p-1 text-left  border bg-bg border-brand box-border ${
             !editing ? "hidden" : "block"
           }`}
         />
+        <div
+          className={`p-2 absolute bottom-[100%] left-[50%] translate-x-[-50%] translate-y-[-10px] bg-bg border border-brand w-24 text-sm transition pointer-events-none ${
+            showHint ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <b className="bg-bg border-brand border-l border-t block absolute w-[12px] h-[12px] bottom-[-6px] left-[50%] translate-x-[-50%] rotate-[-135deg]">
+            &nbsp;
+          </b>
+          Press Enter to apply
+        </div>
       </div>
     );
   } catch (err) {

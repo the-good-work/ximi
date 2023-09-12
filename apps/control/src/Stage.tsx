@@ -10,7 +10,7 @@ import {
   DataPacket_Kind,
   RoomEvent,
 } from "livekit-client";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import * as classNames from "classnames";
 import {
   FaA,

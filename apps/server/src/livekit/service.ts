@@ -36,7 +36,7 @@ export class LivekitService {
   ): string {
     const initialParticipantState: XimiParticipantState = {
       role,
-      audio: { mute: [] },
+      audio: { mute: [], delay: 0 },
       video: { layout: null },
     };
     const at = new AccessToken(

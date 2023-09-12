@@ -132,7 +132,11 @@ export class AppController {
     }
 
     return {
-      token: this.livekit.generateTokenForRoom(roomName, identity, 'CONTROL'),
+      token: await this.livekit.generateTokenForRoom(
+        roomName,
+        identity,
+        'CONTROL',
+      ),
     };
   }
 
@@ -163,7 +167,11 @@ export class AppController {
     }
 
     return {
-      token: this.livekit.generateTokenForRoom(roomName, identity, 'PERFORMER'),
+      token: await this.livekit.generateTokenForRoom(
+        roomName,
+        identity,
+        'PERFORMER',
+      ),
     };
   }
 
@@ -394,7 +402,25 @@ export class AppController {
         raw.toString('utf8'),
         req.get('Authorization'),
       );
-      console.log({ event });
+      console.log(event.event);
+
+      if (event.event === 'participant_joined') {
+        console.log(`participant joined: ${event.participant.identity}`);
+        // doctors hate this trick!!!
+        // ping the participant event to prevent PERFORMER from not receiving metadata upon join
+        const pMeta = event.participant.metadata;
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(
+              this.livekit.client.updateParticipant(
+                event.room.name,
+                event.participant.identity,
+                pMeta,
+              ),
+            );
+          }, 500);
+        });
+      }
     } else {
       console.warn('didnt parse');
     }

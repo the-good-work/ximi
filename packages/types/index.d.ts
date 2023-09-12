@@ -33,6 +33,12 @@ interface UnmuteAudioAction extends RoomAction {
   forParticipant: string;
 }
 
+interface SetAudioDelayAction extends RoomAction {
+  type: "set-audio-delay";
+  forParticipant: string;
+  delay: number;
+}
+
 interface XimiRoomState {
   passcode: string;
   activePreset: SwitchActivePresetAction["activePreset"];
@@ -41,7 +47,7 @@ interface XimiRoomState {
 
 interface XimiParticipantState {
   role: XIMIRole;
-  audio: { mute: ParticipantIdentity[] };
+  audio: { mute: ParticipantIdentity[]; delay: number };
   video: { layout: VideoLayout };
 }
 
@@ -54,9 +60,23 @@ interface Preset {
 }
 
 interface MessageDataPayload {
+  type: "message";
   from: string;
   message: string;
 }
+
+interface PingDataPayload {
+  type: "ping";
+  id: number;
+  sender: string;
+}
+
+interface PongDataPayload {
+  type: "pong";
+  id: number;
+}
+
+MessageDataPayload | PingDataPayload | PongPayload;
 
 export {
   XIMIRole,
@@ -65,7 +85,10 @@ export {
   SetPresetNameAction,
   MuteAudioAction,
   UnmuteAudioAction,
+  SetAudioDelayAction,
   XimiRoomState,
   XimiParticipantState,
   MessageDataPayload,
+  PingDataPayload,
+  PongDataPayload,
 };

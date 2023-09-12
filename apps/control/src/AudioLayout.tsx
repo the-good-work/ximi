@@ -114,6 +114,7 @@ const RemoteParticipantCard: React.FC<{
             >
               <FaMicrophone />
             </div>
+
             {meta.role !== "CONTROL" && (
               <div
                 className={`${
@@ -409,7 +410,7 @@ const DelayInput: React.FC<{
   curDelay: number;
   setDelay: (n: number) => Promise<void>;
 }> = ({ curDelay, setDelay }) => {
-  const [input, setInput] = useState(curDelay.toString());
+  const [input, setInput] = useState("");
   const [showHint, setShowHint] = useState(false);
   const inputRef = useRef(null);
 
@@ -453,7 +454,7 @@ const DelayInput: React.FC<{
             }
           }}
           placeholder={curDelay.toString()}
-          className="w-full h-full py-1 text-center bg-brand/25 text-text"
+          className="w-full h-full py-1 text-center bg-brand/25 text-text [&::placeholder]:text-text/20"
         />
 
         <div

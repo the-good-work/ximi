@@ -1,149 +1,100 @@
-import {
-  AudioTrack,
-  useLocalParticipant,
-  useRemoteParticipants,
-  useRoomInfo,
-} from "@livekit/components-react";
-import { createLocalAudioTrack } from "livekit-client";
+import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
+import { DataPacket_Kind, RoomEvent } from "livekit-client";
 import { useEffect, useState } from "react";
-import * as classNames from "classnames";
-import { FaMicrophone, FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
-import { SwitchActivePresetAction, XimiRoomState } from "types";
-import { Dialog, Transition } from "@headlessui/react";
-import { Field, Formik } from "formik";
-import { Button } from "ui/tailwind";
-import { toast } from "react-hot-toast";
-
-const clsSmallSidebarButton = classNames(
-  "flex",
-  "items-center",
-  "justify-center",
-  "w-full",
-  "p-2",
-  "hover:bg-brand/50",
-);
+import {
+  MessageDataPayload,
+  PingDataPayload,
+  PongDataPayload,
+  XimiParticipantState,
+} from "types";
+import {
+  AudioInputControl,
+  AudioRenderer,
+  CameraControl,
+  ChatControl,
+} from "ui/tailwind";
 
 const Stage = () => {
-  const meta = useRoomInfo();
-  const [roomState, setRoomState] = useState<XimiRoomState | undefined>();
+  const { localParticipant } = useLocalParticipant();
+  const room = useRoomContext();
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    try {
-      if (meta.metadata === undefined) {
-        return;
-      }
-      const state = JSON.parse(meta.metadata) as XimiRoomState;
-      setRoomState(state);
-    } catch (err) {
-      console.log(err);
-    }
-  }, [meta.metadata, setRoomState]);
+    const id = window.setInterval(() => {
+      setTick((t) => (t === 0 ? 1 : 0));
+    }, 1000);
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [localParticipant.metadata]);
 
-  if (roomState === undefined) {
+  // pong response
+  useEffect(() => {
+    const handleDataReceived = (payload: Uint8Array) => {
+      const decoder = new TextDecoder();
+      const data = decoder.decode(payload);
+
+      try {
+        const payload:
+          | MessageDataPayload
+          | PingDataPayload
+          | PongDataPayload
+          | undefined = JSON.parse(data) as
+          | MessageDataPayload
+          | PingDataPayload
+          | PongDataPayload;
+
+        if (payload === undefined) {
+          throw new Error("invalid payload");
+        }
+
+        if (payload.type === "ping") {
+          const pongPayload: PongDataPayload = {
+            id: payload.id,
+            type: "pong",
+          };
+
+          const encoder = new TextEncoder();
+          const pongData = encoder.encode(JSON.stringify(pongPayload));
+          localParticipant.publishData(pongData, DataPacket_Kind.RELIABLE, [
+            payload.sender,
+          ]);
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+    room.on(RoomEvent.DataReceived, handleDataReceived);
+
+    return () => {
+      room.off(RoomEvent.DataReceived, handleDataReceived);
+    };
+  }, [room, localParticipant]);
+
+  try {
+    if (localParticipant.metadata === undefined) {
+      console.warn("local participant does not have metadata");
+      return <>loading</>;
+    }
+
+    const meta = JSON.parse(localParticipant.metadata) as XimiParticipantState;
+
     return (
-      <div id="stage__loading" className="h-[calc(100vh-33px)] relative w-full">
-        Loading..
+      <div className="relative w-full h-[calc(100%-33px)]" id="stage">
+        muted devices:{meta.audio.mute.length}
+        <br />
+        {meta.audio.delay}
+        <AudioRenderer />
+        <div className="fixed flex p-1 text-lg border rounded-sm controls left-4 bottom-4 border-text gap-1 bg-bg">
+          <CameraControl />
+          <AudioInputControl />
+          <ChatControl />
+        </div>
       </div>
     );
+  } catch (err) {
+    return <>Error</>;
   }
-
-  return (
-    <div
-      id="stage__base"
-      className="h-[calc(100vh-33px)] relative w-full grid grid-cols-[auto_40px]"
-    ></div>
-  );
-};
-
-const AudioRenderer = () => {
-  const p = useRemoteParticipants();
-
-  useEffect(() => {
-    p.forEach((p) => {
-      p.audioTracks.forEach((track) => {
-        track.setSubscribed(true);
-        track.setEnabled(true);
-      });
-    });
-  }, [p]);
-
-  return (
-    <>
-      {p.map((p) => (
-        <div key={`audio_renderer_p_${p.identity}`}>
-          {Array.from(p.audioTracks).map(([key, track]) => {
-            return (
-              <AudioTrack participant={p} key={key} source={track.source} />
-            );
-          })}
-        </div>
-      ))}
-    </>
-  );
-};
-
-const MicControl = () => {
-  const p = useLocalParticipant();
-  const hasTrack = p.localParticipant.audioTracks.size > 0;
-  const [muted, setMuted] = useState(false);
-
-  return (
-    <>
-      <button
-        type="button"
-        className={`${clsSmallSidebarButton} ${
-          hasTrack ? "text-accent" : "text-text"
-        }`}
-        onClick={async () => {
-          if (hasTrack) {
-            p.localParticipant.audioTracks.forEach(async ({ track }) => {
-              if (track !== undefined) {
-                await p.localParticipant.unpublishTrack(track);
-              }
-            });
-          } else {
-            const newTrack = await createLocalAudioTrack({
-              autoGainControl: false,
-              echoCancellation: true,
-              noiseSuppression: true,
-              sampleRate: 48000,
-              channelCount: 2,
-            });
-            await p.localParticipant.publishTrack(newTrack);
-          }
-        }}
-      >
-        <FaMicrophone size={16} />
-      </button>
-      <button
-        type="button"
-        className={`${clsSmallSidebarButton} ${
-          hasTrack
-            ? muted
-              ? "text-negative"
-              : "text-text"
-            : "text-disabled/50"
-        }
-				 ${hasTrack ? "pointer-events-auto" : "pointer-events-none"}
-				`}
-        onClick={() => {
-          if (muted) {
-            p.localParticipant.audioTracks.forEach(async (track) => {
-              await track.unmute();
-              setMuted(false);
-            });
-          } else {
-            p.localParticipant.audioTracks.forEach(async (track) => {
-              await track.mute();
-            });
-            setMuted(true);
-          }
-        }}
-      >
-        {muted ? <FaVolumeXmark /> : <FaVolumeHigh />}
-      </button>
-    </>
-  );
 };
 
 export { Stage };

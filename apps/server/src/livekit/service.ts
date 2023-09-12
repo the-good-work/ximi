@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { XimiParticipantState, XIMIRole } from 'ximi-types';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { XimiParticipantState, XIMIRole, XimiRoomState } from 'ximi-types';
 import {
   RoomServiceClient,
   WebhookReceiver,
@@ -29,26 +29,44 @@ export class LivekitService {
     return this.client.listRooms([roomName]);
   }
 
-  generateTokenForRoom(
+  async generateTokenForRoom(
     roomName: string,
     participantIdentity: string,
     role: XIMIRole,
-  ): string {
-    const initialParticipantState: XimiParticipantState = {
-      role,
-      audio: { mute: [], delay: 0 },
-      video: { layout: null },
-    };
-    const at = new AccessToken(
-      process.env.LIVEKIT_KEY,
-      process.env.LIVEKIT_SECRET,
-      {
-        identity: participantIdentity,
-        metadata: JSON.stringify(initialParticipantState),
-      },
-    );
-    at.addGrant({ roomJoin: true, room: roomName });
-    const token = at.toJwt();
-    return token;
+  ): Promise<string> {
+    try {
+      const [room] = await this.getRoom(roomName);
+
+      if (room === undefined) {
+        throw new Error('room does not exist');
+      }
+
+      const roomMeta = JSON.parse(room.metadata) as XimiRoomState;
+
+      // check if user already has state
+      //
+      const initialParticipantState: XimiParticipantState = roomMeta.presets[
+        roomMeta.activePreset
+      ].participants[participantIdentity]?.state || {
+        role,
+        audio: { mute: [], delay: 0 },
+        video: { layout: null },
+      };
+
+      const at = new AccessToken(
+        process.env.LIVEKIT_KEY,
+        process.env.LIVEKIT_SECRET,
+        {
+          identity: participantIdentity,
+          metadata: JSON.stringify(initialParticipantState),
+        },
+      );
+      at.addGrant({ roomJoin: true, room: roomName });
+      const token = at.toJwt();
+      return token;
+    } catch (err) {
+      console.warn(err);
+      throw new BadRequestException('Room has no metadata');
+    }
   }
 }

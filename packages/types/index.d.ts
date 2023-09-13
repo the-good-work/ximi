@@ -67,13 +67,13 @@ interface MessageDataPayload {
 
 interface PingDataPayload {
   type: "ping";
-  id: number;
+  id: string;
   sender: string;
 }
 
 interface PongDataPayload {
   type: "pong";
-  id: number;
+  id: string;
 }
 
 MessageDataPayload | PingDataPayload | PongPayload;

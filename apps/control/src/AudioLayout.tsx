@@ -22,6 +22,7 @@ import {
 import Copy from "react-copy";
 import { toast } from "react-hot-toast";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { Pinger } from "./Ping";
 
 type ParticipantWithMeta = {
   participant: LocalParticipant | RemoteParticipant;
@@ -104,7 +105,10 @@ const RemoteParticipantCard: React.FC<{
             ) : (
               <FaDesktop />
             )}{" "}
-            <span>{participant.identity}</span>
+            <span>{participant.identity}</span>{" "}
+            <span className="text-accent">
+              <Pinger participant={participant} />
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div

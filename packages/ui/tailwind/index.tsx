@@ -7,3 +7,4 @@ export * from "./components/AudioRenderer";
 export * from "./components/AudioInputControl";
 export * from "./components/CameraControl";
 export * from "./components/ChatControl";
+export * from "./components/ScreencastControl";

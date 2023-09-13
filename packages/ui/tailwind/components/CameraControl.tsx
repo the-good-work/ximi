@@ -1,24 +1,10 @@
 import { useLocalParticipant } from "@livekit/components-react";
 import * as classNames from "classnames";
-import {
-  createLocalAudioTrack,
-  createLocalVideoTrack,
-  Track,
-  VideoPresets,
-} from "livekit-client";
+import { createLocalVideoTrack, Track, VideoPresets } from "livekit-client";
 import { useState } from "react";
-import {
-  FaVolumeOff,
-  FaVolumeHigh,
-  FaMicrophone,
-  FaCircleDot,
-  FaVolumeXmark,
-  FaH,
-  FaL,
-  FaVideo,
-} from "react-icons/fa6";
+import { FaH, FaL, FaVideo } from "react-icons/fa6";
 
-const clsControlBtn = (active: boolean) =>
+const clsControlBtn = (active: boolean, disabled: boolean) =>
   classNames(
     "flex",
     "items-center",
@@ -28,21 +14,9 @@ const clsControlBtn = (active: boolean) =>
     "h-8",
     "hover:bg-brand/50",
     active ? "text-accent" : "text-text",
-  );
-
-const clsControlBtnMute = (muted: boolean) =>
-  classNames(
-    "flex",
-    "items-center",
-    "justify-center",
-    "p-1",
-    "w-8",
-    "h-8",
-    "rounded-sm",
-    muted ? "hover:bg-negative/25" : "hover:bg-negative/50",
-    muted ? "border border-negative" : "border-transparent",
-    muted ? "bg-negative" : "bg-[transparent]",
-    muted ? "hover:text-negative" : "hover:text-text",
+    disabled
+      ? "hover:bg-[transparent] opacity-50"
+      : "hover:brand-50 opacity-100",
   );
 
 const clsToggle = (on: boolean) =>
@@ -57,13 +31,18 @@ const CameraControl = () => {
     Array.from(localParticipant.videoTracks).filter(
       ([, track]) => track.videoTrack.source === Track.Source.Camera,
     ).length > 0;
+
+  const hasScreenshareTrack =
+    Array.from(localParticipant.videoTracks).filter(
+      ([, track]) => track.videoTrack.source === Track.Source.ScreenShare,
+    ).length > 0;
   const [showHint, setShowHint] = useState(false);
   const [mode, setMode] = useState<"HIGH" | "LOW">("HIGH");
 
   return (
     <div className="flex items-center pr-2 border-r gap-1">
       <button
-        className={clsControlBtn(hasTrack)}
+        className={clsControlBtn(hasTrack, hasScreenshareTrack)}
         onClick={async () => {
           if (hasTrack) {
             localParticipant.videoTracks.forEach(async ({ track }) => {

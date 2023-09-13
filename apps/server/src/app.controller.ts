@@ -408,6 +408,7 @@ export class AppController {
         console.log(`participant joined: ${event.participant.identity}`);
         // doctors hate this trick!!!
         // ping the participant event to prevent PERFORMER from not receiving metadata upon join
+        // check if this works, not sure
         const pMeta = event.participant.metadata;
         await new Promise((resolve) => {
           setTimeout(() => {

@@ -12,6 +12,7 @@ import {
   AudioRenderer,
   CameraControl,
   ChatControl,
+  ScreencastControl,
 } from "ui/tailwind";
 
 const Stage = () => {
@@ -22,7 +23,7 @@ const Stage = () => {
   useEffect(() => {
     const id = window.setInterval(() => {
       setTick((t) => (t === 0 ? 1 : 0));
-    }, 1000);
+    }, 2500);
     return () => {
       window.clearInterval(id);
     };
@@ -56,6 +57,7 @@ const Stage = () => {
 
           const encoder = new TextEncoder();
           const pongData = encoder.encode(JSON.stringify(pongPayload));
+
           localParticipant.publishData(pongData, DataPacket_Kind.RELIABLE, [
             payload.sender,
           ]);
@@ -81,12 +83,10 @@ const Stage = () => {
 
     return (
       <div className="relative w-full h-[calc(100%-33px)]" id="stage">
-        muted devices:{meta.audio.mute.length}
-        <br />
-        {meta.audio.delay}
         <AudioRenderer />
         <div className="fixed flex p-1 text-lg border rounded-sm controls left-4 bottom-4 border-text gap-1 bg-bg">
           <CameraControl />
+          <ScreencastControl />
           <AudioInputControl />
           <ChatControl />
         </div>

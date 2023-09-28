@@ -109,7 +109,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
     }
 
     const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
-    const curLayout = pMeta.video.layout;
+    const curLayout = pMeta.video.name;
 
     const numAutoCols = Math.ceil(Math.sqrt(filteredParticipants.length));
     const numAutoRows = Math.ceil(filteredParticipants.length / numAutoCols);
@@ -120,13 +120,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
       <div className="flex flex-col w-full h-full">
         <div className="flex justify-center p-1 border-b gap-1 border-brand">
           {videoLayouts.map((layout) => (
-            <button
-              className={vidLayoutBtnCls(
-                layout.name === "All" && curLayout === null
-                  ? true
-                  : curLayout === layout.name,
-              )}
-            >
+            <button className={vidLayoutBtnCls(curLayout === layout.name)}>
               <img src={layout.image} alt={layout.name} className="w-6" />
               <span>{layout.name}</span>
             </button>
@@ -165,7 +159,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
 const videoLayouts = [
   {
     image: "/video-layouts/layout-default.png",
-    name: "All",
+    name: "Auto",
     layout: [],
   },
 

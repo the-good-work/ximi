@@ -118,7 +118,7 @@ const RemoteParticipantCard: React.FC<{
             >
               <FaMicrophone />
             </div>
-
+            {participant.videoTracks.size}
             {meta.role !== "CONTROL" && (
               <div
                 className={`${

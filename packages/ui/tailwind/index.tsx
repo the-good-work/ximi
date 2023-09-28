@@ -4,6 +4,8 @@ export * from "./components/Header";
 export * from "./components/RoomList";
 
 export * from "./components/AudioRenderer";
+export * from "./components/VideoRenderer";
+export * from "./components/VideoFrame";
 export * from "./components/AudioInputControl";
 export * from "./components/CameraControl";
 export * from "./components/ChatControl";

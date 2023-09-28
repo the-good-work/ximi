@@ -50,7 +50,7 @@ export class LivekitService {
       ].participants[participantIdentity]?.state || {
         role,
         audio: { mute: [], delay: 0 },
-        video: { layout: null },
+        video: { layout: undefined, name: 'Auto' },
       };
 
       const at = new AccessToken(

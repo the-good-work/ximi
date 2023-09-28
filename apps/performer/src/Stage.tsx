@@ -10,6 +10,7 @@ import {
 import {
   AudioInputControl,
   AudioRenderer,
+  VideoRenderer,
   CameraControl,
   ChatControl,
   ScreencastControl,
@@ -79,11 +80,10 @@ const Stage = () => {
       return <>loading</>;
     }
 
-    const meta = JSON.parse(localParticipant.metadata) as XimiParticipantState;
-
     return (
       <div className="relative w-full h-[calc(100%-33px)]" id="stage">
         <AudioRenderer />
+        <VideoRenderer thisPerformerIdentity={localParticipant.identity} />
         <div className="fixed flex p-1 text-lg border rounded-sm controls left-4 bottom-4 border-text gap-1 bg-bg">
           <CameraControl />
           <ScreencastControl />

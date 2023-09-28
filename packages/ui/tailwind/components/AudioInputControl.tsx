@@ -53,7 +53,6 @@ const AudioInputControl = () => {
   const [muted, setMuted] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo>();
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
-  const [openDeviceList, setOpenDeviceList] = useState(false);
 
   return (
     <div className="flex items-center pr-2 border-r gap-1">
@@ -88,10 +87,9 @@ const AudioInputControl = () => {
             onClick={async () => {
               const devices = await navigator.mediaDevices.enumerateDevices();
               const audioInputDevices = devices.filter(
-                (device, n, a) => device.kind === "audioinput",
+                (device) => device.kind === "audioinput",
               );
               setDeviceList(audioInputDevices);
-              setOpenDeviceList(true);
             }}
           >
             <FaCaretDown />

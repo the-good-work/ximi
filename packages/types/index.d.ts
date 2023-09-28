@@ -4,7 +4,27 @@ type PresetIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 type ParticipantIdentity = string;
 
-type VideoLayout = {} | null;
+/**
+ * @description haha
+ */
+type GridAreaString = string;
+type VideoLayoutName =
+  | "Auto"
+  | "A"
+  | "B"
+  | "C"
+  | "D"
+  | "E"
+  | "F"
+  | "G"
+  | "H"
+  | "I"
+  | "J";
+
+type VideoLayout = {
+  name: VideoLayoutName;
+  layout: { identity: string; layout: GridAreaString }[] | undefined;
+};
 
 interface RoomAction {
   roomName: string;
@@ -48,7 +68,7 @@ interface XimiRoomState {
 interface XimiParticipantState {
   role: XIMIRole;
   audio: { mute: ParticipantIdentity[]; delay: number };
-  video: { layout: VideoLayout };
+  video: VideoLayout;
 }
 
 interface Preset {

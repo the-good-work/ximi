@@ -1,8 +1,9 @@
+import { Popover } from "@headlessui/react";
 import { useLocalParticipant } from "@livekit/components-react";
 import * as classNames from "classnames";
 import { createLocalVideoTrack, Track, VideoPresets } from "livekit-client";
 import { useState } from "react";
-import { FaH, FaL, FaVideo } from "react-icons/fa6";
+import { FaCaretDown, FaH, FaL, FaVideo } from "react-icons/fa6";
 
 const clsControlBtn = (active: boolean, disabled: boolean) =>
   classNames(
@@ -39,6 +40,9 @@ const CameraControl = () => {
   const [showHint, setShowHint] = useState(false);
   const [mode, setMode] = useState<"HIGH" | "LOW">("HIGH");
 
+  const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo>();
+  const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
+
   return (
     <div className="flex items-center pr-2 border-r gap-1">
       <button
@@ -52,8 +56,8 @@ const CameraControl = () => {
             });
           } else {
             const newTrack = await createLocalVideoTrack({
-              resolution:
-                mode === "HIGH" ? VideoPresets.h720 : VideoPresets.h360,
+              deviceId: selectedDevice.deviceId,
+              resolution: mode === "HIGH" ? undefined : VideoPresets.h360,
             });
             await localParticipant.publishTrack(newTrack);
           }
@@ -61,6 +65,41 @@ const CameraControl = () => {
       >
         <FaVideo />
       </button>
+
+      {!hasTrack && (
+        <Popover className="relative flex flex-col justify-center w-6 h-full">
+          <Popover.Button
+            onClick={async () => {
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const audioInputDevices = devices.filter(
+                (device) => device.kind === "videoinput",
+              );
+              setDeviceList(audioInputDevices);
+            }}
+          >
+            <FaCaretDown />
+          </Popover.Button>
+          <Popover.Panel className="absolute z-10 bottom-[calc(100%+1rem)] w-40 text-sm">
+            <div className="flex flex-col p-1 border rounded-sm gap-1 bg-bg border-text ">
+              {deviceList.map((d) => (
+                <Popover.Button
+                  className={`w-full truncate hover:bg-brand pointer-cursor ${
+                    selectedDevice?.deviceId === d.deviceId
+                      ? "bg-brand"
+                      : "bg-[transparent]"
+                  }`}
+                  onClick={() => {
+                    setSelectedDevice(d);
+                  }}
+                  key={d.deviceId}
+                >
+                  {d.label}
+                </Popover.Button>
+              ))}
+            </div>
+          </Popover.Panel>
+        </Popover>
+      )}
 
       <div
         className={`flex items-center h-6 p-0 border rounded-sm ${

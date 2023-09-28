@@ -344,7 +344,7 @@ export class AppController {
                   const initialParticipantState: XimiParticipantState = {
                     role: actualParticipantMeta.role,
                     audio: { mute: [], delay: 0 },
-                    video: { layout: null },
+                    video: { name: 'Auto', layout: undefined },
                   };
 
                   return this.livekit.client.updateParticipant(

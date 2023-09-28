@@ -52,7 +52,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
                 <div
                   key={p.identity}
                   className={classNames(
-                    "relative border w-full h-full",
+                    "relative border w-full h-full bg-bg/50",
                     p.identity === thisPerformerIdentity
                       ? "border-accent"
                       : "border-disabled",

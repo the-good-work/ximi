@@ -26,7 +26,7 @@ export const VideoFrame: React.FC<{ identity: string }> = ({ identity }) => {
   const [, firstVid] = firstVidTrackPub;
 
   return (
-    <div className="w-full h-full cursor-pointer bg-bg/50">
+    <div className="w-full h-full cursor-pointer">
       <VideoTrack
         participant={p}
         source={firstVid.source}

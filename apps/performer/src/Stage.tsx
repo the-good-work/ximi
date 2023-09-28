@@ -82,7 +82,7 @@ const Stage = () => {
 
     return (
       <div className="relative w-full h-[calc(100%-33px)]" id="stage">
-        <div className="fixed flex p-1 text-lg border rounded-sm controls right-4 bottom-4 border-text gap-1 bg-bg">
+        <div className="fixed flex p-1 text-lg rounded-sm controls right-4 bottom-4 gap-1 bg-bg">
           <AudioRenderer />
         </div>
         <VideoRenderer thisPerformerIdentity={localParticipant.identity} />

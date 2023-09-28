@@ -1,42 +1,24 @@
-import {
-  AudioTrack,
-  useLocalParticipant,
-  useRemoteParticipants,
-  useRoomContext,
-  useRoomInfo,
-} from "@livekit/components-react";
-import {
-  createLocalAudioTrack,
-  DataPacket_Kind,
-  RoomEvent,
-} from "livekit-client";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useLocalParticipant, useRoomInfo } from "@livekit/components-react";
+import { createLocalAudioTrack } from "livekit-client";
+import { useEffect, useState } from "react";
 import * as classNames from "classnames";
 import {
   FaA,
   FaClapperboard,
   FaDownload,
   FaEye,
-  FaMessage,
   FaMicrophone,
   FaUpload,
   FaVideo,
   FaVolumeHigh,
   FaVolumeXmark,
 } from "react-icons/fa6";
-import {
-  MessageDataPayload,
-  SwitchActivePresetAction,
-  XimiParticipantState,
-  XimiRoomState,
-} from "types";
+import { SwitchActivePresetAction, XimiRoomState } from "types";
 import { PresetRenamer } from "./PresetRenamer";
 import { AudioLayout } from "./AudioLayout";
-import { Dialog, Transition } from "@headlessui/react";
-import { Field, Formik } from "formik";
-import { AudioRenderer, Button, ChatControl } from "ui/tailwind";
+import { AudioRenderer, ChatControl } from "ui/tailwind";
 import { toast } from "react-hot-toast";
-import * as Yup from "yup";
+import { VideoLayout } from "./VideoLayout";
 
 const ARR_12 = new Array(12).fill(0);
 
@@ -107,7 +89,7 @@ const Stage = () => {
             {tab === "AUDIO" ? (
               <AudioLayout />
             ) : tab === "VIDEO" ? (
-              <div>Video</div>
+              <VideoLayout />
             ) : tab === "SCOUT VIDEO" ? (
               <div>ScoutVid</div>
             ) : tab === "SCOUT TEXT" ? (

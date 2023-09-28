@@ -36,7 +36,6 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
       const numAutoCols = Math.ceil(Math.sqrt(filteredParticipants.length));
       const numAutoRows = Math.ceil(filteredParticipants.length / numAutoCols);
 
-      console.log({ numAutoCols, numAutoRows });
       return (
         <div
           className={`w-full h-full grid gap-1 p-1`}

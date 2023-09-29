@@ -176,6 +176,41 @@ export class AppController {
     };
   }
 
+  @Post('room/token/scout')
+  @UsePipes(new YupValidationPipe(joinRoomSchema()))
+  @ApiBody(yupToOpenAPISchema(joinRoomSchema(), 'Generate a performer token'))
+  async generateScoutToken(
+    @Body() body: Yup.InferType<ReturnType<typeof joinRoomSchema>>,
+  ): Promise<{ token: string }> {
+    const { identity, passcode, roomName } = body;
+
+    // check room exists first
+    const room = await this.livekit.getRoom(roomName);
+    if (room.length < 1) {
+      throw new NotFoundException('Room not found');
+    }
+
+    try {
+      const { passcode: actualPasscode } = JSON.parse(room[0].metadata) as {
+        passcode: string;
+      };
+
+      if (passcode !== actualPasscode) {
+        throw new UnauthorizedException('Incorrect passcode');
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    return {
+      token: await this.livekit.generateTokenForRoom(
+        roomName,
+        identity,
+        'SCOUT',
+      ),
+    };
+  }
+
   @Post('room/identity/check')
   async checkIdentityAvailableForRoom(
     @Body() body: { identity: string; roomName: string },

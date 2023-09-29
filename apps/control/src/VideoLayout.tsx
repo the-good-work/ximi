@@ -36,7 +36,7 @@ const VideoLayout = () => {
           return false;
         }
         const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
-        return pMeta.role === "PERFORMER";
+        return pMeta.role === "PERFORMER" || pMeta.role === "SCOUT";
       } catch (err) {
         console.warn(err);
         return false;
@@ -55,20 +55,30 @@ const VideoLayout = () => {
       </div>
     );
   }
+
   return (
     <div className="w-full h-[calc(100vh-80px)] flex items-stretch">
       <div className="w-20 text-sm border-r md:w-40 md:text-base border-brand">
-        {filteredParticipants.map((p) => (
-          <div
-            key={p.identity}
-            className={clsSidebarBtn(selectedPerformer === p.identity)}
-            onClick={() => {
-              setSelectedPerformer(() => p.identity);
-            }}
-          >
-            {p.identity}
-          </div>
-        ))}
+        {filteredParticipants
+          .filter((p) => {
+            try {
+              const _pm = JSON.parse(p.metadata || "");
+              return _pm?.role === "PERFORMER";
+            } catch (err) {
+              return false;
+            }
+          })
+          .map((p) => (
+            <div
+              key={p.identity}
+              className={clsSidebarBtn(selectedPerformer === p.identity)}
+              onClick={() => {
+                setSelectedPerformer(() => p.identity);
+              }}
+            >
+              {p.identity}
+            </div>
+          ))}
       </div>
       <div className="flex items-center justify-center flex-grow">
         {selectedPerformer === undefined ? (
@@ -99,6 +109,22 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
         }
         const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
         return pMeta.role === "PERFORMER";
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    })
+
+    .sort((a, b) => (a.identity < b.identity ? -1 : 1));
+
+  const filteredParticipantsWithScouts = participants
+    .filter((p) => {
+      try {
+        if (p.metadata === undefined) {
+          return false;
+        }
+        const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+        return pMeta.role === "PERFORMER" || pMeta.role === "SCOUT";
       } catch (err) {
         console.warn(err);
         return false;
@@ -253,7 +279,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                             </label>
                           </Popover.Button>
                           <Popover.Panel className="flex flex-col w-24 gap-1">
-                            {filteredParticipants.map((selectedP) => (
+                            {filteredParticipantsWithScouts.map((selectedP) => (
                               <Popover.Button
                                 onClick={async () => {
                                   const newLayout =

@@ -88,19 +88,34 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
       if (!Array.isArray(videoState.layout)) {
         return <div>Layout state error</div>;
       }
+      const thisVideoLayout = videoLayouts.find(
+        (l) => l.name === videoState.name,
+      )?.layout;
+
+      if (!Array.isArray(thisVideoLayout)) {
+        return <>layout error</>;
+      }
       return (
         <div
-          className={`w-full h-full grid gap-1 p-1 grid-cols-12 grid-rows-12`}
+          style={{
+            gridTemplateColumns: "repeat(12, minmax(0,1fr))",
+            gridTemplateRows: "repeat(12, minmax(0,1fr))",
+          }}
+          className={`w-full h-[calc(100vh-96px)] grid gap-1 p-1`}
         >
-          {videoState.layout.map((p) => {
+          {videoState.layout.map((p, slotNum) => {
             try {
               const meta = filteredParticipants.find(
                 (_p) => _p.identity === p.identity,
-              ).metadata;
-              const pMeta = JSON.parse(meta) as XimiParticipantState;
+              )?.metadata;
+              const pMeta =
+                meta === undefined
+                  ? undefined
+                  : (JSON.parse(meta) as XimiParticipantState);
               return (
                 <div
-                  key={p.identity}
+                  key={`slot_${slotNum}_${p.identity}`}
+                  style={{ gridArea: thisVideoLayout?.[slotNum] }}
                   className={classNames(
                     "relative border",
                     p.identity === thisPerformerIdentity
@@ -117,7 +132,9 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
                         : "text-text bg-bg/50",
                     )}
                   >
-                    {pMeta.role === "PERFORMER" ? (
+                    {pMeta === undefined ? (
+                      "-"
+                    ) : pMeta.role === "PERFORMER" ? (
                       <FaUser size={10} />
                     ) : pMeta.role === "SCOUT" ? (
                       <FaBinoculars size={10} />
@@ -129,7 +146,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
                 </div>
               );
             } catch (err) {
-              return <div>Participant state error</div>;
+              return <div></div>;
             }
           })}
         </div>
@@ -139,3 +156,85 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
     return <div>Loading video layout</div>;
   }
 };
+
+const videoLayouts: {
+  image: string;
+  layout: string[];
+  name: XimiParticipantState["video"]["name"];
+}[] = [
+  {
+    image: "/video-layouts/layout-default.png",
+    name: "Auto",
+    layout: [],
+  },
+
+  {
+    image: "/video-layouts/layout-a.png",
+    name: "A",
+    layout: ["1 / 1 / 13 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-b.png",
+    name: "B",
+
+    layout: ["1 / 4 / 7 / 10", "7 / 4 / 13 / 10"],
+  },
+  {
+    image: "/video-layouts/layout-c.png",
+    name: "C",
+    layout: ["4 / 1 / 10 / 7", "4 / 7 / 10 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-d.png",
+    name: "D",
+    layout: ["1 / 4 / 7 / 10", "7 / 1 / 13 / 7", "7 / 7 / 13 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-e.png",
+    name: "E",
+    layout: ["1 / 1 / 7 / 7", "1 / 7 / 7 / 13", "7 / 4 / 13 / 10"],
+  },
+
+  {
+    image: "/video-layouts/layout-f.png",
+    name: "F",
+    layout: ["1 / 1 / 13 / 7", "1 / 7 / 7 / 13", "7 / 7 / 13 / 13"],
+  },
+
+  {
+    image: "/video-layouts/layout-g.png",
+    name: "G",
+    layout: ["1 / 4 / 7 / 10", "7 / 1 / 13 / 7", "7 / 7 / 13 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-h.png",
+    name: "H",
+
+    layout: ["5 / 1 / 9 / 5", "5 / 5 / 9 / 9", "5 / 9 / 9 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-i.png",
+    name: "I",
+    layout: ["1 / 1 / 13 / 5", "1 / 5 / 13 / 9", "1 / 9 / 13 / 13"],
+  },
+  {
+    image: "/video-layouts/layout-j.png",
+    name: "J",
+    layout: [
+      "1 / 1 / 7 / 7",
+      "1 / 7 / 7 / 14",
+      "7 / 1 / 13 / 7",
+      "7 / 7 / 13 / 13",
+    ],
+  },
+  {
+    image: "/video-layouts/layout-k.png",
+    name: "K",
+    layout: [
+      "1 / 1 / 13 / 4",
+      "1 / 4 / 13 / 7",
+      "1 / 7 / 13 / 10",
+      "1 / 10 / 13 / 13",
+    ],
+  },
+];

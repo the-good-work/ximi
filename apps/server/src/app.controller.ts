@@ -30,6 +30,7 @@ import {
   UnmuteAudioAction,
   PresetIndex,
   SetAudioDelayAction,
+  SetVideoLayoutAction,
 } from 'ximi-types';
 
 config();
@@ -213,7 +214,8 @@ export class AppController {
       | SetPresetNameAction
       | SetAudioDelayAction
       | MuteAudioAction
-      | UnmuteAudioAction,
+      | UnmuteAudioAction
+      | SetVideoLayoutAction,
   ): Promise<{ ok: boolean }> {
     const { type, roomName } = body;
 
@@ -384,6 +386,46 @@ export class AppController {
             JSON.stringify(update),
           );
 
+          break;
+        }
+
+        case 'set-video-layout': {
+          const { layout, forParticipant } = body;
+
+          const p = await this.livekit.client.getParticipant(
+            roomName,
+            forParticipant,
+          );
+
+          if (p === undefined) {
+            throw new BadRequestException(
+              `No participant ${forParticipant} found`,
+            );
+          }
+
+          try {
+            const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+            const _roomMetadata = { ...metadata };
+
+            pMeta.video = layout;
+
+            _roomMetadata.presets[_roomMetadata.activePreset].participants[
+              p.identity
+            ] = { identity: p.identity, state: pMeta };
+
+            await this.livekit.client.updateParticipant(
+              roomName,
+              forParticipant,
+              JSON.stringify(pMeta),
+            );
+
+            await this.livekit.client.updateRoomMetadata(
+              roomName,
+              JSON.stringify(_roomMetadata),
+            );
+          } catch (err) {
+            throw new BadRequestException(err);
+          }
           break;
         }
       }

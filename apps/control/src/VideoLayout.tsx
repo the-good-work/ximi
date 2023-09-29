@@ -1,15 +1,17 @@
 import {
   useRemoteParticipant,
   useRemoteParticipants,
-  VideoTrack,
+  useRoomInfo,
 } from "@livekit/components-react";
 import { useState } from "react";
-import { XimiParticipantState } from "types";
+import { SetVideoLayoutAction, XimiParticipantState } from "types";
 import * as classNames from "classnames";
+import { FaBinoculars, FaUser } from "react-icons/fa6";
+import { VideoFrame } from "ui/tailwind";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(
-    "px-2 py-1 cursor-pointer",
+    "px-2 py-1 cursor-pointer text-sm",
     active
       ? "bg-brand hover:bg-brand/75"
       : "bg-[transparent] hover:bg-brand/50",
@@ -26,18 +28,20 @@ const vidLayoutBtnCls = (active: boolean) =>
 
 const VideoLayout = () => {
   const participants = useRemoteParticipants();
-  const filteredParticipants = participants.filter((p) => {
-    try {
-      if (p.metadata === undefined) {
+  const filteredParticipants = participants
+    .filter((p) => {
+      try {
+        if (p.metadata === undefined) {
+          return false;
+        }
+        const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+        return pMeta.role === "PERFORMER";
+      } catch (err) {
+        console.warn(err);
         return false;
       }
-      const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
-      return pMeta.role === "PERFORMER";
-    } catch (err) {
-      console.warn(err);
-      return false;
-    }
-  });
+    })
+    .sort((a, b) => (a.identity < b.identity ? -1 : 1));
   const [selectedPerformer, setSelectedPerformer] = useState<string>();
 
   if (filteredParticipants.length < 1) {
@@ -85,6 +89,7 @@ const VideoLayout = () => {
 const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
   const p = useRemoteParticipant(identity);
   const participants = useRemoteParticipants();
+  const { name: roomName } = useRoomInfo();
   const filteredParticipants = participants
     .filter((p) => {
       try {
@@ -98,7 +103,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
         return false;
       }
     })
-    .sort((a, b) => (a.identity > b.identity ? -1 : 1));
+    .sort((a, b) => (a.identity < b.identity ? -1 : 1));
 
   try {
     if (p === undefined) {
@@ -114,37 +119,96 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
     const numAutoCols = Math.ceil(Math.sqrt(filteredParticipants.length));
     const numAutoRows = Math.ceil(filteredParticipants.length / numAutoCols);
 
-    console.log({ numAutoCols, numAutoRows });
-
     return (
       <div className="flex flex-col w-full h-full">
         <div className="flex justify-center p-1 border-b gap-1 border-brand">
           {videoLayouts.map((layout) => (
-            <button className={vidLayoutBtnCls(curLayout === layout.name)}>
+            <button
+              className={vidLayoutBtnCls(curLayout === layout.name)}
+              onClick={async () => {
+                const currentLayoutIdentities =
+                  pMeta.video.layout === undefined
+                    ? []
+                    : [...pMeta.video.layout].map((l) => l.identity);
+                const numSlots = layout.layout.length;
+                const patch: SetVideoLayoutAction = {
+                  type: "set-video-layout",
+                  roomName: roomName,
+                  forParticipant: p.identity,
+                  layout: {
+                    name: layout.name,
+                    layout: new Array(numSlots).fill("").map((_, n) => ({
+                      identity: currentLayoutIdentities?.[n] || "",
+                      layout: layout.layout[n],
+                    })),
+                  },
+                };
+
+                const r = await fetch(
+                  `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+                  {
+                    method: "PATCH",
+                    body: JSON.stringify(patch),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  },
+                );
+                return await r.json();
+              }}
+            >
               <img src={layout.image} alt={layout.name} className="w-6" />
               <span>{layout.name}</span>
             </button>
           ))}
         </div>
         <div className="relative flex-grow">
-          {curLayout === null ? (
+          {curLayout === "Auto" ? (
             <div
-              className={`w-full h-full grid gap-1 p-1`}
+              className={`w-full h-[calc(100vh-130px)] grid gap-1 p-1`}
               style={{
-                gridTemplateColumns: `repeat(${numAutoCols}, 1fr)`,
-                gridTemplateRows: `repeat(${numAutoRows}, 1fr)`,
+                gridTemplateColumns: `repeat(${numAutoCols}, minmax(0,1fr))`,
+                gridTemplateRows: `repeat(${numAutoRows}, minmax(0,1fr))`,
               }}
             >
-              {filteredParticipants.map((p) => (
-                <div key={p.identity} className="border border-disabled">
-                  <VideoFrame identity={p.identity} />
-                  {p.identity}
-                </div>
-              ))}
+              {filteredParticipants.map((p) => {
+                try {
+                  const pMeta = JSON.parse(
+                    p.metadata || "",
+                  ) as XimiParticipantState;
+                  return (
+                    <div
+                      key={p.identity}
+                      className="relative border border-disabled"
+                    >
+                      <VideoFrame identity={p.identity} />
+                      <label
+                        className={classNames(
+                          "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",
+                          "text-text bg-bg/50",
+                        )}
+                      >
+                        {pMeta.role === "PERFORMER" ? (
+                          <FaUser size={10} />
+                        ) : pMeta.role === "SCOUT" ? (
+                          <FaBinoculars size={10} />
+                        ) : (
+                          ""
+                        )}{" "}
+                        {p.identity}
+                      </label>
+                    </div>
+                  );
+                } catch (err) {
+                  return <div>Participant state error</div>;
+                }
+              })}
             </div>
           ) : (
-            <div className="w-full h-full grid-cols-12 grid-rows-12">
-              // specific grid
+            <div
+              className={`w-full h-[calc(100vh-130px)] grid gap-1 p-1 grid-cols-12 grid-rows-12`}
+            >
+              {curLayout}
             </div>
           )}
         </div>
@@ -156,7 +220,11 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
   }
 };
 
-const videoLayouts = [
+const videoLayouts: {
+  image: string;
+  layout: string[];
+  name: XimiParticipantState["video"]["name"];
+}[] = [
   {
     image: "/video-layouts/layout-default.png",
     name: "Auto",
@@ -235,22 +303,3 @@ const videoLayouts = [
 ];
 
 export { VideoLayout };
-
-const VideoFrame: React.FC<{ identity: string }> = ({ identity }) => {
-  const p = useRemoteParticipant(identity);
-  const videoTracks =
-    p?.videoTracks?.size !== undefined && p.videoTracks.size > 0
-      ? Array.from(p.videoTracks)
-      : [];
-  const firstVidTrack = videoTracks[0];
-
-  if (!p || firstVidTrack === undefined) {
-    return null;
-  }
-
-  return (
-    <div>
-      {/* <VideoTrack participant={p} source={firstVidTrack.source} />*/}
-    </div>
-  );
-};

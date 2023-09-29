@@ -9,13 +9,12 @@ import {
   FaEarListen,
   FaUser,
   FaVolumeHigh,
-  FaVolumeOff,
   FaVolumeXmark,
 } from "react-icons/fa6";
 import { XimiParticipantState } from "types";
 import * as classNames from "classnames";
 
-const AudioRenderer = () => {
+const AudioRenderer: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
   const remoteParticipants = useRemoteParticipants();
   const { localParticipant } = useLocalParticipant();
   const [showLayout, setShowLayout] = useState(true);
@@ -62,7 +61,10 @@ const AudioRenderer = () => {
 
   return (
     <div
-      className="relative cursor-pointer"
+      className={classNames(
+        "relative cursor-pointer",
+        hidden === true && "hidden",
+      )}
       onClick={() => {
         setShowLayout((show) => !show);
       }}

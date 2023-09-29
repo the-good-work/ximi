@@ -4,9 +4,6 @@ type PresetIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 type ParticipantIdentity = string;
 
-/**
- * @description haha
- */
 type GridAreaString = string;
 type VideoLayoutName =
   | "Auto"
@@ -19,7 +16,8 @@ type VideoLayoutName =
   | "G"
   | "H"
   | "I"
-  | "J";
+  | "J"
+  | "K";
 
 type VideoLayout = {
   name: VideoLayoutName;
@@ -57,6 +55,12 @@ interface SetAudioDelayAction extends RoomAction {
   type: "set-audio-delay";
   forParticipant: string;
   delay: number;
+}
+
+interface SetVideoLayoutAction extends RoomAction {
+  type: "set-video-layout";
+  forParticipant: string;
+  layout: VideoLayout;
 }
 
 interface XimiRoomState {
@@ -105,6 +109,7 @@ export {
   SetPresetNameAction,
   MuteAudioAction,
   UnmuteAudioAction,
+  SetVideoLayoutAction,
   SetAudioDelayAction,
   XimiRoomState,
   XimiParticipantState,

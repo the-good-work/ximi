@@ -98,7 +98,7 @@ const Stage = () => {
               <div>Tab error</div>
             )}
 
-            <AudioRenderer />
+            <AudioRenderer hidden={true} />
           </div>
         </div>
 

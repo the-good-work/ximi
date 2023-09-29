@@ -5,6 +5,8 @@ import {
 import { useState } from "react";
 import { XimiParticipantState } from "types";
 import * as classNames from "classnames";
+import { VideoFrame } from "ui/tailwind";
+import { FaBinoculars } from "react-icons/fa6";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(
@@ -14,7 +16,7 @@ const clsSidebarBtn = (active: boolean) =>
       : "bg-[transparent] hover:bg-brand/50",
   );
 
-const ScoutText = () => {
+const ScoutVideos = () => {
   const participants = useRemoteParticipants();
   const filteredParticipants = participants
     .filter((p) => {
@@ -30,7 +32,9 @@ const ScoutText = () => {
       }
     })
     .sort((a, b) => (a.identity < b.identity ? -1 : 1));
-  const [selectedScout, setSelectedScout] = useState<string>();
+
+  const numAutoCols = Math.ceil(Math.sqrt(filteredParticipants.length));
+  const numAutoRows = Math.ceil(filteredParticipants.length / numAutoCols);
 
   if (filteredParticipants.length < 1) {
     return (
@@ -45,72 +49,38 @@ const ScoutText = () => {
 
   return (
     <div className="w-full h-[calc(100vh-80px)] flex items-stretch">
-      <div className="w-20 text-sm border-r md:w-40 md:text-base border-brand">
-        {filteredParticipants.map((p) => (
+      <div className="flex flex-col w-full h-full">
+        <div className="relative flex-grow">
           <div
-            key={p.identity}
-            className={clsSidebarBtn(selectedScout === p.identity)}
-            onClick={() => {
-              setSelectedScout(() => p.identity);
+            className={`w-full h-[calc(100vh-130px)] grid gap-1 p-1`}
+            style={{
+              gridTemplateColumns: `repeat(${numAutoCols}, minmax(0,1fr))`,
+              gridTemplateRows: `repeat(${numAutoRows}, minmax(0,1fr))`,
             }}
           >
-            {p.identity}
+            {filteredParticipants.map((p) => {
+              return (
+                <div
+                  key={p.identity}
+                  className="relative border border-disabled"
+                >
+                  <VideoFrame identity={p.identity} />
+                  <label
+                    className={classNames(
+                      "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",
+                      "text-text bg-bg/50",
+                    )}
+                  >
+                    <FaBinoculars size={10} /> {p.identity}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-center flex-grow">
-        {selectedScout === undefined ? (
-          <div>
-            Select
-            <span className="text-xs relative top-[-.05em] mx-1 p-1 inline-block border leading-3 rounded-sm">
-              SCOUT
-            </span>{" "}
-            on sidebar
-          </div>
-        ) : (
-          <TextPosterEditor identity={selectedScout} />
-        )}
+        </div>
       </div>
     </div>
   );
 };
 
-const TextPosterEditor = ({ identity }: { identity: string }) => {
-  const p = useRemoteParticipant(identity);
-
-  try {
-    const pMeta = JSON.parse(p?.metadata || "") as XimiParticipantState;
-
-    return (
-      <div className="w-full h-[calc(100vh-80px)] p-1">
-        <div className="h-full p-1 border grid grid-rows-2 border-brand gap-1">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <label className="text-sm text-center uppercase">
-              Current text
-            </label>
-            <p className="text-3xl text-center">{pMeta.textPoster || "-"}</p>
-          </div>
-
-          <div className="flex flex-col items-center justify-center gap-4">
-            <textarea
-              placeholder={pMeta.textPoster || "Type here"}
-              className="block w-full p-2 text-4xl text-center border h-36 text-text border-brand bg-bg"
-            />
-            <div className="flex gap-4">
-              <button className="px-2 py-1 text-sm border rounded border-brand hover:bg-brand/25">
-                Set {identity} text
-              </button>
-              <button className="px-2 py-1 text-sm border rounded border-brand hover:bg-brand/25">
-                Set all scout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  } catch (err) {
-    return <div>Participant state error</div>;
-  }
-};
-
-export { ScoutText };
+export { ScoutVideos };

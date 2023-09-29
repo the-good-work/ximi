@@ -6,7 +6,6 @@ import {
 import { useState } from "react";
 import { SetScoutTextAction, XimiParticipantState } from "types";
 import * as classNames from "classnames";
-import { useRoom } from "@livekit/react-core";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(

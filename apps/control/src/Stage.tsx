@@ -20,6 +20,7 @@ import { AudioRenderer, ChatControl } from "ui/tailwind";
 import { toast } from "react-hot-toast";
 import { VideoLayout } from "./VideoLayout";
 import { ScoutText } from "./ScoutText";
+import { ScoutVideos } from "./ScoutVideos";
 
 const ARR_12 = new Array(12).fill(0);
 
@@ -92,7 +93,7 @@ const Stage = () => {
             ) : tab === "VIDEO" ? (
               <VideoLayout />
             ) : tab === "SCOUT VIDEO" ? (
-              <div>Scout Videos</div>
+              <ScoutVideos />
             ) : tab === "SCOUT TEXT" ? (
               <ScoutText />
             ) : (

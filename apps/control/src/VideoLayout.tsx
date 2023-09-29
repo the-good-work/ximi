@@ -8,6 +8,7 @@ import { SetVideoLayoutAction, XimiParticipantState } from "types";
 import * as classNames from "classnames";
 import { FaBinoculars, FaUser } from "react-icons/fa6";
 import { VideoFrame } from "ui/tailwind";
+import { Popover } from "@headlessui/react";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(
@@ -206,9 +207,99 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
             </div>
           ) : (
             <div
-              className={`w-full h-[calc(100vh-130px)] grid gap-1 p-1 grid-cols-12 grid-rows-12`}
+              style={{
+                gridTemplateColumns: "repeat(12, minmax(0,1fr))",
+                gridTemplateRows: "repeat(12, minmax(0,1fr))",
+              }}
+              className={`w-full h-[calc(100vh-130px)] grid gap-1 p-1`}
             >
-              {curLayout}
+              {Array.isArray(pMeta.video.layout) &&
+                pMeta.video.layout.map((slot, slotNum) => {
+                  try {
+                    const thisSlotParticipant = filteredParticipants.find(
+                      (p) => p.identity === slot.identity,
+                    );
+                    const slotMeta =
+                      thisSlotParticipant === undefined
+                        ? undefined
+                        : (JSON.parse(
+                            thisSlotParticipant.metadata || "",
+                          ) as XimiParticipantState);
+                    return (
+                      <div
+                        key={`slot_${slotNum}_${slot.identity}`}
+                        className="relative border border-disabled"
+                        style={{ gridArea: slot.layout }}
+                      >
+                        <VideoFrame identity={slot.identity} />
+                        <Popover className="absolute text-sm top-1 left-1">
+                          <Popover.Button className="border cursor-pointer ">
+                            <label
+                              className={classNames(
+                                "flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",
+                                "text-text bg-bg/50",
+                              )}
+                            >
+                              {slotMeta === undefined ? (
+                                ""
+                              ) : slotMeta.role === "PERFORMER" ? (
+                                <FaUser size={10} />
+                              ) : slotMeta.role === "SCOUT" ? (
+                                <FaBinoculars size={10} />
+                              ) : (
+                                ""
+                              )}{" "}
+                              {slot.identity || "Select"}
+                            </label>
+                          </Popover.Button>
+                          <Popover.Panel className="flex flex-col w-24 gap-1">
+                            {filteredParticipants.map((selectedP) => (
+                              <Popover.Button
+                                onClick={async () => {
+                                  const newLayout =
+                                    pMeta.video.layout === undefined
+                                      ? []
+                                      : [...pMeta.video.layout];
+
+                                  newLayout[slotNum].identity =
+                                    selectedP.identity;
+
+                                  const patch: SetVideoLayoutAction = {
+                                    type: "set-video-layout",
+                                    roomName: roomName,
+                                    forParticipant: p.identity,
+                                    layout: {
+                                      ...pMeta.video,
+                                      layout: newLayout,
+                                    },
+                                  };
+
+                                  const r = await fetch(
+                                    `${
+                                      import.meta.env.VITE_XIMI_SERVER_HOST
+                                    }/room/state`,
+                                    {
+                                      method: "PATCH",
+                                      body: JSON.stringify(patch),
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                    },
+                                  );
+                                  return await r.json();
+                                }}
+                              >
+                                {selectedP.identity}
+                              </Popover.Button>
+                            ))}
+                          </Popover.Panel>
+                        </Popover>
+                      </div>
+                    );
+                  } catch (err) {
+                    return <div></div>;
+                  }
+                })}
             </div>
           )}
         </div>

@@ -51,6 +51,7 @@ export class LivekitService {
         role,
         audio: { mute: [], delay: 0 },
         video: { layout: undefined, name: 'Auto' },
+        textPoster: '',
       };
 
       const at = new AccessToken(

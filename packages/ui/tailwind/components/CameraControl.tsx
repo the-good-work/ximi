@@ -71,6 +71,7 @@ const CameraControl = () => {
           <Popover.Button
             onClick={async () => {
               const devices = await navigator.mediaDevices.enumerateDevices();
+
               const audioInputDevices = devices.filter(
                 (device) => device.kind === "videoinput",
               );
@@ -93,7 +94,7 @@ const CameraControl = () => {
                   }}
                   key={d.deviceId}
                 >
-                  {d.label}
+                  {d.label || "Default device"}
                 </Popover.Button>
               ))}
             </div>

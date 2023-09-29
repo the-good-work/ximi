@@ -63,6 +63,12 @@ interface SetVideoLayoutAction extends RoomAction {
   layout: VideoLayout;
 }
 
+interface SetScoutTextAction extends RoomAction {
+  type: "set-scout-text";
+  forParticipant: string[];
+  textPoster: string;
+}
+
 interface XimiRoomState {
   passcode: string;
   activePreset: SwitchActivePresetAction["activePreset"];
@@ -73,6 +79,7 @@ interface XimiParticipantState {
   role: XIMIRole;
   audio: { mute: ParticipantIdentity[]; delay: number };
   video: VideoLayout;
+  textPoster: string;
 }
 
 interface Preset {
@@ -111,6 +118,7 @@ export {
   UnmuteAudioAction,
   SetVideoLayoutAction,
   SetAudioDelayAction,
+  SetScoutTextAction,
   XimiRoomState,
   XimiParticipantState,
   MessageDataPayload,

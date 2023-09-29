@@ -19,6 +19,7 @@ import { AudioLayout } from "./AudioLayout";
 import { AudioRenderer, ChatControl } from "ui/tailwind";
 import { toast } from "react-hot-toast";
 import { VideoLayout } from "./VideoLayout";
+import { ScoutText } from "./ScoutText";
 
 const ARR_12 = new Array(12).fill(0);
 
@@ -91,9 +92,9 @@ const Stage = () => {
             ) : tab === "VIDEO" ? (
               <VideoLayout />
             ) : tab === "SCOUT VIDEO" ? (
-              <div>ScoutVid</div>
+              <div>Scout Videos</div>
             ) : tab === "SCOUT TEXT" ? (
-              <div>ScoutText</div>
+              <ScoutText />
             ) : (
               <div>Tab error</div>
             )}

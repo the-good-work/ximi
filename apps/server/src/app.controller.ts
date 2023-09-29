@@ -31,6 +31,7 @@ import {
   PresetIndex,
   SetAudioDelayAction,
   SetVideoLayoutAction,
+  SetScoutTextAction,
 } from 'ximi-types';
 
 config();
@@ -250,6 +251,7 @@ export class AppController {
       | SetAudioDelayAction
       | MuteAudioAction
       | UnmuteAudioAction
+      | SetScoutTextAction
       | SetVideoLayoutAction,
   ): Promise<{ ok: boolean }> {
     const { type, roomName } = body;
@@ -382,6 +384,7 @@ export class AppController {
                     role: actualParticipantMeta.role,
                     audio: { mute: [], delay: 0 },
                     video: { name: 'Auto', layout: undefined },
+                    textPoster: '',
                   };
 
                   return this.livekit.client.updateParticipant(
@@ -461,6 +464,51 @@ export class AppController {
           } catch (err) {
             throw new BadRequestException(err);
           }
+          break;
+        }
+
+        case 'set-scout-text': {
+          const { textPoster, forParticipant } = body;
+
+          const participants = await Promise.all(
+            forParticipant.map((identity) =>
+              this.livekit.client.getParticipant(roomName, identity),
+            ),
+          );
+
+          if (participants === undefined || !Array.isArray(participants)) {
+            throw new BadRequestException(`No scout participants found`);
+          }
+
+          const _roomMetadata = { ...metadata };
+
+          await Promise.all(
+            participants.map((p) => {
+              try {
+                const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+
+                pMeta.textPoster = textPoster;
+
+                _roomMetadata.presets[_roomMetadata.activePreset].participants[
+                  p.identity
+                ] = { identity: p.identity, state: pMeta };
+
+                return this.livekit.client.updateParticipant(
+                  roomName,
+                  p.identity,
+                  JSON.stringify(pMeta),
+                );
+              } catch (err) {
+                throw new BadRequestException(err);
+              }
+            }),
+          );
+
+          await this.livekit.client.updateRoomMetadata(
+            roomName,
+            JSON.stringify(_roomMetadata),
+          );
+
           break;
         }
       }

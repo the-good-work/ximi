@@ -108,7 +108,7 @@ const AudioInputControl = () => {
                   }}
                   key={d.deviceId}
                 >
-                  {d.label}
+                  {d.label || "Default device"}
                 </Popover.Button>
               ))}
             </div>

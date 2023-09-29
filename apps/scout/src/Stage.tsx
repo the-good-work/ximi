@@ -14,6 +14,7 @@ import {
   CameraControl,
   ChatControl,
   ScreencastControl,
+  VideoFrame,
 } from "ui/tailwind";
 
 const Stage = () => {
@@ -85,7 +86,7 @@ const Stage = () => {
         <div className="fixed flex p-1 text-lg rounded-sm controls right-4 bottom-4 gap-1 bg-bg">
           <AudioRenderer />
         </div>
-        <VideoRenderer thisPerformerIdentity={localParticipant.identity} />
+        <ScoutVisual />
         <div className="fixed flex p-1 text-lg border rounded-sm controls left-4 bottom-4 border-text gap-1 bg-bg">
           <CameraControl />
           <ScreencastControl />
@@ -100,3 +101,39 @@ const Stage = () => {
 };
 
 export { Stage };
+
+const ScoutVisual = () => {
+  const [showPoster, setShowPoster] = useState(true);
+  const { localParticipant } = useLocalParticipant();
+
+  try {
+    const meta = JSON.parse(
+      localParticipant.metadata || "",
+    ) as XimiParticipantState;
+
+    return (
+      <div
+        className="w-full h-full"
+        onClick={() => {
+          setShowPoster((a) => !a);
+        }}
+      >
+        {showPoster ? (
+          <div className="flex items-center justify-center w-full h-full text-4xl uppercase .whitespace-pre-line">
+            {meta.textPoster || "-"}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center w-full h-full uppercase">
+            {localParticipant.videoTracks.size < 1 ? (
+              <div>Video off</div>
+            ) : (
+              <VideoFrame identity={localParticipant.identity} />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  } catch (err) {
+    return <div>Participant state error</div>;
+  }
+};

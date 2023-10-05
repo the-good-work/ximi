@@ -59,7 +59,7 @@ const CameraControl = () => {
               deviceId: selectedDevice.deviceId,
               resolution: mode === "HIGH" ? undefined : VideoPresets.h360,
             });
-            await localParticipant.publishTrack(newTrack);
+            await localParticipant.publishTrack(newTrack, { simulcast: true });
           }
         }}
       >

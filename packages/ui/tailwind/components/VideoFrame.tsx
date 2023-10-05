@@ -1,11 +1,13 @@
 import { useRemoteParticipant, VideoTrack } from "@livekit/components-react";
 import * as classNames from "classnames";
+import { VideoQuality } from "livekit-client";
 import { useEffect, useState } from "react";
 
-export const VideoFrame: React.FC<{ identity: string; full: boolean }> = ({
-  identity,
-  full,
-}) => {
+export const VideoFrame: React.FC<{
+  identity: string;
+  full: boolean;
+  preview?: boolean;
+}> = ({ identity, full, preview = true }) => {
   const p = useRemoteParticipant(identity);
   const [videoDisplayState, setVideoDisplayState] = useState<1 | 2 | 3 | 4>(
     full ? 2 : 1,
@@ -23,12 +25,21 @@ export const VideoFrame: React.FC<{ identity: string; full: boolean }> = ({
       ? Array.from(p.videoTracks)
       : [];
   const firstVidTrackPub = videoTracks?.[0];
+  const [, firstVid] = firstVidTrackPub === undefined ? [,] : firstVidTrackPub;
+
+  useEffect(() => {
+    if (firstVid === undefined) {
+      return;
+    }
+    if (typeof firstVid?.setVideoQuality === "function") {
+      firstVid.setVideoQuality(preview ? VideoQuality.LOW : VideoQuality.HIGH);
+    }
+  }, [firstVid, firstVid?.subscriptionStatus, preview]);
+  //firstVid.setVideoQuality();
 
   if (!p || firstVidTrackPub === undefined) {
     return null;
   }
-
-  const [, firstVid] = firstVidTrackPub;
 
   return (
     <div className="w-full h-full cursor-pointer">

@@ -38,7 +38,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
 
       return (
         <div
-          className={`w-full h-full grid gap-1 p-1`}
+          className={`w-full h-[calc(100vh-96px)] grid gap-1 p-1`}
           style={{
             gridTemplateColumns: `repeat(${numAutoCols}, minmax(0,1fr))`,
             gridTemplateRows: `repeat(${numAutoRows}, minmax(0,1fr))`,
@@ -58,7 +58,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
                       : "border-disabled",
                   )}
                 >
-                  <VideoFrame identity={p.identity} />
+                  <VideoFrame full={true} identity={p.identity} />
                   <label
                     className={classNames(
                       "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",
@@ -123,7 +123,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
                       : "border-disabled",
                   )}
                 >
-                  <VideoFrame identity={p.identity} />
+                  <VideoFrame identity={p.identity} full={true} />
                   <label
                     className={classNames(
                       "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",

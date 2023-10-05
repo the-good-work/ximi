@@ -1,25 +1,29 @@
 import {
   LiveKitRoom,
   useRemoteParticipant,
-  useRoomInfo,
   AudioTrack,
   StartAudio,
   useStartAudio,
   useRoomContext,
 } from "@livekit/components-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { VideoFrame } from "ui/tailwind";
 import * as qs from "qs";
-import { TrackSource } from "livekit-client/dist/src/proto/livekit_models_pb";
+import ShortUniqueId from "short-unique-id";
 
 const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
+
+const uid = new ShortUniqueId({
+  dictionary: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+});
 
 function App() {
   const { room, passcode, target, mode } = qs.parse(window.location.search, {
     ignoreQueryPrefix: true,
   });
 
-  const [identity, setIdentity] = useState<string>(`O${target}`);
+  const rand = useMemo(() => uid.rnd(6), []);
+  const [identity, setIdentity] = useState<string>(`OUT${rand}`);
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
@@ -77,12 +81,12 @@ const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
     return <div>Loading</div>;
   }
   return (
-    <div className="object-cover w-full h-[100vh]">
-      {audioOn && (
+    <div className="object-cover w-full h-[100vh] overflow-hidden">
+      {audioOn && participant.audioTracks.size > 0 && (
         <>
           <AudioTrack
             participant={participant}
-            source={Array.from(participant.audioTracks)?.[0][1].source}
+            source={Array.from(participant.audioTracks)[0][1].source}
           />
 
           {!canPlayAudio && (
@@ -93,7 +97,9 @@ const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
         </>
       )}
 
-      {videoOn && <VideoFrame identity={target} full={true} />}
+      {videoOn && participant.videoTracks.size > 0 && (
+        <VideoFrame identity={target} full={true} preview={false} />
+      )}
     </div>
   );
 };

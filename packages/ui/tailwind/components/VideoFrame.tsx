@@ -2,6 +2,14 @@ import { useRemoteParticipant, VideoTrack } from "@livekit/components-react";
 import * as classNames from "classnames";
 import { VideoQuality } from "livekit-client";
 import { useEffect, useState } from "react";
+import {
+  FaDiceFour,
+  FaDiceOne,
+  FaDiceSix,
+  FaRegSquare,
+  FaTableCells,
+  FaTableCellsLarge,
+} from "react-icons/fa6";
 
 export const VideoFrame: React.FC<{
   identity: string;
@@ -14,6 +22,9 @@ export const VideoFrame: React.FC<{
   );
   const [flip, setFlip] = useState(false);
   const [fit, setFit] = useState(false);
+  const [quality, setQuality] = useState(
+    preview === true ? VideoQuality.MEDIUM : VideoQuality.HIGH,
+  );
 
   useEffect(() => {
     setFlip(() => videoDisplayState > 2);
@@ -32,16 +43,16 @@ export const VideoFrame: React.FC<{
       return;
     }
     if (typeof firstVid?.setVideoQuality === "function") {
-      firstVid.setVideoQuality(preview ? VideoQuality.LOW : VideoQuality.HIGH);
+      firstVid.setVideoQuality(quality);
     }
-  }, [firstVid, firstVid?.subscriptionStatus, preview]);
+  }, [firstVid, firstVid?.subscriptionStatus, quality]);
 
   if (!p || firstVidTrackPub === undefined) {
     return null;
   }
 
   return (
-    <div className="w-full h-full cursor-pointer">
+    <div className="relative w-full h-full cursor-pointer">
       <VideoTrack
         participant={p}
         source={firstVid.source}
@@ -56,6 +67,26 @@ export const VideoFrame: React.FC<{
           fit === true ? "object-contain" : "object-cover",
         )}
       />
+      <button
+        className={`absolute top-2 right-2`}
+        onClick={() => {
+          setQuality((a) =>
+            a === VideoQuality.LOW
+              ? VideoQuality.MEDIUM
+              : a === VideoQuality.MEDIUM
+              ? VideoQuality.HIGH
+              : VideoQuality.LOW,
+          );
+        }}
+      >
+        {quality === VideoQuality.LOW ? (
+          <FaRegSquare />
+        ) : quality === VideoQuality.MEDIUM ? (
+          <FaTableCellsLarge />
+        ) : (
+          <FaTableCells />
+        )}
+      </button>
     </div>
   );
 };

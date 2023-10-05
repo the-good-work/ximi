@@ -1,5 +1,5 @@
 {
-  "name": "scout",
+  "name": "output",
   "version": "0.0.3",
   "private": true,
   "dependencies": {
@@ -12,6 +12,7 @@
     "@types/node": "^16.11.62",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
+    "query-string": "^7.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-ionicons": "^4.2.0",
@@ -22,7 +23,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "dev": "export PORT=3400; craco start",
+    "dev": "export PORT=3300; craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject"

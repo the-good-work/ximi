@@ -62,7 +62,11 @@ export class LivekitService {
           metadata: JSON.stringify(initialParticipantState),
         },
       );
-      at.addGrant({ roomJoin: true, room: roomName });
+      at.addGrant({
+        roomJoin: true,
+        room: roomName,
+        canPublish: role === 'OUTPUT' ? false : true,
+      });
       const token = at.toJwt();
       return token;
     } catch (err) {

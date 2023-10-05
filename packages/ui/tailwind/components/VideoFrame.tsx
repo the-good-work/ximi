@@ -2,9 +2,14 @@ import { useRemoteParticipant, VideoTrack } from "@livekit/components-react";
 import * as classNames from "classnames";
 import { useEffect, useState } from "react";
 
-export const VideoFrame: React.FC<{ identity: string }> = ({ identity }) => {
+export const VideoFrame: React.FC<{ identity: string; full: boolean }> = ({
+  identity,
+  full,
+}) => {
   const p = useRemoteParticipant(identity);
-  const [videoDisplayState, setVideoDisplayState] = useState<1 | 2 | 3 | 4>(1);
+  const [videoDisplayState, setVideoDisplayState] = useState<1 | 2 | 3 | 4>(
+    full ? 2 : 1,
+  );
   const [flip, setFlip] = useState(false);
   const [fit, setFit] = useState(false);
 

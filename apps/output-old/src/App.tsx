@@ -98,7 +98,7 @@ const PerformerAudio = ({
 
   const audioRef = useRef<HTMLAudioElement>();
   const firstAudioTrack = p.publications.find(
-    (pub) => pub.kind === Track.Kind.Audio
+    (pub) => pub.kind === Track.Kind.Audio,
   ) as RemoteTrackPublication | undefined;
 
   /* refs to AudioContext (HTML WebAudio) objects */
@@ -154,7 +154,7 @@ const PerformerAudio = ({
               mediaStream.current = new MediaStream([track.mediaStreamTrack]);
               mediaStreamSource.current =
                 AudioCtxRef.current.createMediaStreamSource(
-                  mediaStream.current
+                  mediaStream.current,
                 );
               mediaStreamSource.current
                 .connect(delayNode.current)
@@ -185,7 +185,7 @@ const PerformerVideo = ({ performer }: { performer: Participant }) => {
   const p = useParticipant(performer);
   const videoRef = useRef<HTMLVideoElement>();
   const firstVideoTrack = p.publications.find(
-    (pub) => pub.kind === Track.Kind.Video
+    (pub) => pub.kind === Track.Kind.Video,
   ) as RemoteTrackPublication | undefined;
   useEffect(() => {
     if (firstVideoTrack) {

@@ -5,11 +5,15 @@ import {
   StartAudio,
   useStartAudio,
   useRoomContext,
+  useParticipants,
 } from "@livekit/components-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { VideoFrame } from "ui/tailwind";
 import * as qs from "qs";
 import ShortUniqueId from "short-unique-id";
+import { FaPlay } from "react-icons/fa6";
+import { XimiParticipantState } from "types";
+import { ParticipantEvent } from "livekit-client";
 
 const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
 
@@ -67,32 +71,112 @@ function App() {
 export default App;
 
 const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
-  const participant = useRemoteParticipant(target);
+  const participants = useParticipants();
+  const participant = participants.find((p) => p.identity === target);
   const room = useRoomContext();
-  const { canPlayAudio } = useStartAudio({
+  const { canPlayAudio, mergedProps } = useStartAudio({
     room,
-    props: {},
+    props: { style: { display: "flex" } },
   });
+
+  const audioRef = useRef<HTMLMediaElement>(null);
+  const AudioCtxRef = useRef<AudioContext>();
+  const mediaStreamSource = useRef<MediaStreamAudioSourceNode>();
+  const delayNode = useRef<DelayNode>();
 
   const videoOn = mode === "1" || mode === "2";
   const audioOn = mode === "0" || mode === "2";
 
+  console.log("bb", participant?.metadata);
+
+  useEffect(() => {
+    console.log("a");
+    if (participant?.metadata === undefined) {
+      return;
+    }
+
+    try {
+      const pState = JSON.parse(
+        participant.metadata || "",
+      ) as XimiParticipantState;
+      if (typeof pState.audio.delay === "number") {
+        console.log("b", pState);
+        if (delayNode.current !== undefined) {
+          delayNode.current.delayTime.value = pState.audio.delay / 1000;
+          console.log(`delay set to ${pState.audio.delay}`);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [participant?.metadata]);
+
+  useEffect(() => {
+    if (!canPlayAudio) {
+      return;
+    }
+
+    if (participant === undefined || participant.audioTracks.size < 0) {
+      return;
+    }
+
+    if (AudioCtxRef.current === undefined) {
+      AudioCtxRef.current = new AudioContext();
+    }
+
+    if (delayNode.current === undefined) {
+      delayNode.current = new DelayNode(AudioCtxRef.current, {
+        maxDelayTime: 5,
+        delayTime: 0,
+      });
+    }
+
+    const targetTrack = Array.from(participant.audioTracks)[0][1].track;
+
+    if (audioRef.current !== null && targetTrack !== undefined) {
+      targetTrack.attach(audioRef.current);
+      audioRef.current.muted = true;
+    }
+
+    if (mediaStreamSource.current === undefined && targetTrack !== undefined) {
+      mediaStreamSource.current = AudioCtxRef.current.createMediaStreamSource(
+        new MediaStream([targetTrack.mediaStreamTrack]),
+      );
+
+      mediaStreamSource.current
+        .connect(delayNode.current)
+        .connect(AudioCtxRef.current.destination);
+    }
+
+    if (AudioCtxRef.current.state !== "running") {
+      AudioCtxRef.current.resume();
+    }
+  }, [canPlayAudio, participant?.audioTracks?.size, participant]);
+
   if (participant === undefined) {
     return <div>Loading</div>;
   }
+
+  const audioTrackPub =
+    participant.audioTracks.size > 0
+      ? Array.from(participant.audioTracks)[0][1].source
+      : undefined;
+
   return (
     <div className="object-cover w-full h-[100vh] overflow-hidden">
-      {audioOn && participant.audioTracks.size > 0 && (
+      {audioOn && audioTrackPub && (
         <>
-          <AudioTrack
-            participant={participant}
-            source={Array.from(participant.audioTracks)[0][1].source}
-          />
+          {/*
+          <AudioTrack participant={participant} source={audioTrackPub} />
+					*/}
+          <audio ref={audioRef} />
 
           {!canPlayAudio && (
-            <div className="fixed z-10 w-24 h-24 bottom-2 right-2 bg-bg text-text">
-              <StartAudio label=">" />
-            </div>
+            <button {...mergedProps}>
+              <div className="fixed z-10 flex items-center justify-center w-8 h-8 p-0 bottom-2 right-2 text-text bg-bg/10">
+                <FaPlay size={16} />
+              </div>
+            </button>
           )}
         </>
       )}

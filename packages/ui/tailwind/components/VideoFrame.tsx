@@ -35,7 +35,6 @@ export const VideoFrame: React.FC<{
       firstVid.setVideoQuality(preview ? VideoQuality.LOW : VideoQuality.HIGH);
     }
   }, [firstVid, firstVid?.subscriptionStatus, preview]);
-  //firstVid.setVideoQuality();
 
   if (!p || firstVidTrackPub === undefined) {
     return null;

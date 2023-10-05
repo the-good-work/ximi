@@ -143,8 +143,12 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
     const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
     const curLayout = pMeta.video.name;
 
-    const numAutoCols = Math.ceil(Math.sqrt(filteredParticipants.length));
-    const numAutoRows = Math.ceil(filteredParticipants.length / numAutoCols);
+    const numAutoCols = Math.ceil(
+      Math.sqrt(filteredParticipantsWithScouts.length),
+    );
+    const numAutoRows = Math.ceil(
+      filteredParticipantsWithScouts.length / numAutoCols,
+    );
 
     return (
       <div className="flex flex-col w-full h-full">
@@ -198,7 +202,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                 gridTemplateRows: `repeat(${numAutoRows}, minmax(0,1fr))`,
               }}
             >
-              {filteredParticipants.map((p) => {
+              {filteredParticipantsWithScouts.map((p) => {
                 try {
                   const pMeta = JSON.parse(
                     p.metadata || "",
@@ -208,7 +212,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                       key={p.identity}
                       className="relative border border-disabled"
                     >
-                      <VideoFrame identity={p.identity} />
+                      <VideoFrame identity={p.identity} full={true} />
                       <label
                         className={classNames(
                           "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",
@@ -242,22 +246,24 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
               {Array.isArray(pMeta.video.layout) &&
                 pMeta.video.layout.map((slot, slotNum) => {
                   try {
-                    const thisSlotParticipant = filteredParticipants.find(
-                      (p) => p.identity === slot.identity,
-                    );
+                    const thisSlotParticipant =
+                      filteredParticipantsWithScouts.find(
+                        (p) => p.identity === slot.identity,
+                      );
                     const slotMeta =
                       thisSlotParticipant === undefined
                         ? undefined
                         : (JSON.parse(
                             thisSlotParticipant.metadata || "",
                           ) as XimiParticipantState);
+                    console.log({ slotMeta });
                     return (
                       <div
                         key={`slot_${slotNum}_${slot.identity}`}
                         className="relative border border-disabled"
                         style={{ gridArea: slot.layout }}
                       >
-                        <VideoFrame identity={slot.identity} />
+                        <VideoFrame identity={slot.identity} full={true} />
                         <Popover className="absolute text-sm top-1 left-1">
                           <Popover.Button className="border cursor-pointer ">
                             <label
@@ -278,9 +284,10 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                               {slot.identity || "Select"}
                             </label>
                           </Popover.Button>
-                          <Popover.Panel className="flex flex-col w-24 gap-1">
+                          <Popover.Panel className="flex flex-col w-24 border relative -top-[1px]">
                             {filteredParticipantsWithScouts.map((selectedP) => (
                               <Popover.Button
+                                className="w-full p-1 text-left hover:bg-text/10"
                                 onClick={async () => {
                                   const newLayout =
                                     pMeta.video.layout === undefined

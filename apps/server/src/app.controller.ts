@@ -32,6 +32,7 @@ import {
   SetAudioDelayAction,
   SetVideoLayoutAction,
   SetScoutTextAction,
+  UploadPresetsAction,
 } from 'ximi-types';
 
 config();
@@ -287,7 +288,8 @@ export class AppController {
       | MuteAudioAction
       | UnmuteAudioAction
       | SetScoutTextAction
-      | SetVideoLayoutAction,
+      | SetVideoLayoutAction
+      | UploadPresetsAction,
   ): Promise<{ ok: boolean }> {
     const { type, roomName } = body;
 
@@ -544,6 +546,52 @@ export class AppController {
             JSON.stringify(_roomMetadata),
           );
 
+          break;
+        }
+
+        case 'upload-presets': {
+          const { roomState, roomName } = body;
+
+          const rooms = await this.livekit.client.listRooms();
+          if (rooms.findIndex((r) => r.name === roomName) < 0) {
+            throw new BadRequestException(`No matching room ${roomName} found`);
+          }
+
+          try {
+            await this.livekit.client.updateRoomMetadata(
+              roomName,
+              JSON.stringify(roomState),
+            );
+
+            const reloadPresetPayload: SwitchActivePresetAction = {
+              roomName,
+              activePreset: roomState.activePreset,
+              type: 'set-active-preset',
+            };
+
+            await fetch(`${process.env.HOST}/room/state`, {
+              method: 'PATCH',
+              body: JSON.stringify(reloadPresetPayload),
+
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            /*
+            await Promise.all(
+              Object.keys(_activePreset.participants).map((participant) =>
+                this.livekit.client.updateParticipant(
+                  roomName,
+                  participant,
+                  JSON.stringify(_activePreset.participants[participant]),
+                ),
+              ),
+            );
+						*/
+          } catch (err) {
+            throw new BadRequestException(err);
+          }
           break;
         }
       }

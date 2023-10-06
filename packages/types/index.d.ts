@@ -63,6 +63,11 @@ interface SetVideoLayoutAction extends RoomAction {
   layout: VideoLayout;
 }
 
+interface UploadPresetsAction extends RoomAction {
+  type: "upload-presets";
+  roomState: XimiRoomState;
+}
+
 interface SetScoutTextAction extends RoomAction {
   type: "set-scout-text";
   forParticipant: string[];
@@ -119,6 +124,7 @@ export {
   SetVideoLayoutAction,
   SetAudioDelayAction,
   SetScoutTextAction,
+  UploadPresetsAction,
   XimiRoomState,
   XimiParticipantState,
   MessageDataPayload,

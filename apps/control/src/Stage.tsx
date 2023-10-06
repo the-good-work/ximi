@@ -13,7 +13,11 @@ import {
   FaVolumeHigh,
   FaVolumeXmark,
 } from "react-icons/fa6";
-import { SwitchActivePresetAction, XimiRoomState } from "types";
+import {
+  SwitchActivePresetAction,
+  UploadPresetsAction,
+  XimiRoomState,
+} from "types";
 import { PresetRenamer } from "./PresetRenamer";
 import { AudioLayout } from "./AudioLayout";
 import { AudioRenderer, ChatControl } from "ui/tailwind";
@@ -21,6 +25,7 @@ import { toast } from "react-hot-toast";
 import { VideoLayout } from "./VideoLayout";
 import { ScoutText } from "./ScoutText";
 import { ScoutVideos } from "./ScoutVideos";
+import { format } from "date-fns";
 
 const ARR_12 = new Array(12).fill(0);
 
@@ -161,13 +166,114 @@ const Stage = () => {
               );
             })}
           </nav>
-          <button type="button" className={clsSmallSidebarButton}>
+          <button
+            type="button"
+            className={clsSmallSidebarButton}
+            onClick={() => {
+              const roomStateJson = JSON.stringify(roomState);
+              const timestamp = format(new Date(), "yyyy-MM-dd HHmmss");
+
+              const fileName = `${meta.name}-${timestamp}.json`;
+              const fileContent = roomStateJson;
+              const _file = new Blob([fileContent], {
+                type: "application/json",
+              });
+
+              window.URL = window.URL || window.webkitURL;
+              const dlBtn = document.createElement("a");
+
+              dlBtn.setAttribute("href", window.URL.createObjectURL(_file));
+              dlBtn.setAttribute("download", fileName);
+              dlBtn.click();
+
+              toast(`Downloaded preset as ${meta.name}-${timestamp}.json`, {
+                position: "bottom-right",
+                className: "bg-brand/80 text-text rounded-none",
+              });
+            }}
+          >
             <FaDownload size={16} />
           </button>
 
-          <button type="button" className={clsSmallSidebarButton}>
+          <button
+            type="button"
+            className={clsSmallSidebarButton}
+            onClick={() => {
+              const fileInput = document.getElementById("preset-upload");
+              if (!fileInput) {
+                return;
+              }
+              fileInput.click();
+            }}
+          >
             <FaUpload size={16} />
           </button>
+
+          <input
+            type="file"
+            id="preset-upload"
+            className="hidden"
+            multiple={false}
+            accept="application/json"
+            max={1}
+            onChange={async (e) => {
+              const firstFile = e.target.files?.[0];
+              if (firstFile === undefined) {
+                return;
+              }
+
+              try {
+                const text = await firstFile.text();
+                const preset = JSON.parse(text) as XimiRoomState;
+
+                // naive sanity check
+                if (
+                  !(
+                    typeof preset?.activePreset === "number" &&
+                    typeof preset?.passcode === "string" &&
+                    Array.isArray(preset?.presets) &&
+                    preset?.presets?.length === 12
+                  )
+                ) {
+                  throw Error(
+                    "Preset file is possibly damaged. It does not pass the sanity check. ",
+                  );
+                }
+
+                const payload: UploadPresetsAction = {
+                  type: "upload-presets",
+                  roomName: meta.name,
+                  roomState: preset,
+                };
+
+                const r = await fetch(
+                  `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
+                  {
+                    method: "PATCH",
+                    body: JSON.stringify(payload),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  },
+                );
+
+                console.log({ r });
+
+                toast("Preset loaded", {
+                  position: "bottom-right",
+                  className: "bg-brand/80 text-text rounded-none",
+                });
+                e.target.value = "";
+              } catch (err) {
+                console.log(err);
+                toast("Could not load preset from file", {
+                  position: "bottom-right",
+                  className: "bg-brand/80 text-text rounded-none",
+                });
+                e.target.value = "";
+              }
+            }}
+          />
         </div>
         <div className="flex flex-col pb-4 gap-2">
           <ChatControl />

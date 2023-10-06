@@ -101,21 +101,6 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
   const p = useRemoteParticipant(identity);
   const participants = useRemoteParticipants();
   const { name: roomName } = useRoomInfo();
-  const filteredParticipants = participants
-    .filter((p) => {
-      try {
-        if (p.metadata === undefined) {
-          return false;
-        }
-        const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
-        return pMeta.role === "PERFORMER";
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
-    })
-
-    .sort((a, b) => (a.identity < b.identity ? -1 : 1));
 
   const filteredParticipantsWithScouts = participants
     .filter((p) => {
@@ -202,14 +187,14 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                 gridTemplateRows: `repeat(${numAutoRows}, minmax(0,1fr))`,
               }}
             >
-              {filteredParticipantsWithScouts.map((p) => {
+              {filteredParticipantsWithScouts.map((p, n) => {
                 try {
                   const pMeta = JSON.parse(
                     p.metadata || "",
                   ) as XimiParticipantState;
                   return (
                     <div
-                      key={p.identity}
+                      key={`slot_${n}_${p.identity}`}
                       className="relative border border-disabled"
                     >
                       <VideoFrame identity={p.identity} full={true} />
@@ -256,7 +241,6 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                         : (JSON.parse(
                             thisSlotParticipant.metadata || "",
                           ) as XimiParticipantState);
-                    console.log({ slotMeta });
                     return (
                       <div
                         key={`slot_${slotNum}_${slot.identity}`}

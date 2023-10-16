@@ -12,7 +12,7 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
   const filteredParticipants = participants
     .filter((p) => {
       try {
-        const pState: XimiParticipantState = JSON.parse(p.metadata);
+        const pState: XimiParticipantState = JSON.parse(p.metadata || "");
         return pState.role === "PERFORMER" || pState.role === "SCOUT";
       } catch (err) {
         return false;
@@ -27,8 +27,11 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
   );
 
   try {
+    if (thisParticipant === undefined) {
+      throw Error("Did not find participant");
+    }
     const thisParticipantState = JSON.parse(
-      thisParticipant.metadata,
+      thisParticipant.metadata || "",
     ) as XimiParticipantState;
     const videoState = thisParticipantState.video;
 
@@ -46,7 +49,9 @@ export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
         >
           {filteredParticipants.map((p) => {
             try {
-              const pMeta = JSON.parse(p.metadata) as XimiParticipantState;
+              const pMeta = JSON.parse(
+                p.metadata || "",
+              ) as XimiParticipantState;
 
               return (
                 <div

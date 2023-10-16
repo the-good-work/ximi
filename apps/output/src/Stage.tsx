@@ -1,11 +1,9 @@
-import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
-import { DataPacket_Kind, RoomEvent } from "livekit-client";
+import { useLocalParticipant } from "@livekit/components-react";
 import { useEffect, useState } from "react";
-import { MessageDataPayload, XimiParticipantState } from "types";
+import { XimiParticipantState } from "types";
 import {
   AudioInputControl,
   AudioRenderer,
-  VideoRenderer,
   CameraControl,
   ChatControl,
   ScreencastControl,
@@ -14,7 +12,6 @@ import {
 
 const Stage = () => {
   const { localParticipant } = useLocalParticipant();
-  const room = useRoomContext();
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -78,7 +75,7 @@ const ScoutVisual = () => {
             {localParticipant.videoTracks.size < 1 ? (
               <div>Video off</div>
             ) : (
-              <VideoFrame identity={localParticipant.identity} />
+              <VideoFrame identity={localParticipant.identity} full={true} />
             )}
           </div>
         )}

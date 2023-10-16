@@ -30,12 +30,12 @@ const CameraControl = () => {
   const { localParticipant } = useLocalParticipant();
   const hasTrack =
     Array.from(localParticipant.videoTracks).filter(
-      ([, track]) => track.videoTrack.source === Track.Source.Camera,
+      ([, track]) => track.videoTrack?.source === Track.Source.Camera,
     ).length > 0;
 
   const hasScreenshareTrack =
     Array.from(localParticipant.videoTracks).filter(
-      ([, track]) => track.videoTrack.source === Track.Source.ScreenShare,
+      ([, track]) => track.videoTrack?.source === Track.Source.ScreenShare,
     ).length > 0;
   const [showHint, setShowHint] = useState(false);
   const [mode, setMode] = useState<"HIGH" | "LOW">("HIGH");
@@ -56,7 +56,7 @@ const CameraControl = () => {
             });
           } else {
             const newTrack = await createLocalVideoTrack({
-              deviceId: selectedDevice.deviceId,
+              deviceId: selectedDevice?.deviceId,
               resolution: mode === "HIGH" ? undefined : VideoPresets.h360,
             });
             await localParticipant.publishTrack(newTrack, { simulcast: true });

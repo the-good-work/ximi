@@ -2,14 +2,7 @@ import { useRemoteParticipant, VideoTrack } from "@livekit/components-react";
 import * as classNames from "classnames";
 import { VideoQuality } from "livekit-client";
 import { useEffect, useState } from "react";
-import {
-  FaDiceFour,
-  FaDiceOne,
-  FaDiceSix,
-  FaRegSquare,
-  FaTableCells,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
+import { FaRegSquare, FaTableCells, FaTableCellsLarge } from "react-icons/fa6";
 
 export const VideoFrame: React.FC<{
   identity: string;
@@ -51,7 +44,9 @@ export const VideoFrame: React.FC<{
     return null;
   }
 
-  return (
+  return firstVid === undefined ? (
+    <></>
+  ) : (
     <div className="relative w-full h-full cursor-pointer">
       <VideoTrack
         participant={p}

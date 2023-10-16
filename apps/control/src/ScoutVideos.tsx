@@ -1,20 +1,8 @@
-import {
-  useRemoteParticipant,
-  useRemoteParticipants,
-} from "@livekit/components-react";
-import { useState } from "react";
+import { useRemoteParticipants } from "@livekit/components-react";
 import { XimiParticipantState } from "types";
 import * as classNames from "classnames";
 import { VideoFrame } from "ui/tailwind";
 import { FaBinoculars } from "react-icons/fa6";
-
-const clsSidebarBtn = (active: boolean) =>
-  classNames(
-    "px-2 py-1 cursor-pointer text-sm",
-    active
-      ? "bg-brand hover:bg-brand/75"
-      : "bg-[transparent] hover:bg-brand/50",
-  );
 
 const ScoutVideos = () => {
   const participants = useRemoteParticipants();

@@ -22,7 +22,7 @@ const AudioRenderer: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
   const filteredParticipants = remoteParticipants
     .map((p) => {
       try {
-        const pState: XimiParticipantState = JSON.parse(p.metadata);
+        const pState: XimiParticipantState = JSON.parse(p.metadata || "");
         return { participant: p, role: pState.role };
       } catch (err) {
         return { participant: p };
@@ -73,7 +73,7 @@ const AudioRenderer: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
         <div
           className={classNames(
             "flex flex-col gap-1",
-            setShowLayout ? "block" : "hidden",
+            showLayout ? "block" : "hidden",
           )}
         >
           {filteredParticipants.map((p) => {

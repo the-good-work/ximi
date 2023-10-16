@@ -1,13 +1,7 @@
 import { useLocalParticipant } from "@livekit/components-react";
 import * as classNames from "classnames";
-import {
-  createLocalScreenTracks,
-  createLocalVideoTrack,
-  Track,
-  VideoPresets,
-} from "livekit-client";
-import { useState } from "react";
-import { FaH, FaL, FaTabletScreenButton, FaTv, FaVideo } from "react-icons/fa6";
+import { createLocalScreenTracks, Track } from "livekit-client";
+import { FaTv } from "react-icons/fa6";
 
 const clsControlBtn = (active: boolean, disabled: boolean) =>
   classNames(
@@ -28,11 +22,11 @@ const ScreencastControl = () => {
 
   const hasTrack =
     Array.from(localParticipant.videoTracks).filter(
-      ([, track]) => track.videoTrack.source === Track.Source.ScreenShare,
+      ([, track]) => track.videoTrack?.source === Track.Source.ScreenShare,
     ).length > 0;
   const hasCameraTrack =
     Array.from(localParticipant.videoTracks).filter(
-      ([, track]) => track.videoTrack.source === Track.Source.Camera,
+      ([, track]) => track.videoTrack?.source === Track.Source.Camera,
     ).length > 0;
 
   return (
@@ -49,12 +43,11 @@ const ScreencastControl = () => {
             });
           } else {
             const newTracks = await createLocalScreenTracks({ audio: false });
-            if (
-              newTracks.filter((t) => t.kind === Track.Kind.Video).length > 0
-            ) {
-              await localParticipant.publishTrack(
-                newTracks.find((t) => t.kind === Track.Kind.Video),
-              );
+            const trackToPublish = newTracks.find(
+              (t) => t.kind === Track.Kind.Video,
+            );
+            if (trackToPublish !== undefined) {
+              await localParticipant.publishTrack(trackToPublish);
             }
           }
         }}

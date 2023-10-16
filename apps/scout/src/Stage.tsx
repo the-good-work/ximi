@@ -10,7 +10,6 @@ import {
 import {
   AudioInputControl,
   AudioRenderer,
-  VideoRenderer,
   CameraControl,
   ChatControl,
   ScreencastControl,

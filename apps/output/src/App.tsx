@@ -1,8 +1,5 @@
 import {
   LiveKitRoom,
-  useRemoteParticipant,
-  AudioTrack,
-  StartAudio,
   useStartAudio,
   useRoomContext,
   useParticipants,
@@ -13,7 +10,7 @@ import * as qs from "qs";
 import ShortUniqueId from "short-unique-id";
 import { FaPlay } from "react-icons/fa6";
 import { XimiParticipantState } from "types";
-import { ParticipantEvent } from "livekit-client";
+import { RemoteParticipant } from "livekit-client";
 
 const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
 
@@ -27,7 +24,7 @@ function App() {
   });
 
   const rand = useMemo(() => uid.rnd(6), []);
-  const [identity, setIdentity] = useState<string>(`OUT${rand}`);
+  const [identity] = useState<string>(`OUT${rand}`);
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
@@ -72,7 +69,9 @@ export default App;
 
 const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
   const participants = useParticipants();
-  const participant = participants.find((p) => p.identity === target);
+  const participant = participants.find(
+    (p) => p.identity === target,
+  ) as RemoteParticipant;
   const room = useRoomContext();
   const { canPlayAudio, mergedProps } = useStartAudio({
     room,
@@ -87,10 +86,7 @@ const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
   const videoOn = mode === "1" || mode === "2";
   const audioOn = mode === "0" || mode === "2";
 
-  console.log("bb", participant?.metadata);
-
   useEffect(() => {
-    console.log("a");
     if (participant?.metadata === undefined) {
       return;
     }
@@ -100,7 +96,6 @@ const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
         participant.metadata || "",
       ) as XimiParticipantState;
       if (typeof pState.audio.delay === "number") {
-        console.log("b", pState);
         if (delayNode.current !== undefined) {
           delayNode.current.delayTime.value = pState.audio.delay / 1000;
           console.log(`delay set to ${pState.audio.delay}`);

@@ -2,7 +2,6 @@ import { useRoomInfo } from "@livekit/components-react";
 import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { PresetIndex, SetPresetNameAction, XimiRoomState } from "types";
-import * as Yup from "yup";
 
 const renamePreset = async (
   roomName: string,

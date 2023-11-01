@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, Fragment } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRoomContext, useLocalParticipant } from "@livekit/components-react";
 import { MessageDataPayload } from "types";
 import { Field, Formik } from "formik";
@@ -74,10 +74,10 @@ const ChatControl = () => {
 
   return (
     <>
-      <Transition show={showChatModal} as={Fragment}>
+      <Transition show={showChatModal}>
         <Dialog className="relative" onClose={() => setShowChatModal(false)}>
           <Transition.Child
-            as={Fragment}
+            // as={Fragment}
             enter="transition duration-100 ease-out"
             enterFrom="opacity-0"
             enterTo="opacity-1"
@@ -88,7 +88,7 @@ const ChatControl = () => {
             <div className="fixed inset-0 z-10 bg-bg/30">&nbsp;</div>
           </Transition.Child>
           <Transition.Child
-            as={Fragment}
+            // as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
             enterTo="opacity-100 scale-100"

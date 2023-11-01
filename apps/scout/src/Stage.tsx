@@ -126,7 +126,7 @@ const ScoutVisual = () => {
             {localParticipant.videoTracks.size < 1 ? (
               <div>Video off</div>
             ) : (
-              <VideoFrame identity={localParticipant.identity} />
+              <VideoFrame identity={localParticipant.identity} full={true} />
             )}
           </div>
         )}

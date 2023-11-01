@@ -1,12 +1,7 @@
 import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
 import { DataPacket_Kind, RoomEvent } from "livekit-client";
 import { useEffect, useState } from "react";
-import {
-  MessageDataPayload,
-  PingDataPayload,
-  PongDataPayload,
-  XimiParticipantState,
-} from "types";
+import { MessageDataPayload, PingDataPayload, PongDataPayload } from "types";
 import {
   AudioInputControl,
   AudioRenderer,

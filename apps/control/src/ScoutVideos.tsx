@@ -1,6 +1,6 @@
 import { useRemoteParticipants } from "@livekit/components-react";
 import { XimiParticipantState } from "types";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { VideoFrame } from "ui/tailwind";
 import { FaBinoculars } from "react-icons/fa6";
 
@@ -52,7 +52,7 @@ const ScoutVideos = () => {
                   key={p.identity}
                   className="relative border border-disabled"
                 >
-                  <VideoFrame identity={p.identity} />
+                  <VideoFrame identity={p.identity} full={true} />
                   <label
                     className={classNames(
                       "absolute flex items-center py-1 px-2 leading-snug text-sm rounded-sm top-2 left-2 gap-2",

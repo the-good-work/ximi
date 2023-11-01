@@ -77,7 +77,6 @@ const ChatControl = () => {
       <Transition show={showChatModal}>
         <Dialog className="relative" onClose={() => setShowChatModal(false)}>
           <Transition.Child
-            // as={Fragment}
             enter="transition duration-100 ease-out"
             enterFrom="opacity-0"
             enterTo="opacity-1"
@@ -88,7 +87,7 @@ const ChatControl = () => {
             <div className="fixed inset-0 z-10 bg-bg/30">&nbsp;</div>
           </Transition.Child>
           <Transition.Child
-            // as={Fragment}
+            as={"span"}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
             enterTo="opacity-100 scale-100"

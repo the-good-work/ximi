@@ -1,5 +1,5 @@
 import { useParticipants, useRoomInfo } from "@livekit/components-react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import type { LocalParticipant, RemoteParticipant } from "livekit-client";
 import {
   FaBinoculars,
@@ -18,8 +18,8 @@ import {
   UnmuteAudioAction,
   XimiParticipantState,
   XIMIRole,
+  XimiRoomState,
 } from "types";
-import Copy from "react-copy";
 import { toast } from "react-hot-toast";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Pinger } from "./Ping";
@@ -93,6 +93,8 @@ const RemoteParticipantCard: React.FC<{
     if (room.metadata === undefined) {
       throw new Error("no room metadata");
     }
+
+    const roomMeta = JSON.parse(room.metadata) as XimiRoomState;
 
     return (
       <div className="p-2 border text-text box-border">
@@ -177,24 +179,31 @@ const RemoteParticipantCard: React.FC<{
                 <label className="text-xs">Out Link</label>
                 <div className="flex items-center justify-start p-0 gap-1">
                   <CopyButton
-                    copyText={`${
-                      import.meta.env.VITE_XIMI_OUTPUT_HOST
-                    }/specialhash`}
+                    copyText={`${import.meta.env.VITE_XIMI_OUTPUT_HOST}/?room=${
+                      room.name
+                    }&target=${participant.identity}&passcode=${
+                      roomMeta.passcode
+                    }&mode=2`}
                   >
                     <FaVideo /> + <FaVolumeHigh />
                   </CopyButton>
 
                   <CopyButton
-                    copyText={`${
-                      import.meta.env.VITE_XIMI_OUTPUT_HOST
-                    }/specialhash`}
+                    copyText={`${import.meta.env.VITE_XIMI_OUTPUT_HOST}/?room=${
+                      room.name
+                    }&target=${participant.identity}&passcode=${
+                      roomMeta.passcode
+                    }&mode=1`}
                   >
                     <FaVideo /> + <FaVolumeXmark />
                   </CopyButton>
+
                   <CopyButton
-                    copyText={`${
-                      import.meta.env.VITE_XIMI_OUTPUT_HOST
-                    }/specialhash`}
+                    copyText={`${import.meta.env.VITE_XIMI_OUTPUT_HOST}/?room=${
+                      room.name
+                    }&target=${participant.identity}&passcode=${
+                      roomMeta.passcode
+                    }&mode=0`}
                   >
                     <FaVideoSlash /> + <FaVolumeHigh />
                   </CopyButton>
@@ -374,8 +383,15 @@ const CopyButton: React.FC<{ children: ReactNode; copyText: string }> = ({
   copyText,
 }) => {
   const [copied, setCopied] = useState(false);
+  const inputRef = useRef(null);
+
   useEffect(() => {
     if (copied) {
+      toast("Copied link", {
+        position: "bottom-right",
+        className: "bg-brand/80 text-text rounded-none",
+      });
+
       setTimeout(() => {
         setCopied(() => false);
       }, 2000);
@@ -388,23 +404,24 @@ const CopyButton: React.FC<{ children: ReactNode; copyText: string }> = ({
   );
 
   return (
-    <div>
-      <Copy
-        textToBeCopied={copyText}
-        className="overflow-hidden w-0 h-[1px] block"
-        onCopy={() => {
-          toast("Copied link", {
-            position: "bottom-right",
-            className: "bg-brand/80 text-text rounded-none",
-          });
+    <div className="relative overflow-hidden">
+      <input
+        type="text"
+        value={copyText}
+        onChange={() => {}}
+        ref={inputRef}
+        className="absolute bottom-[200%]"
+      />
 
-          setCopied(() => true);
+      <button
+        onClick={async () => {
+          await navigator.clipboard.writeText(copyText);
+          setCopied(true);
         }}
+        className={copyBtnCls}
       >
-        <button className={copyBtnCls}>
-          {copied ? <FaCheck /> : children}
-        </button>
-      </Copy>
+        {copied ? <FaCheck /> : children}
+      </button>
     </div>
   );
 };

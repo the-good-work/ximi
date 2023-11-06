@@ -1,6 +1,6 @@
 import { Popover } from "@headlessui/react";
 import { useLocalParticipant } from "@livekit/components-react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { createLocalVideoTrack, Track, VideoPresets } from "livekit-client";
 import { useState } from "react";
 import { FaCaretDown, FaH, FaL, FaVideo } from "react-icons/fa6";

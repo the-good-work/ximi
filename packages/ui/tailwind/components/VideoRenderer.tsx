@@ -2,7 +2,7 @@ import { useParticipants } from "@livekit/components-react";
 import { FaBinoculars, FaUser } from "react-icons/fa6";
 import { XimiParticipantState } from "types";
 import { VideoFrame } from "./VideoFrame";
-import * as classNames from "classnames";
+import classNames from "classnames";
 
 export const VideoRenderer: React.FC<{ thisPerformerIdentity: string }> = ({
   thisPerformerIdentity,

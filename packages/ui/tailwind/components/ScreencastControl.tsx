@@ -1,5 +1,5 @@
 import { useLocalParticipant } from "@livekit/components-react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { createLocalScreenTracks, Track } from "livekit-client";
 import { FaTv } from "react-icons/fa6";
 

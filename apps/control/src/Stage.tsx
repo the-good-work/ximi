@@ -1,7 +1,7 @@
 import { useLocalParticipant, useRoomInfo } from "@livekit/components-react";
 import { createLocalAudioTrack } from "livekit-client";
 import { useEffect, useState } from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import {
   FaA,
   FaClapperboard,

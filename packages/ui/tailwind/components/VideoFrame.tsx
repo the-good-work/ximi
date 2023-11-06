@@ -1,5 +1,5 @@
 import { useRemoteParticipant, VideoTrack } from "@livekit/components-react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { VideoQuality } from "livekit-client";
 import { useEffect, useState } from "react";
 import { FaRegSquare, FaTableCells, FaTableCellsLarge } from "react-icons/fa6";

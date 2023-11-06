@@ -5,7 +5,7 @@ import {
 } from "@livekit/components-react";
 import { useState } from "react";
 import { SetVideoLayoutAction, XimiParticipantState } from "types";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { FaBinoculars, FaUser } from "react-icons/fa6";
 import { VideoFrame } from "ui/tailwind";
 import { Popover } from "@headlessui/react";

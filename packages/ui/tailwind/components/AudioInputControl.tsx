@@ -1,6 +1,6 @@
 import { Popover } from "@headlessui/react";
 import { useLocalParticipant } from "@livekit/components-react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { createLocalAudioTrack } from "livekit-client";
 import { useState } from "react";
 import {

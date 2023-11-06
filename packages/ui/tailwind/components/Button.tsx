@@ -1,4 +1,4 @@
-import * as classNames from "classnames";
+import classNames from "classnames";
 
 type Size = "2xs" | "xs" | "sm" | "lg" | "xl" | "2xl" | "3xl" | "base";
 

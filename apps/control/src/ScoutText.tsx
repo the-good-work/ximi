@@ -5,7 +5,7 @@ import {
 } from "@livekit/components-react";
 import { useState } from "react";
 import { SetScoutTextAction, XimiParticipantState } from "types";
-import * as classNames from "classnames";
+import classNames from "classnames";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(

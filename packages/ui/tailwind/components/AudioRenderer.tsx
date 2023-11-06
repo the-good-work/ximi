@@ -12,7 +12,7 @@ import {
   FaVolumeXmark,
 } from "react-icons/fa6";
 import { XimiParticipantState } from "types";
-import * as classNames from "classnames";
+import classNames from "classnames";
 
 const AudioRenderer: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
   const remoteParticipants = useRemoteParticipants();

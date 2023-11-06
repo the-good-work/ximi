@@ -8,7 +8,7 @@ import { Transition, Dialog } from "@headlessui/react";
 import * as Yup from "yup";
 import { Button } from "./Button";
 import { FaMessage } from "react-icons/fa6";
-import * as classNames from "classnames";
+import classNames from "classnames";
 
 const clsControlBtn = classNames(
   "flex",

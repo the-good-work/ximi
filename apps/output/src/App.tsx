@@ -126,7 +126,7 @@ const OutputModule = ({ target, mode }: { target: string; mode: string }) => {
       });
     }
 
-    const targetTrack = Array.from(participant.audioTracks)[0][1].track;
+    const targetTrack = Array.from(participant.audioTracks)?.[0]?.[1].track;
 
     if (audioRef.current !== null && targetTrack !== undefined) {
       targetTrack.attach(audioRef.current);

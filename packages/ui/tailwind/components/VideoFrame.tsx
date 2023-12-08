@@ -30,6 +30,7 @@ export const VideoFrame: React.FC<{
       : [];
   const firstVidTrackPub = videoTracks?.[0];
   const [, firstVid] = firstVidTrackPub === undefined ? [,] : firstVidTrackPub;
+  const trackRef: TrackReference;
 
   useEffect(() => {
     if (firstVid === undefined) {
@@ -49,8 +50,13 @@ export const VideoFrame: React.FC<{
   ) : (
     <div className="relative w-full h-full cursor-pointer">
       <VideoTrack
-        participant={p}
-        source={firstVid.source}
+        trackRef={{
+          participant: p,
+          publication: firstVidTrackPub[1],
+          source: firstVid.source,
+        }}
+        // participant={p}
+        // source={firstVid.source}
         onClick={() => {
           setVideoDisplayState((v) =>
             v === 4 ? 1 : ((v + 1) as 1 | 2 | 3 | 4),
@@ -63,7 +69,9 @@ export const VideoFrame: React.FC<{
         )}
       />
       <button
-        className={`absolute top-2 right-2`}
+        className={`absolute top-2 right-2 ${
+          preview === false ? "hidden" : ""
+        }`}
         onClick={() => {
           setQuality((a) =>
             a === VideoQuality.LOW

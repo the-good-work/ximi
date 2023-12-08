@@ -30,7 +30,6 @@ export const VideoFrame: React.FC<{
       : [];
   const firstVidTrackPub = videoTracks?.[0];
   const [, firstVid] = firstVidTrackPub === undefined ? [,] : firstVidTrackPub;
-  const trackRef: TrackReference;
 
   useEffect(() => {
     if (firstVid === undefined) {

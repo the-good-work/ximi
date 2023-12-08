@@ -6,7 +6,7 @@ import {
 } from "@livekit/components-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { VideoFrame } from "ui/tailwind";
-import * as qs from "qs";
+import qs from "qs";
 import ShortUniqueId from "short-unique-id";
 import { FaPlay } from "react-icons/fa6";
 import { XimiParticipantState } from "types";

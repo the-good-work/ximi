@@ -10,7 +10,6 @@ import { Button, RoomList } from "ui/tailwind";
 import { FaSpinner } from "react-icons/fa6";
 import { Header, Layout } from "ui/tailwind";
 import { Dialog, Transition } from "@headlessui/react";
-import useSWRImmutable from "swr";
 import useSWR from "swr";
 import { ErrorMessage, Field, Formik, useFormikContext } from "formik";
 import {
@@ -62,6 +61,11 @@ function App() {
       const req = await fetch(`${server.serverUrl}/livekit-url`);
       const { livekitUrl } = await req.json();
       return livekitUrl;
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
     },
   );
 
@@ -125,7 +129,7 @@ const RoomListScreen: React.FC<{
   setIdentity: Dispatch<SetStateAction<string | undefined>>;
 }> = ({ setToken, setConnect, setRoomname, setIdentity }) => {
   const { server } = useContext(XimiServerContext);
-  const { data, isValidating, error, mutate } = useSWRImmutable(
+  const { data, isValidating, error, mutate } = useSWR(
     `list-rooms-${server.id}`,
     async () => {
       const r = await fetch(`${server.serverUrl}/rooms`);

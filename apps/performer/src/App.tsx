@@ -11,7 +11,6 @@ import { FaSpinner } from "react-icons/fa6";
 import { Header, Layout } from "ui/tailwind";
 import { Dialog, Transition } from "@headlessui/react";
 import useSWR from "swr";
-import useSWRImmutable from "swr";
 import { ErrorMessage, Field, Formik, useFormikContext } from "formik";
 import { joinRoomSchema } from "validation-schema/dist/index.mjs";
 import * as Yup from "yup";
@@ -53,14 +52,21 @@ function App() {
   const [connect, setConnect] = useState<boolean>(false);
   const [server, setServer] = useState<XimiServer>(servers[0]);
 
-  const { data: livekitUrl, isValidating } = useSWRImmutable(
+  const { data: livekitUrl, isValidating } = useSWR(
     `livekitUrl-${server.id}`,
     async () => {
       const req = await fetch(`${server.serverUrl}/livekit-url`);
       const { livekitUrl } = await req.json();
       return livekitUrl;
     },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    },
   );
+
+  console.log({ isValidating, livekitUrl });
 
   return (
     <XimiServerContext.Provider value={{ server, setServer }}>

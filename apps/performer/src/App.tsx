@@ -66,8 +66,6 @@ function App() {
     },
   );
 
-  console.log({ isValidating, livekitUrl });
-
   return (
     <XimiServerContext.Provider value={{ server, setServer }}>
       <LiveKitRoom

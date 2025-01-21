@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaCalendar, FaHouse, FaUser, FaV } from "react-icons/fa6";
 
 const Header: React.FC<{

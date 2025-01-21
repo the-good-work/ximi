@@ -101,6 +101,7 @@ const PresetRenamer = () => {
               );
 
               await renamePreset(
+                server.serverUrl,
                 meta.name,
                 roomState.activePreset,
                 newName || activePresetName,

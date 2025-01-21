@@ -20,7 +20,6 @@ const servers: XimiServer[] = [
   },
 ];
 
-// @ts-expect-error -- vite env
 if (import.meta.env.DEV) {
   servers.splice(0, 0, {
     name: "localhost",

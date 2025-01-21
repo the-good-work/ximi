@@ -41,6 +41,11 @@ config();
 export class AppController {
   constructor(private livekit: LivekitService) {}
 
+  @Get('livekit-url')
+  async returnLivekitServerUrl(): Promise<{ livekitUrl: string }> {
+    return { livekitUrl: process.env.LIVEKIT_HOST };
+  }
+
   @Get('room/:roomName/exists')
   async getRoomExists(
     @Param() { roomName }: { roomName: string },

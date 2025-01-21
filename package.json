@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "livekit": "pnpm --filter server dev:livekit",
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
@@ -27,7 +28,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "packageManager": "npm@8.5.5",
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.0.1",
     "@stitches/react": "^1.2.8",

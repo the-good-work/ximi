@@ -21,8 +21,9 @@ import {
   XimiRoomState,
 } from "types";
 import { toast } from "react-hot-toast";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { Pinger } from "./Ping";
+import { XimiServerContext } from "./ximiServerContext";
 
 type ParticipantWithMeta = {
   participant: LocalParticipant | RemoteParticipant;
@@ -88,6 +89,8 @@ const RemoteParticipantCard: React.FC<{
   participants: ParticipantWithMeta[];
 }> = ({ participant, participants, meta }) => {
   const room = useRoomInfo();
+
+  const { server } = useContext(XimiServerContext);
 
   try {
     if (room.metadata === undefined) {
@@ -157,16 +160,13 @@ const RemoteParticipantCard: React.FC<{
                       channel: p.participant.identity,
                       forParticipant: participant.identity,
                     };
-                    const r = await fetch(
-                      `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                      {
-                        method: "PATCH",
-                        body: JSON.stringify(patch),
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
+                    const r = await fetch(`${server.serverUrl}/room/state`, {
+                      method: "PATCH",
+                      body: JSON.stringify(patch),
+                      headers: {
+                        "Content-Type": "application/json",
                       },
-                    );
+                    });
                     return await r.json();
                   }}
                 />
@@ -222,16 +222,13 @@ const RemoteParticipantCard: React.FC<{
                       delay: n,
                     };
 
-                    const r = await fetch(
-                      `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                      {
-                        method: "PATCH",
-                        body: JSON.stringify(patch),
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
+                    const r = await fetch(`${server.serverUrl}/room/state`, {
+                      method: "PATCH",
+                      body: JSON.stringify(patch),
+                      headers: {
+                        "Content-Type": "application/json",
                       },
-                    );
+                    });
 
                     const res = await r.json();
 
@@ -263,6 +260,7 @@ const LocalParticipantCard: React.FC<{
   participants: ParticipantWithMeta[];
 }> = ({ participant, participants, meta }) => {
   const room = useRoomInfo();
+  const { server } = useContext(XimiServerContext);
 
   try {
     if (room.metadata === undefined) {
@@ -328,16 +326,13 @@ const LocalParticipantCard: React.FC<{
                         channel: p.participant.identity,
                         forParticipant: participant.identity,
                       };
-                      const r = await fetch(
-                        `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                        {
-                          method: "PATCH",
-                          body: JSON.stringify(patch),
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
+                      const r = await fetch(`${server.serverUrl}/room/state`, {
+                        method: "PATCH",
+                        body: JSON.stringify(patch),
+                        headers: {
+                          "Content-Type": "application/json",
                         },
-                      );
+                      });
                       return await r.json();
                     }}
                   />

@@ -1,5 +1,11 @@
 import { LiveKitRoom } from "@livekit/components-react";
-import { useState, Dispatch, SetStateAction, useEffect } from "react";
+import {
+  useState,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useContext,
+} from "react";
 import { Button, RoomList } from "ui/tailwind";
 import { FaSpinner } from "react-icons/fa6";
 import { Header, Layout } from "ui/tailwind";
@@ -12,30 +18,66 @@ import { Fragment } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { Stage } from "./Stage";
 import { joinRoomSchemaForRoom } from "validation-schema";
+import { XimiServerContext } from "./ximiServerContext";
+import { XimiServer, servers } from "../../../lib/ximiServers";
 
-const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
+function ServerSwitcher({ enabled }: { enabled: boolean }) {
+  const { server, setServer } = useContext(XimiServerContext);
+  return (
+    <select
+      disabled={!enabled}
+      value={server.id}
+      className="py-0.5 px-1 border rounded bg-bg text-text border-brand"
+      onChange={(e) => {
+        const newVal = servers.find((a) => a.id === e.target.value);
+        if (newVal === undefined) {
+          return;
+        }
+        setServer(newVal);
+      }}
+    >
+      {servers.map((server) => (
+        <option key={server.id} value={server.id}>
+          {server.name}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 function App() {
   const [roomname, setRoomname] = useState<string>();
   const [identity, setIdentity] = useState<string>();
   const [token, setToken] = useState<string>();
   const [connect, setConnect] = useState<boolean>(false);
+  const [server, setServer] = useState<XimiServer>(servers[0]);
+
+  const { data: livekitUrl, isValidating } = useSWR(
+    `livekitUrl-${server.id}`,
+    async () => {
+      const req = await fetch(`${server.serverUrl}/livekit-url`);
+      const { livekitUrl } = await req.json();
+      return livekitUrl;
+    },
+  );
 
   return (
-    <LiveKitRoom
-      token={token}
-      serverUrl={import.meta.env.VITE_XIMI_LIVEKIT_HOST}
-      connect={connect}
-    >
-      <Screen
-        room={roomname}
-        identity={identity}
-        setToken={setToken}
-        setConnect={setConnect}
-        setRoomname={setRoomname}
-        setIdentity={setIdentity}
-      />
-    </LiveKitRoom>
+    <XimiServerContext.Provider value={{ server, setServer }}>
+      <LiveKitRoom
+        token={token}
+        serverUrl={livekitUrl}
+        connect={connect && !isValidating && typeof livekitUrl === "string"}
+      >
+        <Screen
+          room={roomname}
+          identity={identity}
+          setToken={setToken}
+          setConnect={setConnect}
+          setRoomname={setRoomname}
+          setIdentity={setIdentity}
+        />
+      </LiveKitRoom>
+    </XimiServerContext.Provider>
   );
 }
 
@@ -51,7 +93,12 @@ const Screen: React.FC<{
 }> = ({ identity, room, setToken, setConnect, setRoomname, setIdentity }) => {
   return (
     <Layout>
-      <Header roomName={room} version={__APP_VERSION__} identity={identity} />
+      <Header
+        roomName={room}
+        version={__APP_VERSION__}
+        identity={identity}
+        ServerSwitcher={<ServerSwitcher enabled={room === undefined} />}
+      />
       {room === undefined || identity === undefined ? (
         <RoomListScreen
           setToken={setToken}
@@ -73,10 +120,11 @@ const RoomListScreen: React.FC<{
   setRoomname: Dispatch<SetStateAction<string | undefined>>;
   setIdentity: Dispatch<SetStateAction<string | undefined>>;
 }> = ({ setToken, setConnect, setRoomname, setIdentity }) => {
+  const { server } = useContext(XimiServerContext);
   const { data, isValidating, error } = useSWR(
-    "list-rooms",
+    `list-rooms-${server.id}`,
     async () => {
-      const r = await fetch(`${SERVER_HOST}/rooms`);
+      const r = await fetch(`${server.serverUrl}/rooms`);
       return await r.json();
     },
     {
@@ -164,7 +212,7 @@ const RoomListScreen: React.FC<{
 
               <Formik<Yup.InferType<ReturnType<typeof joinRoomSchemaForRoom>>>
                 validationSchema={joinRoomSchemaForRoom(
-                  SERVER_HOST,
+                  server.serverUrl,
                   joiningRoom,
                 )}
                 initialValues={{
@@ -181,7 +229,7 @@ const RoomListScreen: React.FC<{
                   try {
                     // first, get a token
                     const response = await fetch(
-                      `${SERVER_HOST}/room/token/performer`,
+                      `${server.serverUrl}/room/token/performer`,
                       {
                         method: "POST",
                         body: JSON.stringify({

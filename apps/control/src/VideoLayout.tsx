@@ -3,12 +3,13 @@ import {
   useRemoteParticipants,
   useRoomInfo,
 } from "@livekit/components-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SetVideoLayoutAction, XimiParticipantState } from "types";
 import classNames from "classnames";
 import { FaBinoculars, FaUser } from "react-icons/fa6";
 import { VideoFrame } from "ui/tailwind";
 import { Popover } from "@headlessui/react";
+import { XimiServerContext } from "./ximiServerContext";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(
@@ -101,6 +102,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
   const p = useRemoteParticipant(identity);
   const participants = useRemoteParticipants();
   const { name: roomName } = useRoomInfo();
+  const { server } = useContext(XimiServerContext);
 
   const filteredParticipantsWithScouts = participants
     .filter((p) => {
@@ -160,16 +162,13 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                   },
                 };
 
-                const r = await fetch(
-                  `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                  {
-                    method: "PATCH",
-                    body: JSON.stringify(patch),
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
+                const r = await fetch(`${server.serverUrl}/room/state`, {
+                  method: "PATCH",
+                  body: JSON.stringify(patch),
+                  headers: {
+                    "Content-Type": "application/json",
                   },
-                );
+                });
                 return await r.json();
               }}
             >
@@ -292,9 +291,7 @@ const LayoutEditor: React.FC<{ identity: string }> = ({ identity }) => {
                                   };
 
                                   const r = await fetch(
-                                    `${
-                                      import.meta.env.VITE_XIMI_SERVER_HOST
-                                    }/room/state`,
+                                    `${server.serverUrl}/room/state`,
                                     {
                                       method: "PATCH",
                                       body: JSON.stringify(patch),

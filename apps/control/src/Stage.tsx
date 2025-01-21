@@ -1,6 +1,6 @@
 import { useLocalParticipant, useRoomInfo } from "@livekit/components-react";
 import { createLocalAudioTrack } from "livekit-client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import classNames from "classnames";
 import {
   FaA,
@@ -26,12 +26,14 @@ import { VideoLayout } from "./VideoLayout";
 import { ScoutText } from "./ScoutText";
 import { ScoutVideos } from "./ScoutVideos";
 import { format } from "date-fns";
+import { XimiServerContext } from "./ximiServerContext";
 
 const ARR_12 = new Array(12).fill(0);
 
 type LayoutType = "AUDIO" | "VIDEO" | "SCOUT VIDEO" | "SCOUT TEXT";
 
 const setActivePreset = async (
+  serverUrl: string,
   roomName: string,
   n: SwitchActivePresetAction["activePreset"],
 ) => {
@@ -40,7 +42,7 @@ const setActivePreset = async (
     activePreset: n,
     roomName,
   };
-  const r = await fetch(`${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`, {
+  const r = await fetch(`${serverUrl}/room/state`, {
     method: "PATCH",
     body: JSON.stringify(patch),
     headers: {
@@ -64,6 +66,7 @@ const Stage = () => {
   const [roomState, setRoomState] = useState<XimiRoomState | undefined>();
   const [tab, setTab] = useState<LayoutType>("AUDIO");
   const activePreset = roomState?.activePreset || 0;
+  const { server } = useContext(XimiServerContext);
 
   useEffect(() => {
     try {
@@ -134,6 +137,7 @@ const Stage = () => {
                   type="button"
                   onClick={async () => {
                     const response = await setActivePreset(
+                      server.serverUrl,
                       meta.name,
                       n as SwitchActivePresetAction["activePreset"],
                     );
@@ -246,16 +250,13 @@ const Stage = () => {
                   roomState: preset,
                 };
 
-                const r = await fetch(
-                  `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                  {
-                    method: "PATCH",
-                    body: JSON.stringify(payload),
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
+                const r = await fetch(`${server.serverUrl}/room/state`, {
+                  method: "PATCH",
+                  body: JSON.stringify(payload),
+                  headers: {
+                    "Content-Type": "application/json",
                   },
-                );
+                });
 
                 console.log({ r });
 

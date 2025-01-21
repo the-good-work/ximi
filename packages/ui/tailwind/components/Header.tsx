@@ -1,12 +1,13 @@
 import { format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { FaCalendar, FaHouse, FaUser, FaV } from "react-icons/fa6";
 
 const Header: React.FC<{
   roomName?: string;
   identity?: string;
   version: string;
-}> = ({ roomName = "-", identity = "-", version }) => {
+  ServerSwitcher?: React.ReactNode;
+}> = ({ roomName = "-", identity = "-", version, ServerSwitcher }) => {
   const [date, setDate] = useState(new Date());
 
   const updateTime = useCallback(() => {
@@ -31,6 +32,9 @@ const Header: React.FC<{
         <li>
           <img src="/ximi-icon.png" className="w-6 h-6" />
         </li>
+
+        {ServerSwitcher !== undefined && <li>{ServerSwitcher}</li>}
+
         <li>
           <FaHouse /> {roomName}
         </li>

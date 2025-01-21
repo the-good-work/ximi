@@ -3,9 +3,10 @@ import {
   useRemoteParticipants,
   useRoomInfo,
 } from "@livekit/components-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SetScoutTextAction, XimiParticipantState } from "types";
 import classNames from "classnames";
+import { XimiServerContext } from "./ximiServerContext";
 
 const clsSidebarBtn = (active: boolean) =>
   classNames(
@@ -80,6 +81,7 @@ const TextPosterEditor = ({ identity }: { identity: string }) => {
   const p = useRemoteParticipant(identity);
   const [text, setText] = useState("");
   const { name: roomName } = useRoomInfo();
+  const { server } = useContext(XimiServerContext);
 
   const remoteParticipants = useRemoteParticipants();
 
@@ -132,16 +134,13 @@ const TextPosterEditor = ({ identity }: { identity: string }) => {
                     roomName,
                   };
 
-                  const r = await fetch(
-                    `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                    {
-                      method: "PATCH",
-                      body: JSON.stringify(patch),
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
+                  const r = await fetch(`${server.serverUrl}/room/state`, {
+                    method: "PATCH",
+                    body: JSON.stringify(patch),
+                    headers: {
+                      "Content-Type": "application/json",
                     },
-                  );
+                  });
 
                   setText(() => "");
 
@@ -160,16 +159,13 @@ const TextPosterEditor = ({ identity }: { identity: string }) => {
                     roomName,
                   };
 
-                  const r = await fetch(
-                    `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-                    {
-                      method: "PATCH",
-                      body: JSON.stringify(patch),
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
+                  const r = await fetch(`${server.serverUrl}/room/state`, {
+                    method: "PATCH",
+                    body: JSON.stringify(patch),
+                    headers: {
+                      "Content-Type": "application/json",
                     },
-                  );
+                  });
 
                   setText(() => "");
 

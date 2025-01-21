@@ -1,9 +1,11 @@
 import { useRoomInfo } from "@livekit/components-react";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { PresetIndex, SetPresetNameAction, XimiRoomState } from "types";
+import { XimiServerContext } from "./ximiServerContext";
 
 const renamePreset = async (
+  serverUrl: string,
   roomName: string,
   n: PresetIndex,
   newName: string,
@@ -14,16 +16,13 @@ const renamePreset = async (
     name: newName,
     roomName: roomName,
   };
-  const req = await fetch(
-    `${import.meta.env.VITE_XIMI_SERVER_HOST}/room/state`,
-    {
-      method: "PATCH",
-      body: JSON.stringify(patch),
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const req = await fetch(`${serverUrl}/room/state`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
   const data = await req.json();
   return data;
 };
@@ -37,6 +36,8 @@ const PresetRenamer = () => {
   const [editing, setEditing] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const newNameInputRef = useRef<HTMLInputElement>(null);
+
+  const { server } = useContext(XimiServerContext);
 
   // const setNewName = useCallback(async() =>, []);
 
@@ -78,6 +79,7 @@ const PresetRenamer = () => {
             );
 
             const result = await renamePreset(
+              server.serverUrl,
               meta.name,
               roomState.activePreset,
               newName || activePresetName,

@@ -7,28 +7,44 @@ import {
 import { useState, useEffect, useMemo, useRef } from "react";
 import { VideoFrame } from "ui/tailwind";
 import qs from "qs";
+import useSWR from "swr";
 import ShortUniqueId from "short-unique-id";
 import { FaPlay } from "react-icons/fa6";
 import { XimiParticipantState } from "types";
 import { RemoteParticipant } from "livekit-client";
-
-const SERVER_HOST = import.meta.env.VITE_XIMI_SERVER_HOST || "";
 
 const uid = new ShortUniqueId({
   dictionary: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
 });
 
 function App() {
-  const { room, passcode, target, mode } = qs.parse(window.location.search, {
-    ignoreQueryPrefix: true,
-  });
+  const { server, room, passcode, target, mode } = qs.parse(
+    window.location.search,
+    {
+      ignoreQueryPrefix: true,
+    },
+  );
+
+  const { data: livekitUrl, isValidating } = useSWR(
+    `livekitUrl-${server}`,
+    async () => {
+      const req = await fetch(`${server}/livekit-url`);
+      const { livekitUrl } = await req.json();
+      return livekitUrl;
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    },
+  );
 
   const rand = useMemo(() => uid.rnd(6), []);
   const [identity] = useState<string>(`OUT${rand}`);
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
-    fetch(`${SERVER_HOST}/room/token/output`, {
+    fetch(`${server}/room/token/output`, {
       method: "POST",
       body: JSON.stringify({
         identity,
@@ -43,7 +59,7 @@ function App() {
         setToken(() => _token.token);
       });
     });
-  }, [room, passcode, target, mode, identity]);
+  }, [room, passcode, target, mode, identity, server]);
 
   if (
     typeof room !== "string" ||
@@ -54,12 +70,12 @@ function App() {
     return <div>URL Invalid</div>;
   }
 
+  if (isValidating) {
+    return <div>Loading</div>;
+  }
+
   return (
-    <LiveKitRoom
-      token={token}
-      serverUrl={import.meta.env.VITE_XIMI_LIVEKIT_HOST}
-      connect={token !== ""}
-    >
+    <LiveKitRoom token={token} serverUrl={livekitUrl} connect={token !== ""}>
       <OutputModule target={target} mode={mode} />
     </LiveKitRoom>
   );

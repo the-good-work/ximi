@@ -183,7 +183,7 @@ const RemoteParticipantCard: React.FC<{
                       room.name
                     }&target=${participant.identity}&passcode=${
                       roomMeta.passcode
-                    }&mode=2`}
+                    }&mode=2&server=${encodeURIComponent(server.serverUrl)}`}
                   >
                     <FaVideo /> + <FaVolumeHigh />
                   </CopyButton>
@@ -193,7 +193,7 @@ const RemoteParticipantCard: React.FC<{
                       room.name
                     }&target=${participant.identity}&passcode=${
                       roomMeta.passcode
-                    }&mode=1`}
+                    }&mode=1&server=${encodeURIComponent(server.serverUrl)}`}
                   >
                     <FaVideo /> + <FaVolumeXmark />
                   </CopyButton>
@@ -203,7 +203,7 @@ const RemoteParticipantCard: React.FC<{
                       room.name
                     }&target=${participant.identity}&passcode=${
                       roomMeta.passcode
-                    }&mode=0`}
+                    }&mode=0&server=${encodeURIComponent(server.serverUrl)}`}
                   >
                     <FaVideoSlash /> + <FaVolumeHigh />
                   </CopyButton>
